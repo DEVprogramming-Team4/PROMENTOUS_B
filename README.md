@@ -1,0 +1,2 @@
+# PROMENTOUS_B
+NODEjS (EXPRESS ) 기반의   API ROUTER   /  MYSQL 쿼리 작업 진행 
