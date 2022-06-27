@@ -1,0 +1,153 @@
+## 주의사항!! 
+ 
+-  mysql 의 team4  db schema 에   dev 라는 user가 등록 되어있어야합니다.
+
+-  create funciton 해서  아래에 있는거 하나 돌려보면 에러가 날텐데   https://myhappyman.tistory.com/154 블로그 참고하면 됩니다. 
+
+ (내 로컬의 mysql 의   log_bin_trust_function_creators 옵션이  ON 상태 여야함. ) 
+
+--------- 2022.06.27 추가 / 김인호 
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_apply_dept_desc`(
+  apply_dept_id int
+ 
+ ) RETURNS varchar(20) CHARSET utf8mb4
+BEGIN
+ DECLARE apply_dept_desc varchar(20);
+ SELECT fn_code_data_desc(t.apply_dept_code)
+	from  apply_dept t
+		where t.apply_dept_id = apply_dept_id
+ into apply_dept_desc;
+RETURN apply_dept_desc;
+END
+
+
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_apply_status`(
+  applicant_id int
+ , project_id int 
+ 
+ ) RETURNS varchar(20) CHARSET utf8mb4
+BEGIN
+ DECLARE apply_status varchar(20);
+ SELECT t.apply_status
+	from  apply_admin t
+		where t.applicant_id = applicant_id
+		and t.project_id = project_id 
+        order by insert_date desc
+        limit 1        
+ into apply_status;
+RETURN apply_status;
+END
+
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_board_likecount`(
+  category varchar(20) 
+ , id int(10) 
+ 
+ ) RETURNS int
+BEGIN
+ DECLARE like_cnt INT(10);
+ SELECT count(t.like_time) 
+	from  like_count t
+		where t.post_category = category
+		and t.post_id = id
+        and t.like_yn ='Y'
+ into like_cnt;
+RETURN like_cnt;
+END
+
+
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_board_viewcnt`(
+  category varchar(20) 
+ , id int(10) 
+ 
+ ) RETURNS int
+BEGIN
+ DECLARE VIEW_CNT INT(10);
+ SELECT count(t.view_time) 
+	from  view_count t
+		where t.post_category = category
+		and t.post_id = id
+ into view_cnt;
+RETURN view_cnt;
+END
+
+
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_code_class`(
+  class_title varchar(20)  
+ ) RETURNS int
+BEGIN
+ DECLARE code_class_id varchar(20);
+ SELECT t.code_class_id
+	from  sb_class_code t
+		where t.code_class_desc = class_title
+ into code_class_id;
+RETURN code_class_id;
+END
+
+
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_code_data_desc`(
+  code_name varchar(20)  
+ ) RETURNS varchar(20) CHARSET utf8mb4
+BEGIN
+ DECLARE code_data_desc varchar(20);
+ SELECT t.code_data_desc
+	from  sb_code_data t
+		where t.code_data_name = code_name
+ into code_data_desc;
+RETURN code_data_desc;
+END
+
+
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_get_curr_mentoringstatus`(
+  param_mentoring_id int 
+ ) RETURNS varchar(30) CHARSET utf8mb3
+BEGIN
+ DECLARE mentoring_status varchar(30);
+ SELECT t.status_code
+	from  mentoring t
+		where t.mentoring_id = param_mentoring_id
+ into mentoring_status;
+RETURN mentoring_status;
+END
+
+
+
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_get_mentorinfo`(
+  param_user_id int 
+ ) RETURNS int
+BEGIN
+ DECLARE mentor_info_id int;
+ SELECT t.mentor_info_id
+	from  mentor_info t
+		where t.user_id = param_user_id
+ into mentor_info_id;
+RETURN mentor_info_id;
+END
+
+
+
+
+
+CREATE DEFINER=`dev`@`%` FUNCTION `fn_get_username`(
+  param_user_id int 
+ ) RETURNS varchar(30) CHARSET utf8mb3
+BEGIN
+ DECLARE user_nickname varchar(30);
+ SELECT t.user_nickname
+	from  user t
+		where t.user_id = param_user_id
+ into user_nickname;
+RETURN user_nickname;
+END
+
+
+
+
+------------  2022.XX.XX 추가 / XXX 
