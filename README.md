@@ -5,8 +5,8 @@ NODEjS (EXPRESS ) 기반의 API ROUTER / MYSQL 쿼리 작업 진행
 #   terminal 명령어
 
 - vue 실행하는 터미널과는 별도의 터미널 열어서 PROMENTOUS_B 폴더로 cd 진입
-- node 진입해서 npm i XXXXX 실행
-- cd ./node
+- server 진입해서 npm i XXXXX 실행
+- cd ./server
 - npm i express
 - npm i dotenv
 - npm i mysql
