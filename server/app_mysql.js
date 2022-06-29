@@ -24,10 +24,12 @@ app.listen(3000, () => {
 /* common       공통sql      */
 /****************************/
 app.get("/api/common/deptList", async (req, res) => {
+  console.log("req==>" + req);
   const codeDataList = await mysql.query("common_deptList"); //  함수정의시 키워드 async에 대응한 await 필수
   res.send(codeDataList);
 });
 app.get("/api/common/stackList", async (req, res) => {
+  console.log("req==>" + req);
   const codeDataList = await mysql.query("common_stackList");
   res.send(codeDataList);
 });
@@ -37,6 +39,7 @@ app.get("/api/common/stackList", async (req, res) => {
 /****************************/
 // projectId 기준 분야별 지원자 / 승인된 자 숫자 가져오기
 app.get("/api/project/applicantsPerDept", async (req, res) => {
+  console.log("req==>" + req);
   const applicantsPerDept = await mysql.query("applicantsPerDept");
   res.send(applicantsPerDept);
 });

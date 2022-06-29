@@ -16,6 +16,8 @@ module.exports = {
   common_deptList: `SELECT * FROM  sb_code_data where code_class_id =1;`,
   common_stackList: `SELECT * FROM sb_code_data where code_class_id =2;`,
   common_mainArea: `SELECT * FROM sb_code_data where code_class_id =3;`,
+  common_subArea: `SELECT * FROM sb_code_data where code_class_id = 4 and upper(attribute1) like ?;`,
+
   applicantsPerDept: ``,
   manage_HeaderSelect: `select 'babo' from dual`,
 };
