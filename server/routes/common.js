@@ -2,30 +2,28 @@ const express = require("express");
 const router = express.Router();
 const mysql = require("../mysql");
 
-router.get(
-  "/mainArea" /*이게 다 app.js의  manageRoute 님 덕분  */,
-  async (req, res) => {
-    const common_mainArea = await mysql.query("common_mainArea");
-    res.send(common_mainArea);
-  }
-);
-router.get(
-  "/subArea" /*이게 다 app.js의  manageRoute 님 덕분  */,
-  async (req, res) => {
-    const common_subArea = await mysql.query("common_mainArea", mainAreaCode);
-    res.send(common_subArea);
-  }
-);
-
 /****************************/
-/* manage  프로젝트관리메뉴  */
+/* common       공통sql      */
 /****************************/
-// 플젝관리화면의 상단에서 , userId 기준으로 하여서 선택가능한 팀들을 가져옴.
-router.get("/babo", async (req, res) => {
-  const applicantsPerDept = await mysql.query("manage_HeaderSelect");
-  res.send(applicantsPerDept);
+router.get("/deptList", async (req, res) => {
+  const deptList = await mysql.query("common_deptList"); //  함수정의시 키워드 async에 대응한 await 필수
+  res.send(deptList);
+});
+router.get("/stackList", async (req, res) => {
+  const stackList = await mysql.query("common_stackList");
+  res.send(stackList);
 });
 
-module.exports = router; // 이게 routes 폴더내의 JS 에서 필수적이다!!
+router.get("/mainArea", async (req, res) => {
+  const common_mainArea = await mysql.query("common_mainArea");
+  res.send(common_mainArea);
+});
+router.get("/subArea/:attribute1", async (req, res) => {
+  const { attribute1 } = req.params;
+  console.log("req.params=================>");
+  console.log(req.params);
+  const common_subArea = await mysql.query("common_subArea", attribute1);
+  res.send(common_subArea);
+});
 
-//const stackList = await mysql.query("common_mainArea");  const stackList = await mysql.query("common_subArea", mainAreaCode);
+module.exports = router; // NECCESARY END STATE
