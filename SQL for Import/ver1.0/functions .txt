@@ -5,13 +5,18 @@
 -  create funciton 해서  아래에 있는거 하나 돌려보면 에러가 날텐데   https://myhappyman.tistory.com/154 블로그 참고하면 됩니다. 
 
  (내 로컬의 mysql 의   log_bin_trust_function_creators 옵션이  ON 상태 여야함. ) 
+ -------------  2022-07-03  
+
+  DUMP 뜰때  FUNCTION 같이 DUMP 되어서  그냥 SQL 파일만 돌리시면 됩니다.  ( SQL for Import ) 
+
+
 
 --------- 2022.06.27 추가 / 김인호 
 
 CREATE DEFINER=`dev`@`%` FUNCTION `fn_apply_dept_desc`(
   apply_dept_id int
  
- ) RETURNS varchar(20) CHARSET utf8mb4
+ ) RETURNS varchar(20) CHARSET utf8mb3
 BEGIN
  DECLARE apply_dept_desc varchar(20);
  SELECT fn_code_data_desc(t.apply_dept_code)

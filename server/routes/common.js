@@ -5,11 +5,11 @@ const mysql = require("../mysql");
 /****************************/
 /* common       공통sql      */
 /****************************/
-app.get("/deptList", async (req, res) => {
+router.get("/deptList", async (req, res) => {
   const deptList = await mysql.query("common_deptList"); //  함수정의시 키워드 async에 대응한 await 필수
   res.send(deptList);
 });
-app.get("/stackList", async (req, res) => {
+router.get("/stackList", async (req, res) => {
   const stackList = await mysql.query("common_stackList");
   res.send(stackList);
 });

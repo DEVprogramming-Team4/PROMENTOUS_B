@@ -42,20 +42,6 @@ app.use("/api/manage", manageRoute); // 이 두줄 set덕분에  routes/manage.j
 app.use("/api/common", commonRoute); // 이 두줄 set덕분에  routes/common.js 에서는 1만 써도 데이터 당겨옴.
 
 /****************************/
-/* common       공통sql      */
-/****************************/
-app.get("/api/common/deptList", async (req, res) => {
-  console.log("req==>" + req);
-  const deptList = await mysql.query("common_deptList"); //  함수정의시 키워드 async에 대응한 await 필수
-  res.send(deptList);
-});
-app.get("/api/common/stackList", async (req, res) => {
-  console.log("req==>" + req);
-  const stackList = await mysql.query("common_stackList");
-  res.send(stackList);
-});
-
-/****************************/
 /* project     프로젝트 메뉴  */
 /****************************/
 // projectId 기준 분야별 지원자 / 승인된 자 숫자 가져오기
