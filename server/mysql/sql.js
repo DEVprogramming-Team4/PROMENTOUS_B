@@ -20,5 +20,6 @@ module.exports = {
 
   applicantsPerDept: ``,
   manage_HeaderSelect: `select 'babo' from dual`,
-  projectRecruitList: `SELECT * FROM project` // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
+  projectRecruitList: `SELECT * FROM project`, // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
+  projectDetail: `SELECT * FROM project where project_id = ?`
 };
