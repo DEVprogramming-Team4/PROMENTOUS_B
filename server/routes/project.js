@@ -34,4 +34,33 @@ router.get("/:projectId", async (req, res) => {
   res.send(projectDetail[0]);
 });
 
+// GET
+// 리더 기본정보
+router.get("/:projectId/leader", async (req, res) => {
+  let projectId = req.params.projectId;
+  const leaderData = await mysql.query("projectLeaderData", [projectId]);
+  res.send(leaderData[0]);
+});
+
+// GET
+// 리더 프로젝트 진행이력
+// TODO: 데이터 추가 후 테스트 필요
+router.get("/:projectId/leaderhistory", async (req, res) => {
+  let projectId = req.params.projectId;
+  // TODO: 질문: leaderProjectHistory 쿼리문 -> leaderHistory 이렇게 짜도 되는지.
+  const leaderHistory = await mysql.query("leaderHistory", [
+    projectId,
+    projectId
+  ]);
+  res.send(leaderHistory);
+});
+
+// GET
+// 프로젝트 참고 링크
+router.get("/:projectId/ref_url", async (req, res) => {
+  let projectId = req.params.projectId;
+  const refUrl = await mysql.query("projectRefUrl", [projectId]);
+  res.send(refUrl);
+});
+
 module.exports = router; // NECCESARY END STATE

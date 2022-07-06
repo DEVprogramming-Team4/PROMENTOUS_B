@@ -21,5 +21,16 @@ module.exports = {
   applicantsPerDept: ``,
   manage_HeaderSelect: `select 'babo' from dual`,
   projectRecruitList: `SELECT * FROM project`, // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
-  projectDetail: `SELECT * FROM project where project_id = ?`
+  projectDetail: `SELECT * FROM project where project_id = ?`,
+  projectLeaderData: `select t.* from user t where t.user_id = ( select t2.leader_user from project t2 where t2.project_id = ? )`,
+  leaderProjectHistory: `select t.* from project t where t.project_id in (
+    select project_id t where apply_admin v1, project v2 where v1.applicant_id = (select leader_user from project where project_id = ? )
+    and v1.apply_status = 'ACC' and v2.status_code ='FIN'
+    union all
+    select v3.project_id from project v3
+    where v3.leader_user = (select leader_user from project where project_id = ? )) order by t.created_datetime
+    desc limit 3`, // 쿼리문 에러나서 밑의 걸로 다시 짬. - (질문하기)
+  leaderHistory: `select * from project where leader_user = ? union
+    select * from project where project_id in (select project_id from apply_admin where (applicant_id = ? and apply_status = 'ACC'))`,
+  projectRefUrl: `select * from ref_url where post_id = ? and post_category='RCB'`
 };
