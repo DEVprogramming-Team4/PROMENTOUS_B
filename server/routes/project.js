@@ -27,4 +27,11 @@ router.delete("/delete", async (req, res) => {
   res.send("/project/recruit/delete 라우트 루트");
 });
 
+// 모집글 상세 GET
+router.get("/:projectId", async (req, res) => {
+  let projectId = req.params.projectId;
+  const projectDetail = await mysql.query("projectDetail", [projectId]);
+  res.send(projectDetail[0]);
+});
+
 module.exports = router; // NECCESARY END STATE
