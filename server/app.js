@@ -40,6 +40,7 @@ const commonRoute = require("./routes/common"); // 공통요소
 const manageRoute = require("./routes/manage"); // 팀개요 관련입니다.
 const projectRoute = require("./routes/project"); // 프로젝트 모집 관련입니다.
 const reviewRoute = require("./routes/review"); // 프로젝트 후기 관련입니다.
+const commentRoute = require("./routes/comment"); // 댓글 관련 API
 
 app.use(cors(corsOptions));
 
@@ -47,6 +48,7 @@ app.use("/common", commonRoute);
 app.use("/manage", manageRoute);
 app.use("/project/recruit", projectRoute);
 app.use("/project/review", reviewRoute);
+app.use("/comment", commentRoute);
 
 /****************************/
 /* common       공통sql      */
