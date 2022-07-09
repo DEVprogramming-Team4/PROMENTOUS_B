@@ -7,7 +7,7 @@
     "dev": "cross-env NODE_ENV=test node app.js",
     "prod": "cross-env NODE_ENV=prod forever start app.js"
   },
-  "author": "Seungwon Go",
+  "author": "PROMENTOUS",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",

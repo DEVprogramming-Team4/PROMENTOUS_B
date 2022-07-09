@@ -1,11 +1,12 @@
 const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
+const _ = require("lodash");
 const app = express();
 const port = 3000; // 서버 포트 번호 (동적설정)
-//console.log(app.get("env"));
-require("dotenv").config({ path: `mysql/.env.${app.get("env")}` });
-//console.log(process.env);
+//require("dotenv").config({ path: `mysql/.env.${app.get("env")}` }); 삭제 처리함 202207
+require("dotenv").config({ path: `mysql/.env` }); //변경 후 소스 -  mysql 의   .env 만 쳐다보게 처리
+
 const mysql = require("./mysql"); // 이폴더의 index.js 자동추적
 
 app.use(
@@ -29,21 +30,21 @@ let sess = {
 app.use(session(sess));
 
 const corsOptions = {
-  origin: "http://localhost:8080", // 허용할 도메인 설정
+  origin: "http://localhost:8080", // 허용할 도메인 설정 CORS
   optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
 
-const manageRoute = require("./routes/manage");
-const commonRoute = require("./routes/common");
+const commonRoute = require("./routes/common"); // 공통요소
+const manageRoute = require("./routes/manage"); // 팀개요 관련입니다.
 const projectRoute = require("./routes/project"); // 프로젝트 모집 관련입니다.
 const reviewRoute = require("./routes/review"); // 프로젝트 후기 관련입니다.
 
 app.use(cors(corsOptions));
 
-app.use("/manage", manageRoute); // 이 두줄 set덕분에  routes/manage.js 에서는 1만 써도 데이터 당겨옴.
-app.use("/common", commonRoute); // 이 두줄 set덕분에  routes/common.js 에서는 1만 써도 데이터 당겨옴.
+app.use("/common", commonRoute);
+app.use("/manage", manageRoute);
 app.use("/project/recruit", projectRoute);
 app.use("/project/review", reviewRoute);
 

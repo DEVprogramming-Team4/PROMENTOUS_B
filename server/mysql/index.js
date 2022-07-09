@@ -1,35 +1,29 @@
 const mysql = require("mysql");
 const sql = require("./sql");
-
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,
   port: process.env.MYSQL_PORT,
   user: process.env.MYSQL_USERNAME,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DB,
-  connectionLimit: process.env.MYSQL_LIMIT,
-});
-console.log(pool);
-const pool2 = mysql.createPool({
-  host: "localhost",
-  port: 3306,
-  user: "dev",
-  password: "!1324qewr",
-  database: "team4",
-  connectionLimit: 10,
+  connectionLimit: process.env.MYSQL_LIMIT
 });
 
 /* 쿼리문을 실행하고 결과를 반환하는 함수 */
 const query = async (alias, values) => {
+  console.log("values:=====================");
+  console.log(values);
+
   return new Promise((resolve, reject) =>
     pool.query(sql[alias], values, (error, results) => {
       if (error) {
         // 에러가 발생
         console.log(error);
-        reject({
-          error,
-        });
-      } else resolve(results); // 쿼리 결과를 전달
+
+        reject({ error });
+      } else {
+        resolve(results);
+      } // 쿼리 결과를 전달
     })
   );
 };
@@ -49,5 +43,5 @@ const getConnection = async () => {
 
 module.exports = {
   query,
-  getConnection,
+  getConnection
 };
