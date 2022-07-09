@@ -1,6 +1,6 @@
 const express = require("express");
-const router = express.Router();
 const mysql = require("../mysql");
+const router = express.Router();
 
 /****************************/
 /* manage  프로젝트관리메뉴  */
@@ -18,6 +18,7 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
 router.get("/getTeamDatas/:project_id", async (req, res) => {
   const { project_id } = req.params;
   const teamDatas = await mysql.query("getTeamDatas", project_id);
+  console.log(teamDatas);
   res.send(teamDatas);
 });
 
@@ -43,15 +44,72 @@ router.get("/getTeamMemberInfo/:project_id", async (req, res) => {
   const teamMemberList = await mysql.query("getTeamMemberInfo", project_id);
   res.send(teamMemberList);
 });
-//현재 팀과 관계된 멘토링(mentoring) 카드리스트를 위한정보 당겨오기
-//getTeamMentoringList
-router.get("/getTeamMentoringInfo/:project_id", async (req, res) => {
-  const { project_id } = req.params;
-  const teamMentoringList = await mysql.query(
-    "getTeamMentoringInfo",
-    project_id
+// 현재 팀 연결된 멘토링카드들 가져옴 ( page 도 받아야함.)
+router.get("/getTeamMentoringList", async (req, res) => {
+  console.log("==============================111111111111111");
+  console.log(req);
+  console.log("==============================222222222222222");
+  console.log(req.body.param);
+  const params = [req.body.param.project_id, req.body.param.mentoring_page];
+  const mentoringList = await mysql.query(
+    "getTeamMentoringList",
+    params //param 가져오기
   );
-  res.send(teamMentoringList);
+  res.send(mentoringList);
+});
+/* param TESt  */
+router.post("/testInsert", async (req, res) => {
+  console.log("==============================111111111111111");
+  console.log(req);
+  console.log("==============================222222222222222");
+  console.log(req.body.param);
+  const params = [req.body.param.c1, req.body.param.c2, req.body.param.c3];
+
+  console.log(
+    "======================================================================================"
+  );
+  console.log(params);
+
+  const testRes = await mysql.query(
+    "testInsert",
+    // req.body.param //param 가져오기 //insert into test (c1, c2, c3) values `c1` = 1, `c2` = 'qq', `c3` = 'ww'
+    req.body.param //insert into test (c1, c2, c3) values 1
+  );
+  res.send(testRes);
+});
+//testMyTeamList
+router.get("/testMyTeamList", async (req, res) => {
+  const mentoringList = await mysql.query(
+    "testMyTeamList"
+    //param 가져오기
+  );
+  res.send(mentoringList);
+});
+
+//testGet
+router.post("/testGet", async (req, res) => {
+  console.log("==============================111111111111111");
+  //console.log(req);
+  console.log("==============================222222222222222");
+  console.log(req.body);
+  console.log("==============================3333333333333");
+  // array = [2, "a"];
+  //console.log(array);
+  console.log(
+    "======================================================================================"
+  );
+  //const propertyValues = Object.values(req.body.param);
+  const propertyValues = [{ c2: "zz" }, { c2: "xx" }, { limit: [0, 1] }];
+  console.log(propertyValues);
+
+  const result = await mysql.query(
+    "testGet",
+    // req.body.param //param 가져오기 //insert into test (c1, c2, c3) values `c1` = 1, `c2` = 'qq', `c3` = 'ww'
+    propertyValues // //insert into test (c1, c2, c3) values 1
+  );
+  console.log(typeof result);
+  console.log(result);
+  res.send(result);
 });
 
 /*questions */
