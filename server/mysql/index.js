@@ -81,25 +81,26 @@ const query = async (alias, values) => {
           // 추후 함수화 필요....
           // result 요소들 순회한다
           for (let index = 0; index < Object.keys(results).length; index++) {
-            if (!_.isNull(results[0].like_stackcode)) {
+            if (!_.isNull(results[0].like_stack_code)) {
               //not null check
-              stackArr = _.split(results[index].like_stackcode, ",");
+              stackArr = _.split(results[index].like_stack_code, ",");
               let stackKor = "";
               stackArr.forEach((element) => {
                 stackKor += `${codes[element]},`;
               });
               //stacksKor 예시  = "자바스크립트,타입스크립트";
-              results[index].like_stackcode = stackKor; //????stackArr 을 던져줘도 프론트가 모름
+              console.log(stackKor);
+              results[index].like_stack_code = stackKor; //????stackArr 을 던져줘도 프론트가 모름
             }
-            if (!_.isNull(results[0].like_deptcode)) {
+            if (!_.isNull(results[0].like_dept_code)) {
               //not null check
-              deptArr = _.split(results[index].like_deptcode, ",");
+              deptArr = _.split(results[index].like_dept_code, ",");
               let deptKor = "";
               deptArr.forEach((element) => {
                 deptKor += `${codes[element]},`;
               });
               //deptKor 예시  = "기획,데이터베이스";
-              results[index].like_deptcode = deptKor;
+              results[index].like_dept_code = deptKor;
             }
           }
           console.log(results);
