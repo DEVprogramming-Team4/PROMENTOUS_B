@@ -27,7 +27,7 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
     user_id,
     user_id
   ]);
-  res.send(changeSnake2Camel(teamListForManage));
+  res.send(mysql.changeSnake2Camel(teamListForManage));
 });
 
 // 팀 관리화면 곳곳에 뿌려질 기초 팀정보들을 가져옴
@@ -59,29 +59,29 @@ router.post("/getProjectInfo", async (req, res) => {
   let teamTotalResult = {}; //object 선언
   // 프로젝트 기본정보
   let basicInfo = await mysql.query("getTeamDatas", [req.body.project_id]);
-  teamTotalResult.basicInfo = changeSnake2Camel(basicInfo);
+  teamTotalResult.basicInfo = mysql.changeSnake2Camel(basicInfo);
 
   // 프로젝트 관련링크정보
   let refUrls = await mysql.query("getTeamRefUrls", [req.body.project_id]);
-  teamTotalResult.refUrls = changeSnake2Camel(refUrls);
+  teamTotalResult.refUrls = mysql.changeSnake2Camel(refUrls);
   // 프로젝트 지원자정보
   let applicants = await mysql.query("getTeamApplicants", [
     req.body.project_id
   ]);
-  teamTotalResult.applicants = changeSnake2Camel(applicants);
+  teamTotalResult.applicants = mysql.changeSnake2Camel(applicants);
   // 프로젝트 멤버정보들
   let members = await mysql.query("getTeamMembers", [
     req.body.project_id,
     req.body.project_id
   ]);
-  teamTotalResult.members = changeSnake2Camel(members);
+  teamTotalResult.members = mysql.changeSnake2Camel(members);
 
   // 프로젝트 멘토링정보
   let mentorings = await mysql.queryWithBindings_manage_mentoring(
     "getTeamMentoringList",
     [req.body.project_id] //param object 가져오기
   );
-  teamTotalResult.mentorings = changeSnake2Camel(mentorings);
+  teamTotalResult.mentorings = mysql.changeSnake2Camel(mentorings);
 
   res.send(teamTotalResult);
 });
