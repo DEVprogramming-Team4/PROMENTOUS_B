@@ -26,4 +26,10 @@ router.get("/subArea/:attribute1", async (req, res) => {
   res.send(common_subArea);
 });
 
+///common/getTeamStatusList // 팀개요화면만을 위한 것으로, change2Camel 적용됨.
+router.get("/getTeamStatusList", async (req, res) => {
+  const statusList = await mysql.query("common_statusList");
+  res.send(changeSnake2Camel(statusList));
+});
+
 module.exports = router; // NECCESARY END STATE
