@@ -1,6 +1,7 @@
 const express = require("express");
-const router = express.Router();
 const mysql = require("../mysql");
+const _ = require("lodash");
+const router = express.Router();
 
 /****************************/
 /* common       공통sql      */
@@ -29,7 +30,7 @@ router.get("/subArea/:attribute1", async (req, res) => {
 ///common/getTeamStatusList // 팀개요화면만을 위한 것으로, change2Camel 적용됨.
 router.get("/getTeamStatusList", async (req, res) => {
   const statusList = await mysql.query("common_statusList");
-  res.send(changeSnake2Camel(statusList));
+  res.send(mysql.changeSnake2Camel(statusList));
 });
 
 module.exports = router; // NECCESARY END STATE

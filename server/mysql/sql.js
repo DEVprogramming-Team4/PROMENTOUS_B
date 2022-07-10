@@ -15,13 +15,13 @@ module.exports = {
         ) v
         group by v.status,v.apply_dept_id
     `,
-  common_deptList: `SELECT * FROM  sb_code_data where code_class_id =1;`, //분야코드 가져오기
-  common_stackList: `SELECT * FROM sb_code_data where code_class_id =2;`, //언어스택코드가져오기
-  common_mainArea: `SELECT * FROM sb_code_data where code_class_id =3;`, //대지역코드가져오기
-  common_subArea: `SELECT * FROM sb_code_data where code_class_id = 4 and upper(attribute1) like ?;`, //서브지역가져오기
-  common_statusList: `SELECT * FROM sb_code_data where code_class_id =6;`, //팀상태분류가져오기
-  common_applyStatusList: `SELECT * FROM sb_code_data where code_class_id =7;`, //지원상태분류가져오기
-  common_boardTypes: `SELECT * FROM sb_code_data where code_class_id =8;`, //지원상태분류가져오기
+  common_deptList: `SELECT * FROM  sb_code_data where code_class_id =1`, //분야코드 가져오기
+  common_stackList: `SELECT * FROM sb_code_data where code_class_id =2`, //언어스택코드가져오기
+  common_mainArea: `SELECT * FROM sb_code_data where code_class_id =3`, //대지역코드가져오기
+  common_subArea: `SELECT * FROM sb_code_data where code_class_id = 4 and upper(attribute1) like ?`, //서브지역가져오기
+  common_statusList: `SELECT * FROM sb_code_data where code_class_id =6  `, //팀상태분류가져오기
+  common_applyStatusList: `SELECT * FROM sb_code_data where code_class_id =7`, //지원상태분류가져오기
+  common_boardTypes: `SELECT * FROM sb_code_data where code_class_id =8`, //지원상태분류가져오기
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
