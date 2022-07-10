@@ -77,11 +77,13 @@ router.post("/getProjectInfo", async (req, res) => {
   teamTotalResult.members = mysql.changeSnake2Camel(members);
 
   // 프로젝트 멘토링정보
-  let mentorings = await mysql.queryWithBindings_manage_mentoring(
+  let mentorings = await mysql.query(
     "getTeamMentoringList",
     [req.body.project_id] //param object 가져오기
   );
   teamTotalResult.mentorings = mysql.changeSnake2Camel(mentorings);
+  console.log("------------------------------------------");
+  console.log(mentorings);
 
   res.send(teamTotalResult);
 });

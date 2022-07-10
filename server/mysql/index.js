@@ -54,11 +54,12 @@ function changeSnake2Camel(object) {
         })
       );
     }
-    newObject = temp.reduce(function (acc, cur, i) {
-      acc[i] = cur;
-      return acc;
-    }, {});
-    return newObject;
+    // 새로운 object를 넣는것이 아니고, key 명칭만바꾸고 배열에 넣어주는 것 뿐이므로 4줄 삭제한다.
+    // newObject = temp.reduce(function (acc, cur, i) {
+    //   acc[i] = cur;
+    //   return acc;
+    // }, {});
+    return temp;
   }
 }
 

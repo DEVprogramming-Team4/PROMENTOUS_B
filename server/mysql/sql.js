@@ -43,20 +43,7 @@ module.exports = {
   projectRefUrl: `select * from ref_url where post_id = ? and post_category='RCB'`,
 
   projectRecruitList: `SELECT * FROM project`, // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
-  getTeamMentoringList: `select  fn_get_username(  t.user_id ) ,  t.mentoring_title, t2.mentoring_id  ,t2.mentoring_status, t2.created_datetime, fn_get_curr_mentoringstatus( t2.mentoring_id ) AS "current_status"
-  from mentor_info t,  mentoring_admin t2 
- where t2.mentoring_id in   (
-        /* project id 하나에 여러 멘토링 걸려 있을 수 있음. */
-        select v1.mentoring_id from mentoring v1 where v1.project_id = ?        
- )  
-order by  
- case  current_status 
-      when 'ING' then 1
-      when 'NEW' then 2 
-      when 'REJ' then 100
-      else  50
- end  
- limit  ? , 3 `,
+
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -67,23 +54,23 @@ order by
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
 
-  manage_topSelect: `select    t.status_code, '진행중 프로젝트'  AS "statusName",'N' AS "mentor_yn" , t.title, t.project_id  from project t where t.project_id  in  (
-                    select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN' and v1.status_code <> 'REC'
+  manage_topSelect: `select    t.status_code, '진행중 프로젝트'  AS "statusName",'N' AS "mentor_yn" , t.title as "project_name", t.project_id  from project t where t.project_id  in  (
+                    select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN' 
                     union all 
                     select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code <> 'FIN' and v3.status_code <> 'REC'     
                     ) 
                     union all 
-                    select      t.status_code  ,'완료된 프로젝트' AS  "statusName",'N' AS "mentor_yn"  , t.title, t.project_id from project t where t.project_id  in   (
+                    select      t.status_code  ,'완료된 프로젝트' AS  "statusName",'N' AS "mentor_yn"  , t.title  as "project_name", t.project_id from project t where t.project_id  in   (
                     select  v1.project_id  from project v1  where v1.leader_user = ?    and v1.status_code ='FIN'
                     union all 
                     select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code ='FIN'  
                     )
                     union all 
-                    select   t.status_code  ,'진행중 멘토링' AS "statusName",'Y' AS "mentor_yn" , t.title, t.project_id   from project t where t.project_id  in  ( 
+                    select   t.status_code  ,'진행중 멘토링' AS "statusName",'Y' AS "mentor_yn" , t.title  as "project_name", t.project_id   from project t where t.project_id  in  ( 
                     select v1.project_id  from mentoring v1 where v1.mentor_info_id = fn_get_mentorinfo( ?  )  and v1.status_code in ('ACC', 'ING' )   
                     )   
                     union all 
-                    select   t.status_code  ,'완료된 멘토링' AS "statusName" ,'Y' AS "mentor_yn" , t.title, t.project_id   from project t where t.project_id  in  ( 
+                    select   t.status_code  ,'완료된 멘토링' AS "statusName" ,'Y' AS "mentor_yn" , t.title  as "project_name", t.project_id   from project t where t.project_id  in  ( 
                     select v1.project_id  from mentoring v1 where v1.mentor_info_id = fn_get_mentorinfo(?  )  and v1.status_code = 'FIN' 
                     )   
 

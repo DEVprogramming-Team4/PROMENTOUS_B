@@ -28,9 +28,23 @@ router.get("/subArea/:attribute1", async (req, res) => {
 });
 
 ///common/getTeamStatusList // 팀개요화면만을 위한 것으로, change2Camel 적용됨.
+router.get("/getTeamStatusListForTeamManage", async (req, res) => {
+  const statusList = await mysql.query("common_statusList");
+  //statusListCamel  =   mysql.changeSnake2Camel(statusList);
+  console.log(statusList);
+  let temp = [];
+  for (let index = 0; index < Object.keys(statusList).length; index++) {
+    temp.push(statusList[index].code_data_desc);
+  }
+  //단순배열전송
+  res.send(temp);
+
+  // obejct 배열전송
+  //res.send(mysql.changeSnake2Camel(statusList));
+});
 router.get("/getTeamStatusList", async (req, res) => {
   const statusList = await mysql.query("common_statusList");
-  res.send(mysql.changeSnake2Camel(statusList));
+  res.send(mysql.statusList);
 });
 
 module.exports = router; // NECCESARY END STATE
