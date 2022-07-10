@@ -40,6 +40,7 @@ const commonRoute = require("./routes/common"); // 공통요소
 const manageRoute = require("./routes/manage"); // 팀개요 관련입니다.
 const projectRoute = require("./routes/project"); // 프로젝트 모집 관련입니다.
 const reviewRoute = require("./routes/review"); // 프로젝트 후기 관련입니다.
+const commentRoute = require("./routes/comment"); // 댓글 관련 API
 
 app.use(cors(corsOptions));
 
@@ -47,6 +48,7 @@ app.use("/common", commonRoute);
 app.use("/manage", manageRoute);
 app.use("/project/recruit", projectRoute);
 app.use("/project/review", reviewRoute);
+app.use("/comment", commentRoute);
 
 /****************************/
 /* common       공통sql      */
@@ -68,6 +70,31 @@ app.get("/project/applicantsPerDept", async (req, res) => {
   console.log("req==>" + req);
   const applicantsPerDept = await mysql.query("applicantsPerDept");
   res.send(applicantsPerDept);
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    await mysql.query("insertUser", req.body.param);
+    if (request.body.param.length > 0) {
+      for (let key in request.body.param[0])
+        request.session[key] = request.body.param[0][key];
+      res.send(request.body.param[0]);
+    } else {
+      res.send({
+        error: "Please try again or contact system manager."
+      });
+    }
+    // for (let key in request.body.param[0])
+    // request.session[key] = request.body.param[0][key];
+    // res.send(request.body.param[0]);
+    console.log(req.session);
+    console.log(req.body.param);
+    // res.send(req.body.param);
+  } catch (err) {
+    res.send({
+      error: "DB access error"
+    });
+  }
 });
 
 /****************************/
