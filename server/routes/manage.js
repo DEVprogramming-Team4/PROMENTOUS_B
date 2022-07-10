@@ -57,62 +57,56 @@ router.post("/getProjectInfo", async (req, res) => {
   const project_id = req.body.project_id;
 
   let teamTotalResult = {}; //object 선언
-  // 프로젝트 기본정보
+  /*프로젝트 기본정보  그냥 project 테이블에서 땡겨옴.*/
   let basicInfo = await mysql.query("getTeamDatas", [req.body.project_id]);
   teamTotalResult.basicInfo = mysql.changeSnake2Camel(basicInfo);
 
-  // 프로젝트 관련링크정보
+  /*프로젝트 관련링크정보*/
   let refUrls = await mysql.query("getTeamRefUrls", [req.body.project_id]);
   teamTotalResult.refUrls = mysql.changeSnake2Camel(refUrls);
-  // 프로젝트 지원자정보
+  /*프로젝트 지원자정보*/
   let applicants = await mysql.query("getTeamApplicants", [
     req.body.project_id
   ]);
   teamTotalResult.applicants = mysql.changeSnake2Camel(applicants);
-  // 프로젝트 멤버정보들
+  /*프로젝트 멤버정보들*/
   let members = await mysql.query("getTeamMembers", [
     req.body.project_id,
     req.body.project_id
   ]);
   teamTotalResult.members = mysql.changeSnake2Camel(members);
+  /*소셜링크가져와서 각각 멤버에 심어주기.*/
 
-  // 프로젝트 멘토링정보
+  for (let index = 0; index < teamTotalResult.members.length; index++) {
+    teamTotalResult.members[index].userSocialUrl = await mysql.query(
+      "getUserSocialUrls",
+      [teamTotalResult.members[index].userId]
+    );
+    if (_.isEqual("Y", teamTotalResult.members[index].leaderYn)) {
+      teamTotalResult.members[index].role = "리더";
+    } else {
+      t_role = await mysql.query("getMemberRole", [
+        req.body.project_id,
+        teamTotalResult.members[index].userId
+      ]);
+      teamTotalResult.members[index].role = t_role[0].role;
+    }
+  }
+  console.log("##############");
+  console.log(teamTotalResult.members);
+  // console.log("------------------------------------------");
+  // console.log(teamTotalResult.members);
+
+  /*프로젝트 멘토링정보*/
   let mentorings = await mysql.query(
     "getTeamMentoringList",
     [req.body.project_id] //param object 가져오기
   );
   teamTotalResult.mentorings = mysql.changeSnake2Camel(mentorings);
-  console.log("------------------------------------------");
-  console.log(mentorings);
-
+  //ALL IN ONE
   res.send(teamTotalResult);
 });
 
-//팀개요화면  - 헤딩 projectId 의 지원자정보 가져오기 ( 미승인지원자들 우선 가져오도록 query에서 조정 )
-router.get("/getTeamApplicants/:project_id", async (req, res) => {
-  const { project_id } = req.params;
-  const teamApplicantsList = await mysql.query("getTeamApplicants", project_id);
-  res.send(teamApplicantsList);
-});
-// 현재 등록된 팀인원 카드리스트
-router.get("/getTeamMemberInfo/:project_id", async (req, res) => {
-  const { project_id } = req.params;
-  const teamMemberList = await mysql.query("getTeamMemberInfo", project_id);
-  res.send(teamMemberList);
-});
-// 현재 팀 연결된 멘토링카드들 가져옴 ( page 도 받아야함.)
-router.get("/getTeamMentoringList", async (req, res) => {
-  console.log("==============================111111111111111");
-  console.log(req);
-  console.log("==============================222222222222222");
-  console.log(req.body.param);
-  const params = [req.body.param.project_id, req.body.param.mentoring_page];
-  const mentoringList = await mysql.query(
-    "getTeamMentoringList",
-    params //param 가져오기
-  );
-  res.send(mentoringList);
-});
 /* param TESt  */
 router.post("/testInsert", async (req, res) => {
   console.log("==============================111111111111111");

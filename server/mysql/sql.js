@@ -82,8 +82,8 @@ module.exports = {
                         ,v.apply_dept_id
                         ,fn_user_nickname(v.applicant_id) as "applicant_nickname"
                         ,fn_user_email(v.applicant_id) as "applicant_account"
-                        ,fn_user_stack_code(v.applicant_id) as "like_stackcode"
-                        ,fn_user_dept_code(v.applicant_id) as "like_deptcode"
+                        ,fn_user_stack_code(v.applicant_id) as "like_stack_code"
+                        ,fn_user_dept_code(v.applicant_id) as "like_dept_code"
                         ,max(v.insert_date ) as "insertDate"
                         ,max(v.stat) /*1지원중, 2승인, 3반려 */ stat
                         ,max(v.stat)  as "applyStatus"
@@ -96,12 +96,32 @@ module.exports = {
                         group by applicant_id 
                         order by stat `,
   //getTeamMembers  > ? 2개
-  getTeamMembers: `select t.* from user t 
+  getTeamMembers: `select 'Y' leader_yn 
+                  ,fn_user_stack_code(t.user_id) as "like_stack_code"
+                  ,fn_user_dept_code(t.user_id) as "like_dept_code"   
+                  ,fn_user_email(t.user_id) as "member_email" 
+                  ,t.* from user t 
                    where t.user_id = (select  t2.leader_user  from project  t2 where t2.project_id =  ?      )
            union all
-                  select  t2.* from user t2 
+                  select  'N' leader_yn 
+                  ,fn_user_stack_code(t2.user_id) as "like_stack_code"
+                  ,fn_user_dept_code(t2.user_id) as "like_dept_code"       
+                  ,fn_user_email(t2.user_id) as "member_email"            
+                  ,t2.* from user t2 
                   where t2.user_id in 
                   (select  t3.applicant_id   from apply_admin  t3 where t3.project_id = ?     and t3.apply_status = 'ACC'  ) `,
+  getMemberRole: `SELECT fn_apply_dept_desc(apply_dept_id) AS "role"
+                  FROM apply_dept
+                  where apply_dept_id =
+                  (SELECT apply_dept_id 
+                      FROM  apply_admin
+                      where apply_status  = 'ACC' 
+                      and project_id =  ?
+                      and applicant_id = ?
+                    ) ;
+  `,
+  getUserSocialUrls: `SELECT t.url_title AS "title", t.url_address AS "address" FROM ref_url t 
+  where t.post_category ='USB' and t.post_id = ?`,
   /*멘토링 정보 가져오기 풀버전*/
   getTeamMentoringList2: `/*FULL버전 현재 상황에서 사용 어려움. */
         select   
