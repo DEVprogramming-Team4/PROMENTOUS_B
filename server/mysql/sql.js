@@ -139,10 +139,17 @@ module.exports = {
               where t.mentoring_id in (
                      select v2.mentoring_id from mentoring v2 where v2.project_id = ?      
               )   
-              `
+              `,
 
   /*--------------------------------------------------------------*/
   /*-------------------  마이페이지    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
+  projectList: `select t2.user_nickname , t.*
+  from project t , user t2
+  where t.leader_user = t2.user_id and t.status_code = 'REC'
+  order by t.created_datetime desc limit 8;`,
+  projectDetail: `SELECT * FROM project where project_id = ?`,
+  reviewList: ``,
+  insertUser: `insert into user set ? on duplicate key update ?`
 };
