@@ -1,6 +1,7 @@
 const express = require("express");
-const router = express.Router();
 const mysql = require("../mysql");
+const _ = require("lodash");
+const router = express.Router();
 
 /****************************/
 /* common       공통sql      */
@@ -24,6 +25,26 @@ router.get("/subArea/:attribute1", async (req, res) => {
   console.log(req.params);
   const common_subArea = await mysql.query("common_subArea", attribute1);
   res.send(common_subArea);
+});
+
+///common/getTeamStatusList // 팀개요화면만을 위한 것으로, change2Camel 적용됨.
+router.get("/getTeamStatusListForTeamManage", async (req, res) => {
+  const statusList = await mysql.query("common_statusList");
+  //statusListCamel  =   mysql.changeSnake2Camel(statusList);
+  console.log(statusList);
+  let temp = [];
+  for (let index = 0; index < Object.keys(statusList).length; index++) {
+    temp.push(statusList[index].code_data_desc);
+  }
+  //단순배열전송
+  res.send(temp);
+
+  // obejct 배열전송
+  //res.send(mysql.changeSnake2Camel(statusList));
+});
+router.get("/getTeamStatusList", async (req, res) => {
+  const statusList = await mysql.query("common_statusList");
+  res.send(mysql.statusList);
 });
 
 module.exports = router; // NECCESARY END STATE
