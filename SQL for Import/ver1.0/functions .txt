@@ -4,6 +4,9 @@
 
 -  create funciton 해서  아래에 있는거 하나 돌려보면 에러가 날텐데   https://myhappyman.tistory.com/154 블로그 참고하면 됩니다. 
 
+SET GLOBAL log_bin_trust_function_creators = 1; 
+//ON
+
  (내 로컬의 mysql 의   log_bin_trust_function_creators 옵션이  ON 상태 여야함. ) 
  -------------  2022-07-03  
 

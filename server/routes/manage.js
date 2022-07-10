@@ -1,6 +1,15 @@
 const express = require("express");
 const mysql = require("../mysql");
+const _ = require("lodash");
 const router = express.Router();
+
+const MAIN_CODES = async () => {
+  try {
+    mysql.query("getMainCodes");
+  } catch (error) {
+    return error;
+  }
+};
 
 /****************************/
 /* manage  프로젝트관리메뉴  */
@@ -9,8 +18,16 @@ const router = express.Router();
 /* PARAM : user_id ( ex) 3    ) */
 router.get("/getTeamListForManage/:user_id", async (req, res) => {
   const { user_id } = req.params;
-  const teamListForManage = await mysql.query("manage_topSelect", user_id);
-  res.send(teamListForManage);
+  const teamListForManage = await mysql.query("manage_topSelect", [
+    user_id,
+    user_id,
+    user_id,
+    user_id,
+    user_id,
+    user_id,
+    user_id
+  ]);
+  res.send(changeSnake2Camel(teamListForManage));
 });
 
 // 팀 관리화면 곳곳에 뿌려질 기초 팀정보들을 가져옴
@@ -19,7 +36,7 @@ router.get("/getTeamDatas/:project_id", async (req, res) => {
   const { project_id } = req.params;
   const teamDatas = await mysql.query("getTeamDatas", project_id);
   console.log(teamDatas);
-  res.send(teamDatas);
+  res.send(_.mapKeys(teamDatas, (value, key) => _.camelCase(key)));
 });
 
 // 팀개요화면 팀 소통을위한 팀모임URL을 가져옴.
@@ -32,6 +49,43 @@ router.get("/getTeamCommunicateUrls/:project_id", async (req, res) => {
   );
   res.send(TeamCommunicateUrls);
 });
+
+// 팀 선택 시  . 팀 정보를 한꺼번에 끌어오는 ALL IN ONE API
+router.post("/getProjectInfo", async (req, res) => {
+  console.log("req.body ::" + req.body);
+  console.log(req.body);
+  const project_id = req.body.project_id;
+
+  let teamTotalResult = {}; //object 선언
+  // 프로젝트 기본정보
+  let basicInfo = await mysql.query("getTeamDatas", [req.body.project_id]);
+  teamTotalResult.basicInfo = changeSnake2Camel(basicInfo);
+
+  // 프로젝트 관련링크정보
+  let refUrls = await mysql.query("getTeamRefUrls", [req.body.project_id]);
+  teamTotalResult.refUrls = changeSnake2Camel(refUrls);
+  // 프로젝트 지원자정보
+  let applicants = await mysql.query("getTeamApplicants", [
+    req.body.project_id
+  ]);
+  teamTotalResult.applicants = changeSnake2Camel(applicants);
+  // 프로젝트 멤버정보들
+  let members = await mysql.query("getTeamMembers", [
+    req.body.project_id,
+    req.body.project_id
+  ]);
+  teamTotalResult.members = changeSnake2Camel(members);
+
+  // 프로젝트 멘토링정보
+  let mentorings = await mysql.queryWithBindings_manage_mentoring(
+    "getTeamMentoringList",
+    [req.body.project_id] //param object 가져오기
+  );
+  teamTotalResult.mentorings = changeSnake2Camel(mentorings);
+
+  res.send(teamTotalResult);
+});
+
 //팀개요화면  - 헤딩 projectId 의 지원자정보 가져오기 ( 미승인지원자들 우선 가져오도록 query에서 조정 )
 router.get("/getTeamApplicants/:project_id", async (req, res) => {
   const { project_id } = req.params;
@@ -106,6 +160,21 @@ router.post("/testGet", async (req, res) => {
     "testGet",
     // req.body.param //param 가져오기 //insert into test (c1, c2, c3) values `c1` = 1, `c2` = 'qq', `c3` = 'ww'
     propertyValues // //insert into test (c1, c2, c3) values 1
+  );
+  console.log(typeof result);
+  console.log(result);
+  res.send(result);
+});
+
+router.post("/testGet2", async (req, res) => {
+  console.log("testGet2==============================111111111111111");
+  console.log(
+    "RESULT======================================================================"
+  );
+
+  const result = await mysql.queryWithBindings2(
+    "testGet2",
+    req.body // axios 가 보내주는 JSON 형태의 PARAMS들
   );
   console.log(typeof result);
   console.log(result);
