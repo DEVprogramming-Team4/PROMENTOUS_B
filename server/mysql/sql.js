@@ -43,7 +43,6 @@ module.exports = {
   projectRefUrl: `select * from ref_url where post_id = ? and post_category='RCB'`,
 
   projectRecruitList: `SELECT * FROM project`, // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
-
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -53,7 +52,6 @@ module.exports = {
   /*-------------------  팀 개요    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-
   manage_topSelect: `select    t.status_code, '진행중 프로젝트'  AS "statusName",'N' AS "mentor_yn" , t.title as "project_name", t.project_id  from project t where t.project_id  in  (
                     select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN' 
                     union all 
@@ -145,6 +143,11 @@ module.exports = {
   /*-------------------  마이페이지    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
+  // parentId도 추가 필요..
+  registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
+   target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
+  registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
+    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
   projectList: `select t2.user_nickname , t.*
   from project t , user t2
   where t.leader_user = t2.user_id and t.status_code = 'REC'
