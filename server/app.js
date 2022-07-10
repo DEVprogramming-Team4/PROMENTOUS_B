@@ -70,6 +70,31 @@ app.get("/project/applicantsPerDept", async (req, res) => {
   res.send(applicantsPerDept);
 });
 
+app.post("/login", async (req, res) => {
+  try {
+    await mysql.query("insertUser", req.body.param);
+    if (request.body.param.length > 0) {
+      for (let key in request.body.param[0])
+        request.session[key] = request.body.param[0][key];
+      res.send(request.body.param[0]);
+    } else {
+      res.send({
+        error: "Please try again or contact system manager."
+      });
+    }
+    // for (let key in request.body.param[0])
+    // request.session[key] = request.body.param[0][key];
+    // res.send(request.body.param[0]);
+    console.log(req.session);
+    console.log(req.body.param);
+    // res.send(req.body.param);
+  } catch (err) {
+    res.send({
+      error: "DB access error"
+    });
+  }
+});
+
 /****************************/
 /* mentor        멘토링메뉴  */
 /****************************/
