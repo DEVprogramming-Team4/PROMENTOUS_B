@@ -62,4 +62,12 @@ router.get("/:projectId/ref_url", async (req, res) => {
   res.send(refUrl);
 });
 
+// GET
+// 프로젝트 모집 현황 & 인원
+router.get("/:projectId/recruit_data", async (req, res) => {
+  let projectId = req.params.projectId;
+  const recruitData = await mysql.query("projectRecruitData", [projectId]);
+  res.send(recruitData);
+});
+
 module.exports = router; // NECCESARY END STATE
