@@ -4,6 +4,7 @@ module.exports = {
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*--------------------------------------------------------------*/
   getMainCodes: `select t.* from sb_code_data t where t.code_class_id in ('1','2','5','6','7','8')`,
+  getUserNickName: `select user_nickname from user where user_id = ?`,
   sblList: `select * from sb_code_data`,
   applicantsPerDept: `select v.dept_desc "dept_desc",count(v.status) "count",v.status , v.apply_dept_id  "applyDeptId"
       from
@@ -43,34 +44,55 @@ module.exports = {
   projectRefUrl: `select * from ref_url where post_id = ? and post_category='RCB'`,
 
   projectRecruitList: `SELECT * FROM project`, // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
+  getTeamMentoringList: `select  fn_get_username(  t.user_id ) ,  t.mentoring_title, t2.mentoring_id  ,t2.mentoring_status, t2.created_datetime, fn_get_curr_mentoringstatus( t2.mentoring_id ) AS "current_status"
+  from mentor_info t,  mentoring_admin t2
+ where t2.mentoring_id in (
+        /* project id 하나에 여러 멘토링 걸려 있을 수 있음. */
+        select v1.mentoring_id from mentoring v1 where v1.project_id = ?
+ )
+ order by
+ case  current_status
+      when 'ING' then 1
+      when 'NEW' then 2
+      when 'REJ' then 100
+      else  50
+ end
+ limit  ? , 3 `,
+  registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
+  target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
+  registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
+   target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
+  projectRecruitData: `select * from apply_dept where project_id = ?`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
+  reviewDetail: `SELECT * FROM review where review_id = ?`,
+  reviewOutcomeUrl: `SELECT * FROM review_outcome_url where review_id = ?`,
 
   /*--------------------------------------------------------------*/
   /*-------------------  팀 개요    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
   manage_topSelect: `select    t.status_code, '진행중 프로젝트'  AS "statusName",'N' AS "mentor_yn" , t.title as "project_name", t.project_id  from project t where t.project_id  in  (
-                    select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN' 
-                    union all 
-                    select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code <> 'FIN' and v3.status_code <> 'REC'     
-                    ) 
-                    union all 
+                    select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN'
+                    union all
+                    select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code <> 'FIN' and v3.status_code <> 'REC'
+                    )
+                    union all
                     select      t.status_code  ,'완료된 프로젝트' AS  "statusName",'N' AS "mentor_yn"  , t.title  as "project_name", t.project_id from project t where t.project_id  in   (
                     select  v1.project_id  from project v1  where v1.leader_user = ?    and v1.status_code ='FIN'
-                    union all 
-                    select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code ='FIN'  
+                    union all
+                    select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code ='FIN'
                     )
-                    union all 
-                    select   t.status_code  ,'진행중 멘토링' AS "statusName",'Y' AS "mentor_yn" , t.title  as "project_name", t.project_id   from project t where t.project_id  in  ( 
-                    select v1.project_id  from mentoring v1 where v1.mentor_info_id = fn_get_mentorinfo( ?  )  and v1.status_code in ('ACC', 'ING' )   
-                    )   
-                    union all 
-                    select   t.status_code  ,'완료된 멘토링' AS "statusName" ,'Y' AS "mentor_yn" , t.title  as "project_name", t.project_id   from project t where t.project_id  in  ( 
-                    select v1.project_id  from mentoring v1 where v1.mentor_info_id = fn_get_mentorinfo(?  )  and v1.status_code = 'FIN' 
-                    )   
+                    union all
+                    select   t.status_code  ,'진행중 멘토링' AS "statusName",'Y' AS "mentor_yn" , t.title  as "project_name", t.project_id   from project t where t.project_id  in  (
+                    select v1.project_id  from mentoring v1 where v1.mentor_info_id = fn_get_mentorinfo( ?  )  and v1.status_code in ('ACC', 'ING' )
+                    )
+                    union all
+                    select   t.status_code  ,'완료된 멘토링' AS "statusName" ,'Y' AS "mentor_yn" , t.title  as "project_name", t.project_id   from project t where t.project_id  in  (
+                    select v1.project_id  from mentoring v1 where v1.mentor_info_id = fn_get_mentorinfo(?  )  and v1.status_code = 'FIN'
+                    )
 
                     `,
   ///getProjectInfo 를 위한 쿼리 세트들
@@ -90,89 +112,83 @@ module.exports = {
 
                         from (
                         select t.applicant_id, t.project_id, t.apply_dept_id, t.insert_date, t.apply_status,
-                        if(t.apply_status = 'NEW', 1, if(t.apply_status = 'ACC',2,  3) ) stat   
+                        if(t.apply_status = 'NEW', 1, if(t.apply_status = 'ACC',2,  3) ) stat
                         from apply_admin t where t.project_id = ?
                         ) v
-                        group by applicant_id 
+                        group by applicant_id
                         order by stat `,
   //getTeamMembers  > ? 2개
-  getTeamMembers: `select 'Y' leader_yn 
+  getTeamMembers: `select 'Y' leader_yn
                   ,fn_user_stack_code(t.user_id) as "like_stack_code"
-                  ,fn_user_dept_code(t.user_id) as "like_dept_code"   
-                  ,fn_user_email(t.user_id) as "member_email" 
-                  ,t.* from user t 
+                  ,fn_user_dept_code(t.user_id) as "like_dept_code"
+                  ,fn_user_email(t.user_id) as "member_email"
+                  ,t.* from user t
                    where t.user_id = (select  t2.leader_user  from project  t2 where t2.project_id =  ?      )
            union all
-                  select  'N' leader_yn 
+                  select  'N' leader_yn
                   ,fn_user_stack_code(t2.user_id) as "like_stack_code"
-                  ,fn_user_dept_code(t2.user_id) as "like_dept_code"       
-                  ,fn_user_email(t2.user_id) as "member_email"            
-                  ,t2.* from user t2 
-                  where t2.user_id in 
+                  ,fn_user_dept_code(t2.user_id) as "like_dept_code"
+                  ,fn_user_email(t2.user_id) as "member_email"
+                  ,t2.* from user t2
+                  where t2.user_id in
                   (select  t3.applicant_id   from apply_admin  t3 where t3.project_id = ?     and t3.apply_status = 'ACC'  ) `,
   getMemberRole: `SELECT fn_apply_dept_desc(apply_dept_id) AS "role"
                   FROM apply_dept
                   where apply_dept_id =
-                  (SELECT apply_dept_id 
+                  (SELECT apply_dept_id
                       FROM  apply_admin
-                      where apply_status  = 'ACC' 
+                      where apply_status  = 'ACC'
                       and project_id =  ?
                       and applicant_id = ?
                     ) ;
   `,
-  getUserSocialUrls: `SELECT t.url_title AS "title", t.url_address AS "address" FROM ref_url t 
+  getUserSocialUrls: `SELECT t.url_title AS "title", t.url_address AS "address" FROM ref_url t
   where t.post_category ='USB' and t.post_id = ?`,
   /*멘토링 정보 가져오기 풀버전*/
   getTeamMentoringList2: `/*FULL버전 현재 상황에서 사용 어려움. */
-        select   
+        select
             fn_get_mentorStatusNum (fn_get_curr_mentoringstatus( t2.mentoring_id )) AS "current_status_number"
             , fn_get_curr_mentoringstatus( t2.mentoring_id ) AS "current_status"
-            , t2.mentoring_id 
+            , t2.mentoring_id
             ,( select fn_getMentorname( fn_getMentorinfo( t2.mentoring_id) )  )   "user_name" /*멘토닉네임*/
             , (select v1.mentoring_title from mentor_info v1 where v1.mentor_info_id = fn_getMentorinfo( t2.mentoring_id) )  "mentoring_title"
             ,t2.mentoring_status
             , t2.created_datetime
-        from  mentoring_admin t2 
+        from  mentoring_admin t2
             where t2.mentoring_id in   (
                   /* project id 하나에 여러 멘토링 걸려 있을 수 있음. */
-                  select v2.mentoring_id from mentoring v2 where v2.project_id = ?      
-            )  
-                order by  
-                  case  current_status 
+                  select v2.mentoring_id from mentoring v2 where v2.project_id = ?
+            )
+                order by
+                  case  current_status
                       when 'ING' then 1
-                      when 'NEW' then 2 
+                      when 'NEW' then 2
                       when 'REJ' then 100
                       else  50
-                  end  
+                  end
                 `,
   getTeamMentoringList: ` /* 숫자만 던져주는 버전 - 시간정보는 없음. */
-          select   
+          select
               fn_get_mentorStatusNum (fn_get_curr_mentoringstatus( t.mentoring_id )) AS "mentoring_status"
               ,( select fn_getMentorname( fn_getMentorinfo( t.mentoring_id) )  )   "user_name" /*멘토닉네임*/
               , (select v2.mentoring_title from mentor_info v2 where v2.mentor_info_id = fn_getMentorinfo( t.mentoring_id) )  "mentoring_title"
-              ,t.mentoring_id AS "mentoring_id"    
+              ,t.mentoring_id AS "mentoring_id"
               ,'hardcodingdummydata'  AS "mentor_rating_comment"
               ,'hardcodingdummydata'  AS "mentor_rating_score"
-          from mentoring t 
+          from mentoring t
               where t.mentoring_id in (
-                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?      
-              )   
+                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?
+              )
               `,
 
   /*--------------------------------------------------------------*/
   /*-------------------  마이페이지    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  // parentId도 추가 필요..
-  registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
-   target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
-  registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
-    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
   projectList: `select t2.user_nickname , t.*
   from project t , user t2
   where t.leader_user = t2.user_id and t.status_code = 'REC'
   order by t.created_datetime desc limit 8;`,
-  projectDetail: `SELECT * FROM project where project_id = ?`,
   reviewList: ``,
   insertUser: `insert into user set ? on duplicate key update ?`
 };
