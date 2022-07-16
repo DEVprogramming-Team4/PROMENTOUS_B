@@ -19,14 +19,12 @@ router.get("/mainArea", async (req, res) => {
   const common_mainArea = await mysql.query("common_mainArea");
   res.send(common_mainArea);
 });
-router.get("/subArea/:attribute1", async (req, res) => {
-  const { attribute1 } = req.params;
-  console.log("req.params=================>");
-  console.log(req.params);
+router.get("/subArea", async (req, res) => {
+  const attribute1 = req.query.main;
+  // req.query는 위의 경우, main= 이 상태면 그대로 공백이고, 정의하지 않은걸 끌어오려 하면 그냥 undefined이다
   const common_subArea = await mysql.query("common_subArea", attribute1);
   res.send(common_subArea);
 });
-
 ///common/getTeamStatusList // 팀개요화면만을 위한 것으로, change2Camel 적용됨.
 router.get("/getTeamStatusListForTeamManage", async (req, res) => {
   const statusList = await mysql.query("common_statusList");
