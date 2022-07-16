@@ -29,8 +29,19 @@ module.exports = {
   /*------------------------------------------------------------- -*/
   applicantsPerDept: ``,
   manage_HeaderSelect: `select 'babo' from dual`,
-  projectRecruitList: `SELECT * FROM project`, // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
+  projectList: `select t2.user_nickname , t.*
+  from project t , user t2
+  where t.leader_user = t2.user_id and t.status_code = ?
+  order by t.created_datetime desc
+  limit 8 offset ?;`,
+  projectListDefault: `select t2.user_nickname , t.*
+  from project t , user t2
+  where t.leader_user = t2.user_id and t.status_code = 'REC'
+  order by t.created_datetime desc
+  limit 8`,
   projectDetail: `SELECT * FROM project where project_id = ?`,
+  // 로그인처럼 하면 업데이트문을 쓸수있다(그러나 유니크 키 하나정도 있어야한다) 다시말해 풋요청도 같은 쿼리로 받을 수 있다. 물음표에서 받아오려면 컬럼명일치
+  projectInsert: `insert into project set ?`,
   projectLeaderData: `select t.* from user t where t.user_id = ( select t2.leader_user from project t2 where t2.project_id = ? )`,
   leaderProjectHistory: `select t.* from project t where t.project_id in (
     select project_id t where apply_admin v1, project v2 where v1.applicant_id = (select leader_user from project where project_id = ? )
@@ -63,6 +74,7 @@ module.exports = {
   registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
    target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
   projectRecruitData: `select * from apply_dept where project_id = ?`,
+  getCount: `select count(project_id) as cnt from project where project.status_code = ?;`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -185,10 +197,15 @@ module.exports = {
   /*-------------------  마이페이지    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  projectList: `select t2.user_nickname , t.*
-  from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = 'REC'
-  order by t.created_datetime desc limit 8;`,
   reviewList: ``,
-  insertUser: `insert into user set ? on duplicate key update ?`
+  // parentId도 추가 필요..
+  registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
+   target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
+  registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
+    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
+  // 로그인과 유저아이디를 쏴주는 쿼리영역
+  insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
+  getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
+  // 멘토리스트 관련
+  getmentorList: `select * from mentor_info`
 };
