@@ -75,21 +75,19 @@ app.get("/project/applicantsPerDept", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     await mysql.query("insertUser", req.body.param);
-    if (request.body.param.length > 0) {
-      for (let key in request.body.param[0])
-        request.session[key] = request.body.param[0][key];
-      res.send(request.body.param[0]);
+    const loginUser = await mysql.query(
+      "getLoginUser",
+      req.body.param[0].user_nickname
+    );
+    if (req.body.param.length > 0) {
+      for (let key in req.body.param[0])
+        req.session[key] = req.body.param[0][key];
+      res.send(loginUser);
     } else {
       res.send({
         error: "Please try again or contact system manager."
       });
     }
-    // for (let key in request.body.param[0])
-    // request.session[key] = request.body.param[0][key];
-    // res.send(request.body.param[0]);
-    console.log(req.session);
-    console.log(req.body.param);
-    // res.send(req.body.param);
   } catch (err) {
     res.send({
       error: "DB access error"
