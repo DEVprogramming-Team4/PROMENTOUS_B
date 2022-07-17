@@ -105,6 +105,7 @@ router.post("/getProjectInfo", async (req, res) => {
       teamTotalResult.members[index].rating = tempArr;
     }
     //console.log("testtttttttttttttttttttttttttt");
+    //console.log(teamTotalResult.members[index].rating);
     /* 멤버 각 역할 집어넣기  */
     if (_.isEqual("Y", teamTotalResult.members[index].leaderYn)) {
       teamTotalResult.members[index].role = "리더"; // TODO.리더 아님!!
@@ -187,6 +188,23 @@ router.post("/saveTeamManageInfo", async (req, res) => {
   ]);
 
   res.send(res);
+});
+/********************************************************************** */
+/********************************************************************** */
+/*************       INSERT   / UPDATE                ***************** */
+/********************************************************************** */
+/********************************************************************** */
+router.post("/saveMentorRating", async (req, res) => {
+  let numberForEachPage = 4; //페이지 당 몇개씩 나오는가
+  console.log(
+    "/*************       INSERT   / UPDATE                ***************** */"
+  );
+  console.log(req.body);
+  console.log(
+    "/*************       INSERT   / UPDATE                ***************** */"
+  );
+
+  res.send(null);
 });
 
 /* param TESt  */
