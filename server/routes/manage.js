@@ -78,12 +78,34 @@ router.post("/getProjectInfo", async (req, res) => {
   ]);
   teamTotalResult.members = mysql.changeSnake2Camel(members);
   /*소셜링크가져와서 각각 멤버에 심어주기.*/
-
   for (let index = 0; index < teamTotalResult.members.length; index++) {
+    /* 멤버 소셜 집어넣기 */
     teamTotalResult.members[index].userSocialUrl = await mysql.query(
       "getUserSocialUrls",
       [teamTotalResult.members[index].userId]
     );
+    /* 멤버 평가여부 집어넣기 멘토링ID 처럼 고유값이 아님. rate user id 및 project까지 다필요함.  */
+    teamTotalResult.members[index].rating = await mysql.query(
+      "getMemberRating",
+      [
+        teamTotalResult.members[index].userId,
+        teamTotalResult.members[index].userId,
+        "1" /*TODO 1에서 sessionUserid로 변경!! */,
+        req.body.project_id
+      ]
+    );
+    /*만일 rating 없으면..  */
+    if (teamTotalResult.members[index].rating.length === 0) {
+      tempArr = [];
+      tempArr.push({
+        score: 0,
+        comment: "",
+        rated: "no"
+      });
+      teamTotalResult.members[index].rating = tempArr;
+    }
+    //console.log("testtttttttttttttttttttttttttt");
+    /* 멤버 각 역할 집어넣기  */
     if (_.isEqual("Y", teamTotalResult.members[index].leaderYn)) {
       teamTotalResult.members[index].role = "리더"; // TODO.리더 아님!!
     } else {
@@ -118,17 +140,18 @@ router.post("/getProjectInfo", async (req, res) => {
       teamTotalResult.mentorings[index].mentoringId,
       teamTotalResult.mentorings[index].mentoringId
     ]);
-
     teamTotalResult.mentorings[index].mentorRating = obj;
-    console.log("test");
-    console.log(teamTotalResult.mentorings[index].mentorRating.score);
-    console.log(
-      typeof (await mysql.query("getMentoringInfo", [
-        teamTotalResult.mentorings[index].mentoringId,
-        teamTotalResult.mentorings[index].mentoringId
-      ]))
-    );
-    console.log(teamTotalResult.mentorings[index]);
+    /*만일 rating 없으면..  */
+    if (obj.length === 0) {
+      tempArr = [];
+      tempArr.push({
+        score: 0,
+        comment: "",
+        rated: "no"
+      });
+      teamTotalResult.mentorings[index].mentorRating = tempArr;
+    }
+    //console.log("test");
   }
 
   //ALL IN ONE SEND
