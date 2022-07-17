@@ -116,6 +116,7 @@ module.exports = {
                         ,v.apply_dept_id
                         ,fn_user_nickname(v.applicant_id) as "applicant_nickname"
                         ,fn_user_email(v.applicant_id) as "applicant_account"
+                        ,fn_user_image(v.applicant_id) as "applicant_image"
                         ,fn_user_stack_code(v.applicant_id) as "like_stack_code"
                         ,fn_user_dept_code(v.applicant_id) as "like_dept_code"
                         ,max(v.insert_date ) as "insertDate"
@@ -133,6 +134,7 @@ module.exports = {
   getTeamMembers: `select 'Y' leader_yn
                   ,fn_user_stack_code(t.user_id) as "like_stack_code"
                   ,fn_user_dept_code(t.user_id) as "like_dept_code"
+                  ,fn_user_image(t.user_id) as "member_image"
                   ,fn_user_email(t.user_id) as "member_email"
                   ,t.* from user t
                    where t.user_id = (select  t2.leader_user  from project  t2 where t2.project_id =  ?      )
@@ -140,6 +142,7 @@ module.exports = {
                   select  'N' leader_yn
                   ,fn_user_stack_code(t2.user_id) as "like_stack_code"
                   ,fn_user_dept_code(t2.user_id) as "like_dept_code"
+                  ,fn_user_image(t2.user_id) as "member_image"
                   ,fn_user_email(t2.user_id) as "member_email"
                   ,t2.* from user t2
                   where t2.user_id in
