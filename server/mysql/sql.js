@@ -154,6 +154,16 @@ module.exports = {
                       and applicant_id = ?
                     ) ;
   `,
+  getMemberRating: `            select             
+  t.rate  AS "score"
+  ,t.rate_comment  AS "comment"
+  ,fn_ratedYn(  'USER',  ?   )  AS "rated"
+from rate  t 
+where t.rated_target_id = ? 
+and t.rate_type ='USER'/*하드코딩*/  
+and t.rate_user_id = ?
+and t.project_id = ?
+`,
   getUserSocialUrls: `SELECT t.url_title AS "title", t.url_address AS "address" FROM ref_url t
   where t.post_category ='USB' and t.post_id = ?`,
   /*멘토링 정보 가져오기 풀버전*/

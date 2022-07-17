@@ -85,7 +85,7 @@ const query = async (alias, values) => {
           for (let index = 0; index < Object.keys(results).length; index++) {
             if (
               !_.isNull(results[0].like_stack_code) &&
-              _.isEqualWith(results[0].like_stack_code, undefined)
+              !_.isEmpty(results[index].like_stack_code)
             ) {
               //not null check
               stackArr = _.split(results[index].like_stack_code, ",");
@@ -99,7 +99,7 @@ const query = async (alias, values) => {
             }
             if (
               !_.isNull(results[0].like_dept_code) &&
-              _.isEqualWith(results[0].like_dept_code, undefined)
+              !_.isEmpty(results[index].like_dept_code)
             ) {
               //not null check
               deptArr = _.split(results[index].like_dept_code, ",");
