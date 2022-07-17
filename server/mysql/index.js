@@ -35,6 +35,7 @@ const codes = {
   C02: "C++",
   C03: "C#",
   J01: "javascript"
+  /* 추가 필요 */
 };
 function changeSnake2Camel(object) {
   if (Object.keys(object).length < 2) {
@@ -75,13 +76,17 @@ const query = async (alias, values) => {
 
         reject({ error });
       } else {
+        /*  QUERY . */
         //select 문 한정으로  stacks 내지 depts 는 변환한다
         if (sql[alias].includes("select")) {
           console.log("-------------------query result----------");
           // 추후 함수화 필요....
           // result 요소들 순회한다
           for (let index = 0; index < Object.keys(results).length; index++) {
-            if (!_.isNull(results[0].like_stack_code)) {
+            if (
+              !_.isNull(results[0].like_stack_code) &&
+              _.isEqualWith(results[0].like_stack_code, undefined)
+            ) {
               //not null check
               stackArr = _.split(results[index].like_stack_code, ",");
               let stackKor = "";
@@ -89,10 +94,13 @@ const query = async (alias, values) => {
                 stackKor += `${codes[element]},`;
               });
               //stacksKor 예시  = "자바스크립트,타입스크립트";
-              console.log(stackKor);
+
               results[index].like_stack_code = stackKor; //????stackArr 을 던져줘도 프론트가 모름
             }
-            if (!_.isNull(results[0].like_dept_code)) {
+            if (
+              !_.isNull(results[0].like_dept_code) &&
+              _.isEqualWith(results[0].like_dept_code, undefined)
+            ) {
               //not null check
               deptArr = _.split(results[index].like_dept_code, ",");
               let deptKor = "";
@@ -103,8 +111,8 @@ const query = async (alias, values) => {
               results[index].like_dept_code = deptKor;
             }
           }
-          console.log(results);
-          console.log("-------------------query result----------");
+          // console.log(results);
+          // console.log("-------------------query result----------");
         }
         resolve(results);
       } // 쿼리 결과를 전달
@@ -140,18 +148,26 @@ const queryWithBindings = async (alias, values) => {
   );
 };
 
-const queryWithBindings2 = async (alias, values) => {
+const getProjectList = async (alias, values) => {
   console.log("values:=====================");
   console.log(values);
   let v_alias = alias;
   console.log("v_alias : " + v_alias);
 
-  let sql = `   select * from project where  1=1 `;
-  if (values.progress_method != null && values.progress_method != "") {
-    sql += ` AND progress_method = '${values.progress_method}'`;
+  let sql = `  select t2.user_nickname , t.*
+  from project t , user t2
+  where t.leader_user = t2.user_id  
+  `;
+  // values 는 프론트단에서 건너온 배열인데 이것을 체크
+  if (values.searchKeyWord != null && values.searchKeyWord != "") {
+    sql += ` AND 
+             (project_desc like '%${values.searchKeyWord}%'
+               OR 
+              project_title like '%${values.searchKeyWord}%'  
+             ) `;
   }
-  if (values.status_code != null && values.status_code != "") {
-    sql += ` AND status_code = '${values.status_code}'`;
+  if (values.status != null && values.status != "") {
+    sql += ` AND status_code = '${values.status}'`;
   }
   if (values.main_area_code != null && values.main_area_code != "") {
     sql += ` AND main_area_code = '${values.main_area_code}'`;
@@ -237,7 +253,7 @@ module.exports = {
   changeSnake2Camel,
   query,
   queryWithBindings,
-  queryWithBindings2,
+  getProjectList,
   queryWithBindings_manage_mentoring,
   getConnection
 };
