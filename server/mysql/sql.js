@@ -224,9 +224,9 @@ module.exports = {
   reviewList: ``,
   // parentId도 추가 필요..
   registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
-   target_id) values (?, ?, ?, ?, ?) `,
+    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
   registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
-    target_id) values (?, ?, ?, ?, ?) `,
+     target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
   projectList: `select t2.user_nickname , t.*
   from project t , user t2
   where t.leader_user = t2.user_id and t.status_code = 'REC'
