@@ -237,18 +237,12 @@ and t.project_id = ?
   /*-------------------  마이페이지    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  reviewList: ``,
   // parentId도 추가 필요..
   registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
     target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
   registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
      target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
-  projectList: `select t2.user_nickname , t.*
-  from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = 'REC'
-  order by t.created_datetime desc limit 8;`,
   projectDetail: `SELECT * FROM project where project_id = ?`,
-  reviewList: ``,
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
   // 멘토리스트 관련
