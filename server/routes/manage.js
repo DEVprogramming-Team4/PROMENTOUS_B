@@ -27,6 +27,7 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
     user_id,
     user_id
   ]);
+  console.log("TESTTESTTESTTESTTEST");
   res.send(mysql.changeSnake2Camel(teamListForManage));
 });
 
@@ -55,6 +56,7 @@ router.post("/getProjectInfo", async (req, res) => {
   console.log("req.body ::" + req.body);
   console.log(req.body);
   const project_id = req.body.project_id;
+  console.log("req.body.project_id :  " + req.body.project_id);
 
   let teamTotalResult = {}; //object 선언
   /*프로젝트 기본정보  그냥 project 테이블에서 땡겨옴.*/
@@ -83,7 +85,7 @@ router.post("/getProjectInfo", async (req, res) => {
       [teamTotalResult.members[index].userId]
     );
     if (_.isEqual("Y", teamTotalResult.members[index].leaderYn)) {
-      teamTotalResult.members[index].role = "리더";
+      teamTotalResult.members[index].role = "리더"; // TODO.리더 아님!!
     } else {
       t_role = await mysql.query("getMemberRole", [
         req.body.project_id,
@@ -92,19 +94,76 @@ router.post("/getProjectInfo", async (req, res) => {
       teamTotalResult.members[index].role = t_role[0].role;
     }
   }
-  console.log("##############");
-  console.log(teamTotalResult.members);
   // console.log("------------------------------------------");
   // console.log(teamTotalResult.members);
 
+  /*멘토링 페이지 총계 정보 */
+  let mentoringTotalPageCount = await mysql.query(
+    "getTeamMentoringTotalPage",
+    [req.body.project_id] //param object 가져오기
+  );
+  teamTotalResult.mentoringTotalPageCount = mysql.changeSnake2Camel(
+    mentoringTotalPageCount
+  );
   /*프로젝트 멘토링정보*/
+
   let mentorings = await mysql.query(
     "getTeamMentoringList",
     [req.body.project_id] //param object 가져오기
   );
   teamTotalResult.mentorings = mysql.changeSnake2Camel(mentorings);
-  //ALL IN ONE
+  //mentorRating: { comment: "a", score: 1, rated: "yes" }            2,  1  4  3
+  for (let index = 0; index < teamTotalResult.mentorings.length; index++) {
+    obj = await mysql.query("getMentoringInfo", [
+      teamTotalResult.mentorings[index].mentoringId,
+      teamTotalResult.mentorings[index].mentoringId
+    ]);
+
+    teamTotalResult.mentorings[index].mentorRating = obj;
+    console.log("test");
+    console.log(teamTotalResult.mentorings[index].mentorRating.score);
+    console.log(
+      typeof (await mysql.query("getMentoringInfo", [
+        teamTotalResult.mentorings[index].mentoringId,
+        teamTotalResult.mentorings[index].mentoringId
+      ]))
+    );
+    console.log(teamTotalResult.mentorings[index]);
+  }
+
+  //ALL IN ONE SEND
   res.send(teamTotalResult);
+});
+/* 페이지 선택해 멘토링정보 4단위로 가져오기 */
+router.post("/getMentoringsBySelectedPage", async (req, res) => {
+  let numberForEachPage = 4; //페이지 당 몇개씩 나오는가
+  let mentorings = await mysql.query("getTeamMentoringListBySelectedPage", [
+    req.body.project_id,
+    (req.body.project_id - 1) * numberForEachPage,
+    numberForEachPage
+  ]);
+  mentorings = mysql.changeSnake2Camel(mentorings);
+
+  res.send(mentorings);
+});
+/* 팀개요에서 정보 바꾼뒤 저장 시에 데이터 변경처리하기 */
+router.post("/saveTeamManageInfo", async (req, res) => {
+  console.log("/saveTeamManageInfo");
+  /* project table관련  */
+  res = await mysql.query("getTeamMentoringListBySelectedPage", [
+    req.body.project_id,
+    (req.body.project_id - 1) * numberForEachPage,
+    numberForEachPage
+  ]);
+
+  /* ref_url 테이블 관련 -- 관련 링크..  */
+  res = await mysql.query("getTeamMentoringListBySelectedPage", [
+    req.body.project_id,
+    (req.body.project_id - 1) * numberForEachPage,
+    numberForEachPage
+  ]);
+
+  res.send(res);
 });
 
 /* param TESt  */

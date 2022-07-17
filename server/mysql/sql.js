@@ -179,19 +179,43 @@ module.exports = {
                       else  50
                   end
                 `,
+
+  getTeamMentoringTotalPage: `select ceil(count(*)/4) total_count from mentoring v2 where v2.project_id = ?`,
   getTeamMentoringList: ` /* 숫자만 던져주는 버전 - 시간정보는 없음. */
           select
               fn_get_mentorStatusNum (fn_get_curr_mentoringstatus( t.mentoring_id )) AS "mentoring_status"
-              ,( select fn_getMentorname( fn_getMentorinfo( t.mentoring_id) )  )   "user_name" /*멘토닉네임*/
+              ,( select fn_getMentorname( fn_getMentorinfo( t.mentoring_id) )  )   "mentor_user_id" /*멘토닉네임*/
+              , (select v2.mentoring_title from mentor_info v2 where v2.mentor_info_id = fn_getMentorinfo( t.mentoring_id) )  "mentoring_title"
+              ,t.mentoring_id AS "mentoring_id"    
+          from mentoring t 
+              where t.mentoring_id in (
+                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?      
+              )     /*최초 이므로 (하드코딩) limit 0 4 로만 땡겨온다.*/   
+              LIMIT 0,4
+              `,
+  /* 멘토링정보 페이지 번호기준으로 가져오기  */
+  getTeamMentoringListBySelectedPage: `
+          select   
+              fn_get_mentorStatusNum (fn_get_curr_mentoringstatus( t.mentoring_id )) AS "mentoring_status"
+              ,( select fn_getMentorname( fn_getMentorinfo( t.mentoring_id) )  )   "mentor_user_id" /*멘토닉네임*/
               , (select v2.mentoring_title from mentor_info v2 where v2.mentor_info_id = fn_getMentorinfo( t.mentoring_id) )  "mentoring_title"
               ,t.mentoring_id AS "mentoring_id"
               ,'hardcodingdummydata'  AS "mentor_rating_comment"
               ,'hardcodingdummydata'  AS "mentor_rating_score"
           from mentoring t
               where t.mentoring_id in (
-                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?
+                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?      
               )
+              LIMIT ?, ?   
               `,
+  getMentoringInfo: `
+            select             
+            t.rate  AS "score"
+            ,t.rate_comment  AS "comment"
+            ,fn_ratedYn(  'MENTOR',  ?   )  AS "rated"
+          from rate  t 
+          where t.rated_target_id = ? 
+          and t.rate_type ='MENTOR' /*--하드코딩*/ `,
 
   /*--------------------------------------------------------------*/
   /*-------------------  마이페이지    영역--------------------------*/
@@ -200,10 +224,15 @@ module.exports = {
   reviewList: ``,
   // parentId도 추가 필요..
   registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
-   target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
+   target_id) values (?, ?, ?, ?, ?) `,
   registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
-    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
-  // 로그인과 유저아이디를 쏴주는 쿼리영역
+    target_id) values (?, ?, ?, ?, ?) `,
+  projectList: `select t2.user_nickname , t.*
+  from project t , user t2
+  where t.leader_user = t2.user_id and t.status_code = 'REC'
+  order by t.created_datetime desc limit 8;`,
+  projectDetail: `SELECT * FROM project where project_id = ?`,
+  reviewList: ``,
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
   // 멘토리스트 관련
