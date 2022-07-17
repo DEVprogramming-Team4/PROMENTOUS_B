@@ -277,11 +277,32 @@ CREATE TABLE `project` (
 
 LOCK TABLES `project` WRITE;
 /*!40000 ALTER TABLE `project` DISABLE KEYS */;
-INSERT INTO `project` VALUES (1,3,'자바스크립트 따라잡기','2022-06-19 00:00:00',4,'OFF','REC','M09','S01','T01,R01','test1Leader@google.com','test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명',30000,'https://discord.gg/jRqYDKNH','2022-06-17 00:00:00'),(2,3,'파이썬으로 만드는 TODO LIST','2022-02-19 00:00:00',3,'OFF','FIN','M08','S125','J02,R01','test2Leader@google.com','기종료기종료기종료test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명',20000,'https://discord.gg/jRqYDKNH','2022-01-17 00:00:00'),(3,3,'자바로 게임만들기','2022-02-19 00:00:00',3,'OFF','FIN','M08','S125','T01,R01','test3Leader@google.com','기종료기종료기종료test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명',40000,'https://discord.gg/jRqYDKNH','2022-01-25 00:00:00'),(4,10,'파이썬 프로젝트','2022-01-19 00:00:00',2,'ON','FIN',NULL,NULL,'P01','test4Leader@google.com','기종료기종료기종료test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명test프로젝트설명',60000,'https://discord.gg/jRqYDKNH','2022-01-15 00:00:00'),  (5,2,'포트폴리오 2달 끝내기','2022-07-04 00:00:00',2,'ON','FIN',NULL,NULL,'P01','test5Leader@google.com','Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',60000,'https://discord.gg/jRqYDKNH','2022-06-05 00:00:00'),
-  (6,1,'영화 추천 서비스','2022-07-05 00:00:00',2,'ON','FIN',NULL,NULL,'P01','test6Leader@google.com','Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',60000,'https://discord.gg/jRqYDKNH','2022-06-06 00:00:00'),
-  (7,5,'공용주차장 왓칭 서비스','2022-07-05 00:00:00',2,'ON','REC',NULL,NULL,'P01','test7Leader@google.com','Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',60000,'https://discord.gg/jRqYDKNH','2022-06-07 00:00:00'),
-  (8,7,'최신 IT 동향 메일링 서비스','2022-07-06 00:00:00',2,'ON','FIN',NULL,NULL,'P01','test8Leader@google.com','Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',60000,'https://discord.gg/jRqYDKNH','2022-06-08 00:00:00'),
-  (9,7,'하하하하하하하하 웃어요','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','test9Leader@google.com','Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00');/*!40000 ALTER TABLE `project` ENABLE KEYS */;
+  -- id, userId, tit, desc, expDate, expPeriod, method, mainarea, subarea, stack(string), contact, desc, warranty, meetingURL, create
+INSERT INTO `project` VALUES
+  (1,3,'자바스크립트 따라잡기','2022-06-19 00:00:00',4,'OFF','REC','M09','S01','T01,R01','test1Leader@google.com','설명',30000,'https://discord.gg/jRqYDKNH','2022-01-01 00:00:00'),
+  (2,3,'파이썬으로 만드는 TODO LIST','2022-02-19 00:00:00',3,'OFF','FIN','M08','S125','J02,R01','test2Leader@google.com','종료_설명',20000,'https://discord.gg/jRqYDKNH','2022-01-17 00:00:00'),
+  (3,3,'자바로 게임만들기','2022-02-19 00:00:00',3,'OFF','FIN','M08','S125','T01,R01','test3Leader@google.com','종료_설명',40000,'https://discord.gg/jRqYDKNH','2022-01-25 00:00:00'),
+  (4,10,'파이썬 프로젝트','2022-01-19 00:00:00',2,'ON','FIN',NULL,NULL,'P01','test4Leader@google.com','종료_설명',60000,'https://discord.gg/jRqYDKNH','2022-01-15 00:00:00'),  
+  (5,2,'포트폴리오 2달 끝내기','2022-07-04 00:00:00',2,'ON','FIN',NULL,NULL,'P01','test5Leader@google.com','종료_설명.',60000,'https://discord.gg/jRqYDKNH','2022-06-05 00:00:00'),
+  (6,1,'영화 추천 서비스','2022-07-05 00:00:00',2,'ON','FIN',NULL,NULL,'P01','test6Leader@google.com','종료_설명',60000,'https://discord.gg/jRqYDKNH','2022-06-06 00:00:00'),
+  (7,5,'공용주차장 왓칭 서비스','2022-07-05 00:00:00',2,'ON','REC',NULL,NULL,'P01','test7Leader@google.com','설명.',60000,'https://discord.gg/jRqYDKNH','2022-06-07 00:00:00'),
+  (8,7,'최신 IT 동향 메일링 서비스','2022-07-06 00:00:00',2,'ON','FIN',NULL,NULL,'P01','test8Leader@google.com','종료_설명',60000,'https://discord.gg/jRqYDKNH','2022-06-08 00:00:00'),
+  (9,7,'인터렉티브 웹 페이지 만들기','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','test9Leader@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (10,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','kimkk@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (11,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','parkhonda@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (12,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','vvnasdjqk@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (13,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','jaysungjae@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (14,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','namnana@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (15,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','alex@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (16,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','david@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (17,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','youingsu@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (18,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','freeeeesasd@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (19,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','simon@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (20,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','wsgwannabe@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (21,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','devdignity@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (22,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','domino@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00'),
+  (23,7,'제목','2022-07-07 00:00:00',2,'ON','REC',NULL,NULL,'P01','qwerty@google.com','설명',60000,'https://discord.gg/jRqYDKNH','2022-06-09 00:00:00');
+  /*!40000 ALTER TABLE `project` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -555,6 +576,7 @@ CREATE TABLE `user` (
   `like_stack_code` varchar(200) DEFAULT NULL,
   `user_register_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
+  UNIQUE KEY (`user_account`),
   KEY `fk_code_idx` (`like_dept_code`,`like_stack_code`),
   KEY `fk_ddddd_idx` (`like_stack_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
