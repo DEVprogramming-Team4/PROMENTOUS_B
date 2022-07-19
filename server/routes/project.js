@@ -27,6 +27,7 @@ router.post("/", async (req, res) => {
       page
     ]); // 배열안에 차례차례 담아주기
     // 쏴주는 구역
+    //console.log(projectRecruitList);
     res.send({ count, projectRecruitList }); // node express에서 숫자는 넘겨줄수 없다!!Buffer, String, object, Boolean, Array만 가능하다
   } catch (error) {
     res.send(error);
@@ -53,6 +54,8 @@ router.delete("/delete", async (req, res) => {
 router.get("/:projectId", async (req, res) => {
   let projectId = req.params.projectId;
   const projectDetail = await mysql.query("projectDetail", [projectId]);
+  //console.log("실행---------------------");
+  //console.log(projectDetail[0]);
   res.send(projectDetail[0]);
 });
 
@@ -61,19 +64,21 @@ router.get("/:projectId", async (req, res) => {
 router.get("/:projectId/leader", async (req, res) => {
   let projectId = req.params.projectId;
   const leaderData = await mysql.query("projectLeaderData", [projectId]);
-  res.send(leaderData[0]);
-});
-
-// GET
-// 리더 프로젝트 진행이력
-// TODO: 데이터 추가 후 테스트 필요
-router.get("/:projectId/leaderhistory", async (req, res) => {
-  let projectId = req.params.projectId;
-  // TODO: 질문: leaderProjectHistory 쿼리문 -> leaderHistory 이렇게 짜도 되는지.
   const leaderHistory = await mysql.query("leaderHistory", [
     projectId,
     projectId
   ]);
+  leaderData[0].leaderHistory = leaderHistory;
+  //console.log(leaderData[0]); // leaderData 확인해보세요
+  res.send(leaderData[0]);
+});
+
+// GET
+// 리더 프로젝트 진행이력 ( 삭제. leaderData.leaderHistory 에 있음.)
+// TODO: 데이터 추가 후 테스트 필요
+router.get("/:projectId/leaderhistory", async (req, res) => {
+  let projectId = req.params.projectId;
+  // TODO: 질문: leaderProjectHistory 쿼리문 -> leaderHistory 이렇게 짜도 되는지.
   res.send(leaderHistory);
 });
 
@@ -89,8 +94,11 @@ router.get("/:projectId/ref_url", async (req, res) => {
 // 프로젝트 모집 현황 & 인원
 router.get("/:projectId/recruit_data", async (req, res) => {
   let projectId = req.params.projectId;
+  // apply_dept_id 별로 값을 가짐.
   const recruitData = await mysql.query("projectRecruitData", [projectId]);
+  // 각 배열을 순회하면서 apply_dept_id  기준으로 몇명 ACC 되었는지 값을 가져옴. (팀장 포함? 미포함? )
+  //console.log(" recruitData 확인해보세요");
+  //console.log(recruitData);
   res.send(recruitData);
 });
-
 module.exports = router; // NECCESARY END STATE

@@ -9,6 +9,10 @@ const pool = mysql.createPool({
   database: process.env.MYSQL_DB,
   connectionLimit: process.env.MYSQL_LIMIT
 });
+/********************************************************************** */
+/**************** 01. 공통  METHOD 및 공통  CODE MAP       ***************** */
+/********************************************************************** */
+/********************************************************************** */
 // 코드값  강제로 가져오기.
 const codes = {
   FE: "프론트엔드",
@@ -37,6 +41,22 @@ const codes = {
   J01: "javascript"
   /* 추가 필요 */
 };
+/* getConnection :  APPJS 기본 MYSQL INIT  */
+const getConnection = async () => {
+  return new Promise((resolve, reject) =>
+    pool.getConnection((err, conn) => {
+      if (err) {
+        console.log(err);
+        reject({ err });
+      } else {
+        resolve(conn);
+      }
+    })
+  );
+};
+/* changeSnake2Camel :   DB에서 날것인 SNAKE를  FRONT에 보내기전에 CAMEL 화 한다 
+   OBJECT 속 OBJECT /배열 이라면.. 
+   changeCamel2Snake  를  하위 OBJECT 에도 수행 해줘야 함!! */
 function changeSnake2Camel(object) {
   if (Object.keys(object).length < 2) {
     // single 결과값인경우
@@ -55,18 +75,46 @@ function changeSnake2Camel(object) {
         })
       );
     }
-    // 새로운 object를 넣는것이 아니고, key 명칭만바꾸고 배열에 넣어주는 것 뿐이므로 4줄 삭제한다.
-    // newObject = temp.reduce(function (acc, cur, i) {
-    //   acc[i] = cur;
-    //   return acc;
-    // }, {});
+    //console.log("AFTER  CAMEL....");
+    //console.log(temp);
     return temp;
   }
 }
+/* changeCamel2Snake :  FRONT에서  CAMEL 로 데이터 던져주는경우에 CAMEL 화 한다 
+   OBJECT 속 OBJECT /배열 이라면.. 
+   changeCamel2Snake  를  하위 OBJECT 에도 수행 해줘야 함!!   */
+function changeCamel2Snake(object) {
+  if (Object.keys(object).length < 2) {
+    // single 결과값인경우
+    let newObject = _.mapKeys(object[0], (value, key) => {
+      return _.snakeCase(key);
+    });
+    return newObject;
+  } else {
+    // multiple 결과값인경우
+    newObject = {};
+    temp = [];
+    for (let index = 0; index < Object.keys(object).length; index++) {
+      temp.push(
+        _.mapKeys(object[index], (value, key) => {
+          return _.snakeCase(key);
+        })
+      );
+    }
+    //console.log("AFTER  SNAKE....");
+    //console.log(temp);
+    return temp;
+  }
+}
+/* change DB  */
 
-/* 1. query   쿼리문을 실행하고 결과를 반환하는 함수 */
+/********************************************************************** */
+/*******************          02.  QUERY   METHODS   ***************** */
+/********************************************************************** */
+/********************************************************************** */
+/* 02-1. query   쿼리문을 실행하고 결과를 반환하는 함수 */
 const query = async (alias, values) => {
-  console.log("values:=====================");
+  console.log("PARAMS INTO:=====================");
   console.log(values);
   return new Promise((resolve, reject) =>
     pool.query(sql[alias], values, (error, results) => {
@@ -78,8 +126,11 @@ const query = async (alias, values) => {
       } else {
         /*  QUERY . */
         //select 문 한정으로  stacks 내지 depts 는 변환한다
-        if (sql[alias].includes("select")) {
+        if (sql[alias].includes("select") || sql[alias].includes("SELECT")) {
           console.log("-------------------query result----------");
+          //console.log(results);
+          //console.log(Object.keys(results));
+          //console.log(results[0].stack_code);
           // 추후 함수화 필요....
           // result 요소들 순회한다
           for (let index = 0; index < Object.keys(results).length; index++) {
@@ -88,27 +139,45 @@ const query = async (alias, values) => {
               !_.isEmpty(results[index].like_stack_code)
             ) {
               //not null check
-              stackArr = _.split(results[index].like_stack_code, ",");
-              let stackKor = "";
-              stackArr.forEach((element) => {
-                stackKor += `${codes[element]},`;
+              let likestackKor = "";
+              results[index].like_stack_code_origin =
+                results[index].like_stack_code;
+              likestackArr = _.split(results[index].like_stack_code, ",");
+              likestackArr.forEach((element) => {
+                likestackKor += `${codes[element]},`;
               });
               //stacksKor 예시  = "자바스크립트,타입스크립트";
 
-              results[index].like_stack_code = stackKor; //????stackArr 을 던져줘도 프론트가 모름
+              results[index].like_stack_code = likestackKor; //????stackArr 을 던져줘도 프론트가 모름
             }
             if (
               !_.isNull(results[0].like_dept_code) &&
               !_.isEmpty(results[index].like_dept_code)
             ) {
               //not null check
-              deptArr = _.split(results[index].like_dept_code, ",");
               let deptKor = "";
+              results[index].like_dept_code_origin =
+                results[index].like_dept_code;
+              deptArr = _.split(results[index].like_dept_code, ",");
               deptArr.forEach((element) => {
                 deptKor += `${codes[element]},`;
               });
               //deptKor 예시  = "기획,데이터베이스";
               results[index].like_dept_code = deptKor;
+            }
+            if (
+              !_.isNull(results[0].stack_code) &&
+              !_.isEmpty(results[index].stack_code)
+            ) {
+              //not null check
+              let stackKor = "";
+              results[index].stack_code_origin = results[index].stack_code;
+              stackArr = _.split(results[index].stack_code, ",");
+              stackArr.forEach((element) => {
+                stackKor += `${codes[element]},`;
+              });
+              //deptKor 예시  = "기획,데이터베이스";
+              results[index].stack_code = stackKor;
             }
           }
           // console.log(results);
@@ -119,8 +188,8 @@ const query = async (alias, values) => {
     })
   );
 };
-
-const queryWithBindings = async (alias, values) => {
+/* 02-2. queryDynamic  동적 쿼리 구현 SAMPLE */
+const queryDynamic = async (alias, values) => {
   console.log("values:=====================");
   console.log(values);
   let v_alias = alias;
@@ -147,7 +216,7 @@ const queryWithBindings = async (alias, values) => {
     })
   );
 };
-
+/* 02-2. getProjectList  동적 쿼리로  모집글 리스트를 가져온다  */
 const getProjectList = async (alias, values) => {
   console.log("values:=====================");
   console.log(values);
@@ -180,14 +249,14 @@ const getProjectList = async (alias, values) => {
     // req.body.stack_code 가 어떻게 오느냐에 따라서 다르게 반응.
     // 만약 문자열로 온다면. ex )  "T01,R01"
     let stackcodes = values.stack_code;
-    let arr = stackcodes.split(",");
+    let arr = stackcodes.split(","); // "J01,C01,D01"
     sql += `(`;
     for (let index = 0; index < arr.length; index++) {
       const element = arr[index];
       if (index == 0) {
-        sql += `stack_code like '%${arr[index]}%'`;
+        sql += `stack_code like '%${arr[index]}%'`; //      stack_code like '%$J01%
       } else {
-        sql += `OR stack_code like '%${arr[index]}%'`;
+        sql += `OR stack_code like '%${arr[index]}%'`; // OR   stack_code like '%$C01%
       }
     }
     sql += `)`;
@@ -236,23 +305,11 @@ const queryWithBindings_manage_mentoring = async (alias, values) => {
   );
 };
 
-const getConnection = async () => {
-  return new Promise((resolve, reject) =>
-    pool.getConnection((err, conn) => {
-      if (err) {
-        console.log(err);
-        reject({ err });
-      } else {
-        resolve(conn);
-      }
-    })
-  );
-};
-
 module.exports = {
   changeSnake2Camel,
+  changeCamel2Snake,
   query,
-  queryWithBindings,
+  queryDynamic,
   getProjectList,
   queryWithBindings_manage_mentoring,
   getConnection
