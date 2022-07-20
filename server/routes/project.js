@@ -4,10 +4,25 @@ const _ = require("lodash");
 const mysql = require("../mysql");
 
 // localhost:3000/project/recruit
+async function getViewCount(projectList) {
+  for (let i = 0; i < projectList.length; i++) {
+    // response : [{id: x, cnt: x}]
+    const response = await mysql.query(
+      "getProjectViewCount",
+      projectList[i].project_id
+    );
+    if (response[0] === undefined) {
+      projectList[i].viewCount = 0;
+    } else {
+      projectList[i].viewCount = response[0].viewCnt;
+    }
+  }
+}
 
 // 메인화면에 보내줄 정렬이 필요없는 결과값 보내주기
 router.get("/", async (req, res) => {
   const projectListDefault = await mysql.query("projectListDefault");
+  await getViewCount(projectListDefault);
   res.send(projectListDefault);
 });
 
@@ -27,6 +42,7 @@ router.post("/", async (req, res) => {
       recruitStatus,
       page
     ]); // 배열안에 차례차례 담아주기
+    await getViewCount(projectRecruitList);
     // 쏴주는 구역
     //console.log(projectRecruitList);
     res.send({ count, projectRecruitList }); // node express에서 숫자는 넘겨줄수 없다!!Buffer, String, object, Boolean, Array만 가능하다
@@ -35,12 +51,34 @@ router.post("/", async (req, res) => {
   }
 });
 // POST
-// 모집글 작성 부분입니다. localhost:3000/project/recruitCreate
-router.post("/insert", async (req, res) => {
-  // const result = await mysql.query("projectInsert", req.body.param);
-  // res.send(req);
-  // req.body.xxxx  xxxx : front에서 작성하는 겁니다.
-  res.send("haha");
+// 모집글 작성 부분입니다. localhost:3000/project/recruit/insert
+router.post("/insertPost", async (req, res) => {
+  try {
+    // req.body.xxxx  xxxx : front에서 작성하는 겁니다. 헷갈리면 계속 콘솔에서 찍어봅시다.
+    const projectVal = req.body.param; // {}
+    const response = await mysql.query("projectInsert", projectVal);
+    res.send(response);
+    // res.send로 보내줄 정보가 있을지 고민
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
+});
+router.post("/insertAdditional", async (req, res) => {
+  try {
+    const urlVal = req.body.param[0]; // [[{},{}],[{},{}]]
+    for (let i = 0; i < urlVal.length; i++) {
+      await mysql.query("urlInsert", urlVal[i]);
+    }
+    const deptVal = req.body.param[1];
+    for (let i = 0; i < deptVal.length; i++) {
+      await mysql.query("deptInsert", deptVal[i]);
+    }
+    res.send("success");
+    // res.send로 보내줄 정보가 있을지 고민
+  } catch (error) {
+    res.send(error);
+  }
 });
 // PUT
 router.put("/update", async (req, res) => {
