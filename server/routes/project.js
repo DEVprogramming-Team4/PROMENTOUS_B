@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const _ = require("lodash");
 const mysql = require("../mysql");
 
 // localhost:3000/project/recruit
@@ -101,4 +102,34 @@ router.get("/:projectId/recruit_data", async (req, res) => {
   //console.log(recruitData);
   res.send(recruitData);
 });
+
+router.get("/:projectId/currentMembers", async (req, res) => {
+  let projectId = req.params.projectId;
+  // apply_dept_id 별로 값을 가짐.
+  const currentMembers = await mysql.query("getCurrentMembers", [projectId]);
+  // 각 배열을 순회하면서 apply_dept_id  기준으로 몇명 ACC 되었는지 값을 가져옴. (팀장 포함? 미포함? )
+  //console.log(" currentMembers 확인해보세요");
+  //console.log(currentMembers);
+  sendData = {};
+  deptIdArray = [];
+  for (let index = 0; index < currentMembers.length; index++) {
+    const element = currentMembers[index];
+
+    if (_.indexOf(deptIdArray, element.apply_dept_code) == -1) {
+      //console.log("없다. 추가");
+      deptIdArray.push(element.apply_dept_code);
+      sendData[element.apply_dept_code] = []; // 배열 생성 및 object 투입
+      sendData[element.apply_dept_code].push(element);
+    } else {
+      //console.log("있다. skip ");
+      sendData[element.apply_dept_code].push(element);
+    }
+    //console.log("loop : deptIdArray");
+    //console.log(deptIdArray);
+  }
+  //console.log(" sendData 확인해보세요");
+  //console.log(sendData);
+  res.send(sendData);
+});
+
 module.exports = router; // NECCESARY END STATE
