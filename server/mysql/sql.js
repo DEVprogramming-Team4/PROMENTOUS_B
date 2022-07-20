@@ -86,6 +86,14 @@ module.exports = {
       , fn_acceptedDeptCount(t.apply_dept_id  ) acc_count
       , fn_totalDeptCount(t.apply_dept_id ) total_count
       from apply_dept t where t.project_id = ?  `,
+
+  getCurrentMembers: `
+    select  t.*
+            ,fn_get_username(t.applicant_id) user_nickname
+            ,fn_get_applyDeptCode(apply_dept_id ) apply_dept_code
+      from apply_admin t 
+        where t.apply_status = 'ACC' and t.project_id = ?`,
+
   getCount: `select count(project_id) as cnt from project where project.status_code = ?;`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
@@ -133,7 +141,7 @@ module.exports = {
                         ,fn_user_dept_code(v.applicant_id) as "like_dept_code"
                         ,max(v.insert_date ) as "insertDate"
                         ,max(v.stat) /*1지원중, 2승인, 3반려 */ stat
-                        ,max(v.stat)  as "applyStatus"
+                        ,v.apply_status  as "apply_status"
 
                         from (
                         select t.applicant_id, t.project_id, t.apply_dept_id, t.insert_date, t.apply_status,

@@ -114,8 +114,8 @@ function changeCamel2Snake(object) {
 /********************************************************************** */
 /* 02-1. query   쿼리문을 실행하고 결과를 반환하는 함수 */
 const query = async (alias, values) => {
-  console.log("PARAMS INTO:=====================");
-  console.log(values);
+  //console.log("PARAMS INTO:=====================");
+  //console.log(values);
   return new Promise((resolve, reject) =>
     pool.query(sql[alias], values, (error, results) => {
       if (error) {
@@ -127,7 +127,7 @@ const query = async (alias, values) => {
         /*  QUERY . */
         //select 문 한정으로  stacks 내지 depts 는 변환한다
         if (sql[alias].includes("select") || sql[alias].includes("SELECT")) {
-          console.log("-------------------query result----------");
+          //console.log("-------------------query result----------");
           //console.log(results);
           //console.log(Object.keys(results));
           //console.log(results[0].stack_code);
