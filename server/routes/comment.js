@@ -3,8 +3,19 @@ const router = express.Router();
 const mysql = require("../mysql");
 const _ = require("lodash");
 
-router.get("/get", function (req, res) {
-  res.send("댓글 조회 & 댓글 넘겨주는 API");
+router.get("/recruit/get/:projectId", async (req, res) => {
+  let projectId = req.params.projectId;
+  let commmentList = await mysql.query("getRecruitCommentList", [projectId]);
+
+  // 작성자 id -> 작성자 Name 반환
+  const len = commmentList.length;
+  for (var i = 0; i < len; i++) {
+    commmentList[i].writer_nickname = (
+      await mysql.query("getUserNickName", [commmentList[i].writer_id])
+    )[0].user_nickname;
+  }
+
+  res.send(commmentList);
 });
 
 // POST
@@ -42,8 +53,17 @@ router.put("/update", function (req, res) {
   res.send("댓글이 수정되었습니다..");
 });
 
-router.delete("/delete", function (req, res) {
-  res.send("comment/delete 경로,, 댓글이 삭제되었습니다.");
+// 삭제
+router.put("/delete/:comment_id", function (req, res) {
+  let query = "";
+  query = "deleteRecruitComment";
+  // const registerComment = await mysql.query(query, queryData);
+
+  res.send("댓글이 삭제되었습니다..");
 });
+
+// router.delete("/delete/:comment_id", function (req, res) {
+//   res.send("comment/delete 경로,, 댓글이 삭제되었습니다.");
+// });
 
 module.exports = router;

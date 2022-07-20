@@ -50,8 +50,12 @@ module.exports = {
     select v3.project_id from project v3
     where v3.leader_user = (select leader_user from project where project_id = ? )) order by t.created_datetime
     desc limit 3`, // 쿼리문 에러나서 밑의 걸로 다시 짬. - (질문하기)
-  leaderHistory: `select * from project where leader_user = ? union
-    select * from project where project_id in (select project_id from apply_admin where (applicant_id = ? and apply_status = 'ACC'))`,
+  leaderHistory: `/*leaderHistory */ 
+   select   title, project_id  from
+  (select title, project_id  from project where leader_user = ?
+   union
+   select title, project_id  from project where project_id in (select project_id from apply_admin where (applicant_id = ? and apply_status = 'ACC'))
+   ) v1`,
   projectRefUrl: `select * from ref_url where post_id = ? and post_category='RCB'`,
 
   projectRecruitList: `SELECT * FROM project`, // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
@@ -69,11 +73,19 @@ module.exports = {
       else  50
  end
  limit  ? , 3 `,
+  getRecruitCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
+  getReviewCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
   registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
   target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
+  deleteRecruitComment: `update project_reply set del_yn = 'Y' where project_reply_id = ?`,
   registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
    target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
-  projectRecruitData: `select * from apply_dept where project_id = ?`,
+  projectRecruitData: `
+      select 
+      t.*
+      , fn_acceptedDeptCount(t.apply_dept_id  ) acc_count
+      , fn_totalDeptCount(t.apply_dept_id ) total_count
+      from apply_dept t where t.project_id = ?  `,
   getCount: `select count(project_id) as cnt from project where project.status_code = ?;`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
@@ -116,6 +128,7 @@ module.exports = {
                         ,v.apply_dept_id
                         ,fn_user_nickname(v.applicant_id) as "applicant_nickname"
                         ,fn_user_email(v.applicant_id) as "applicant_account"
+                        ,fn_user_image(v.applicant_id) as "applicant_image"
                         ,fn_user_stack_code(v.applicant_id) as "like_stack_code"
                         ,fn_user_dept_code(v.applicant_id) as "like_dept_code"
                         ,max(v.insert_date ) as "insertDate"
@@ -133,6 +146,7 @@ module.exports = {
   getTeamMembers: `select 'Y' leader_yn
                   ,fn_user_stack_code(t.user_id) as "like_stack_code"
                   ,fn_user_dept_code(t.user_id) as "like_dept_code"
+                  ,fn_user_image(t.user_id) as "member_image"
                   ,fn_user_email(t.user_id) as "member_email"
                   ,t.* from user t
                    where t.user_id = (select  t2.leader_user  from project  t2 where t2.project_id =  ?      )
@@ -140,6 +154,7 @@ module.exports = {
                   select  'N' leader_yn
                   ,fn_user_stack_code(t2.user_id) as "like_stack_code"
                   ,fn_user_dept_code(t2.user_id) as "like_dept_code"
+                  ,fn_user_image(t2.user_id) as "member_image"
                   ,fn_user_email(t2.user_id) as "member_email"
                   ,t2.* from user t2
                   where t2.user_id in
@@ -154,13 +169,13 @@ module.exports = {
                       and applicant_id = ?
                     ) ;
   `,
-  getMemberRating: `            select             
+  getMemberRating: `            select
   t.rate  AS "score"
   ,t.rate_comment  AS "comment"
   ,fn_ratedYn(  'USER',  ?   )  AS "rated"
-from rate  t 
-where t.rated_target_id = ? 
-and t.rate_type ='USER'/*하드코딩*/  
+from rate  t
+where t.rated_target_id = ?
+and t.rate_type ='USER'/*하드코딩*/
 and t.rate_user_id = ?
 and t.project_id = ?
 `,
@@ -196,16 +211,16 @@ and t.project_id = ?
               fn_get_mentorStatusNum (fn_get_curr_mentoringstatus( t.mentoring_id )) AS "mentoring_status"
               ,( select fn_getMentorname( fn_getMentorinfo( t.mentoring_id) )  )   "mentor_user_id" /*멘토닉네임*/
               , (select v2.mentoring_title from mentor_info v2 where v2.mentor_info_id = fn_getMentorinfo( t.mentoring_id) )  "mentoring_title"
-              ,t.mentoring_id AS "mentoring_id"    
-          from mentoring t 
+              ,t.mentoring_id AS "mentoring_id"
+          from mentoring t
               where t.mentoring_id in (
-                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?      
-              )     /*최초 이므로 (하드코딩) limit 0 4 로만 땡겨온다.*/   
+                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?
+              )     /*최초 이므로 (하드코딩) limit 0 4 로만 땡겨온다.*/
               LIMIT 0,4
               `,
   /* 멘토링정보 페이지 번호기준으로 가져오기  */
   getTeamMentoringListBySelectedPage: `
-          select   
+          select
               fn_get_mentorStatusNum (fn_get_curr_mentoringstatus( t.mentoring_id )) AS "mentoring_status"
               ,( select fn_getMentorname( fn_getMentorinfo( t.mentoring_id) )  )   "mentor_user_id" /*멘토닉네임*/
               , (select v2.mentoring_title from mentor_info v2 where v2.mentor_info_id = fn_getMentorinfo( t.mentoring_id) )  "mentoring_title"
@@ -214,35 +229,29 @@ and t.project_id = ?
               ,'hardcodingdummydata'  AS "mentor_rating_score"
           from mentoring t
               where t.mentoring_id in (
-                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?      
+                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?
               )
-              LIMIT ?, ?   
+              LIMIT ?, ?
               `,
   getMentoringInfo: `
-            select             
+            select
             t.rate  AS "score"
             ,t.rate_comment  AS "comment"
             ,fn_ratedYn(  'MENTOR',  ?   )  AS "rated"
-          from rate  t 
-          where t.rated_target_id = ? 
+          from rate  t
+          where t.rated_target_id = ?
           and t.rate_type ='MENTOR' /*--하드코딩*/ `,
 
   /*--------------------------------------------------------------*/
   /*-------------------  마이페이지    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  reviewList: ``,
   // parentId도 추가 필요..
   registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
     target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
   registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
      target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
-  projectList: `select t2.user_nickname , t.*
-  from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = 'REC'
-  order by t.created_datetime desc limit 8;`,
   projectDetail: `SELECT * FROM project where project_id = ?`,
-  reviewList: ``,
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
   // 멘토리스트 관련
