@@ -31,7 +31,22 @@ module.exports = {
   manage_HeaderSelect: `select 'babo' from dual`,
   projectList: `select t2.user_nickname , t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ?
+  where t.leader_user = t2.user_id and t.status_code = ? 
+  order by t.created_datetime desc
+  limit 8 offset ?;`,
+  projectListOnline: `select t2.user_nickname , t.*
+  from project t , user t2
+  where t.leader_user = t2.user_id and t.status_code = ? t.progress_method = ?
+  order by t.created_datetime desc
+  limit 8 offset ?;`,
+  projectListLargeCity: `select t2.user_nickname , t.*
+  from project t , user t2
+  where t.leader_user = t2.user_id and t.status_code = ? t.main_aria_code = ?
+  order by t.created_datetime desc
+  limit 8 offset ?;`,
+  projectListRestCity: `select t2.user_nickname , t.*
+  from project t , user t2
+  where t.leader_user = t2.user_id and t.status_code = ? t.sub_aria_code = ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
   projectListDefault: `select t2.user_nickname , t.*
@@ -42,6 +57,8 @@ module.exports = {
   projectDetail: `SELECT * FROM project where project_id = ?`,
   // 로그인처럼 하면 업데이트문을 쓸수있다(그러나 유니크 키 하나정도 있어야한다) 다시말해 풋요청도 같은 쿼리로 받을 수 있다. 물음표에서 받아오려면 컬럼명일치
   projectInsert: `insert into project set ?`,
+  urlInsert: `insert into ref_url set ?`,
+  deptInsert: `insert into apply_dept set ?`,
   projectLeaderData: `select t.* from user t where t.user_id = ( select t2.leader_user from project t2 where t2.project_id = ? )`,
   leaderProjectHistory: `select t.* from project t where t.project_id in (
     select project_id t where apply_admin v1, project v2 where v1.applicant_id = (select leader_user from project where project_id = ? )
@@ -58,7 +75,6 @@ module.exports = {
    ) v1`,
   projectRefUrl: `select * from ref_url where post_id = ? and post_category='RCB'`,
 
-  projectRecruitList: `SELECT * FROM project`, // 모집글id(클릭시 이걸로 넘겨주기..?) 시작예정일, 모집상태, 프로젝트명, 작성자이름, 스크랩수, 뷰수, 유징스택
   getTeamMentoringList: `select  fn_get_username(  t.user_id ) ,  t.mentoring_title, t2.mentoring_id  ,t2.mentoring_status, t2.created_datetime, fn_get_curr_mentoringstatus( t2.mentoring_id ) AS "current_status"
   from mentor_info t,  mentoring_admin t2
  where t2.mentoring_id in (
@@ -95,10 +111,16 @@ module.exports = {
         where t.apply_status = 'ACC' and t.project_id = ?`,
 
   getCount: `select count(project_id) as cnt from project where project.status_code = ?;`,
+  getProjectViewCount: `SELECT post_id, count(post_id) as viewCnt
+  FROM view_count
+  where post_category="RCB"
+  and post_id = ?
+  group by post_id;`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
+  reviewList: `select * from review`,
   reviewDetail: `SELECT * FROM review where review_id = ?`,
   reviewOutcomeUrl: `SELECT * FROM review_outcome_url where review_id = ?`,
 
@@ -262,6 +284,29 @@ and t.project_id = ?
   projectDetail: `SELECT * FROM project where project_id = ?`,
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
-  // 멘토리스트 관련
-  getmentorList: `select * from mentor_info`
+  /*--------------------------------------------------------------*/
+  /*-------------------  멘토리스트    영역--------------------------*/
+  /*------------------------------------------------------------- -*/
+  // 메인페이지에서 보일 6개 리스트
+  mentorListDefault: `select * from mentor_info order by mentor_register_date desc limit 6`,
+  // mentorID: `select user_id from mentor_info order by mentor_register_date desc limit 6`,
+  /*
+  mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
+  FROM rate
+  where rate_type = 'MENTOR' 
+  and (rated_target_id in (select user_id from mentor_info order by mentor_register_date desc))
+  group by rated_target_id;`,
+  */
+  mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
+  FROM rate
+  where rate_type = 'MENTOR' 
+  and rated_target_id = ?
+  group by rated_target_id;`,
+  // mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
+  // FROM rate
+  // where rate_type = 'MENTOR'
+  // and (rated_target_id in (?,?,?,?,?))
+  // group by rated_target_id;`,
+  // 멘토링 메뉴에서 보일 8개 리스트 _ TODO:정렬 검색 보완해야함
+  mentorList: `select * from mentor_info order by mentor_register_date desc desc limit 8`
 };
