@@ -23,7 +23,7 @@ router.get("/recruit/get/:projectId", async (req, res) => {
 // 받아야되는 인자: 페이지 유형(review인지,, 모집인지,, )- 그거에 따라 대상 테이블 분기.,
 // 작성자 아이디, 댓글 내용, 비밀글 여부, 타겟 댓글 아이디.. - 어디서 달앗냐에 따라.. + 시퀀스?
 router.post("/register/:project_id", async (req, res) => {
-  let projectId = req.params.projectId;
+  let projectId = req.params.project_id;
   let body = req.body;
   let query = "";
   let queryData = _.concat(

@@ -23,6 +23,8 @@ module.exports = {
   common_statusList: `SELECT * FROM sb_code_data where code_class_id =6  `, //팀상태분류가져오기
   common_applyStatusList: `SELECT * FROM sb_code_data where code_class_id =7`, //지원상태분류가져오기
   common_boardTypes: `SELECT * FROM sb_code_data where code_class_id =8`, //지원상태분류가져오기
+  common_TeamRatingInfo:``,
+  common_MentorRatingInfo: ``,
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -31,7 +33,7 @@ module.exports = {
   manage_HeaderSelect: `select 'babo' from dual`,
   projectList: `select t2.user_nickname , t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ? 
+  where t.leader_user = t2.user_id and t.status_code = ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
   projectListOnline: `select t2.user_nickname , t.*
@@ -67,7 +69,7 @@ module.exports = {
     select v3.project_id from project v3
     where v3.leader_user = (select leader_user from project where project_id = ? )) order by t.created_datetime
     desc limit 3`, // 쿼리문 에러나서 밑의 걸로 다시 짬. - (질문하기)
-  leaderHistory: `/*leaderHistory */ 
+  leaderHistory: `/*leaderHistory */
    select   title, project_id  from
   (select title, project_id  from project where leader_user = ?
    union
@@ -91,13 +93,13 @@ module.exports = {
  limit  ? , 3 `,
   getRecruitCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
   getReviewCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
-  registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
+  registerRecruitComment: `insert into project_reply (project_id, writer_id, contents, parent_id,
   target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
   deleteRecruitComment: `update project_reply set del_yn = 'Y' where project_reply_id = ?`,
-  registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
+  registerReviewComment: `insert into review_reply (review_id, writer_id, contents, parent_id,
    target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
   projectRecruitData: `
-      select 
+      select
       t.*
       , fn_acceptedDeptCount(t.apply_dept_id  ) acc_count
       , fn_totalDeptCount(t.apply_dept_id ) total_count
@@ -107,7 +109,7 @@ module.exports = {
     select  t.*
             ,fn_get_username(t.applicant_id) user_nickname
             ,fn_get_applyDeptCode(apply_dept_id ) apply_dept_code
-      from apply_admin t 
+      from apply_admin t
         where t.apply_status = 'ACC' and t.project_id = ?`,
 
   getCount: `select count(project_id) as cnt from project where project.status_code = ?;`,
@@ -276,30 +278,41 @@ and t.project_id = ?
   /*-------------------  마이페이지    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  // parentId도 추가 필요..
-  registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
-    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
-  registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
-     target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
-  projectDetail: `SELECT * FROM project where project_id = ?`,
+  // 추후 삭제
+  // registerRecruitComment: `insert into project_reply (project_id, writer_id, contents, parent_id,
+  //   target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
+  // registerReviewComment: `insert into review_reply (review_id, writer_id, contents, parent_id,
+  //    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
+  // projectDetail: `SELECT * FROM project where project_id = ?`,
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
+  userDetail : `select * from user t where user_id = ? `,
   /*--------------------------------------------------------------*/
   /*-------------------  멘토리스트    영역--------------------------*/
   /*------------------------------------------------------------- -*/
   // 메인페이지에서 보일 6개 리스트
   mentorListDefault: `select * from mentor_info order by mentor_register_date desc limit 6`,
+  // 멘토링 단에서 보이는 리스트 
+  mentorListAvail : `/*멘토정보 리스트 가져오기 */
+  
+  select   fn_getMantorRate( t1.user_id ) totalRate
+          ,fn_getMentorRateCount(t1.user_id ) rateCount
+          ,t1.*
+          ,t2.*  from mentor_info t1, user t2
+  where t2.user_id = t1.user_id  
+  and t1.mentoring_availability ='Y'
+  `,
   // mentorID: `select user_id from mentor_info order by mentor_register_date desc limit 6`,
   /*
   mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
   FROM rate
-  where rate_type = 'MENTOR' 
+  where rate_type = 'MENTOR'
   and (rated_target_id in (select user_id from mentor_info order by mentor_register_date desc))
   group by rated_target_id;`,
   */
   mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
   FROM rate
-  where rate_type = 'MENTOR' 
+  where rate_type = 'MENTOR'
   and rated_target_id = ?
   group by rated_target_id;`,
   // mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
@@ -308,5 +321,42 @@ and t.project_id = ?
   // and (rated_target_id in (?,?,?,?,?))
   // group by rated_target_id;`,
   // 멘토링 메뉴에서 보일 8개 리스트 _ TODO:정렬 검색 보완해야함
-  mentorList: `select * from mentor_info order by mentor_register_date desc desc limit 8`
+  getRate : `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? ` ,
+  mentorList: `select * from mentor_info order by mentor_register_date desc desc limit 8`,
+
+
+    /*--------------------------------------------------------------*/
+    /*-------------------  멘토디테일    영역--------------------------*/
+    /*------------------------------------------------------------- -*/
+  mentorBasicInfo : ` /*멘토링 기본정보끌고오기 */
+  select   fn_getMantorRate( t1.user_id ) totalRate
+  ,fn_getMentorRateCount(t1.user_id ) rateCount
+  ,t1.*
+  ,t2.*  from mentor_info t1, user t2
+where t2.user_id = t1.user_id  
+and t1.user_id = ?
+and t1.mentoring_availability ='Y'
+  `,
+  mentorReputations : `select t1.rate "score" , t1.rate_comment "comment" 
+  from rate  t1  
+  where t1.rate_type ='MENTOR' and t1.rated_target_id = ?
+  order by t1.rate desc, rate_register_date desc   ;`,
+  mentorHistory: `
+  select  
+    t1.project_id   
+  ,(select v.title from project v where v.project_id = t1.project_id) "title"
+  from mentoring t1, mentoring_admin t2
+  where t2.mentoring_id = t1.mentoring_id 
+  and t2.mentoring_status = 'FIN'
+  and t1.mentor_info_id = fn_get_mentorinfo( ?  )
+  group by t1.project_id   
+  `,
+  /*TODO 멘토인포 등록하는 멘토입장에서 > 나 어디어디 멘토링하고싶은지 입력하는 부분 + 가져오는 부분 다필요하다!  */
+
+
+    /*--------------------------------------------------------------*/
+    /*-------------------  멘토링 신청하기 영역--------------------------*/
+    /*------------------------------------------------------------- -*/
+  mentoringRequestFormData : ``/*TODO ! > 신청분야리스트 처리 필요하다. */
+
 };
