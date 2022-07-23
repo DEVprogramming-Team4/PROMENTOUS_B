@@ -31,7 +31,7 @@ module.exports = {
   manage_HeaderSelect: `select 'babo' from dual`,
   projectList: `select t2.user_nickname , t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ? 
+  where t.leader_user = t2.user_id and t.status_code = ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
   projectListOnline: `select t2.user_nickname , t.*
@@ -67,7 +67,7 @@ module.exports = {
     select v3.project_id from project v3
     where v3.leader_user = (select leader_user from project where project_id = ? )) order by t.created_datetime
     desc limit 3`, // 쿼리문 에러나서 밑의 걸로 다시 짬. - (질문하기)
-  leaderHistory: `/*leaderHistory */ 
+  leaderHistory: `/*leaderHistory */
    select   title, project_id  from
   (select title, project_id  from project where leader_user = ?
    union
@@ -91,13 +91,13 @@ module.exports = {
  limit  ? , 3 `,
   getRecruitCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
   getReviewCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
-  registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
+  registerRecruitComment: `insert into project_reply (project_id, writer_id, contents, parent_id,
   target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
   deleteRecruitComment: `update project_reply set del_yn = 'Y' where project_reply_id = ?`,
-  registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
+  registerReviewComment: `insert into review_reply (review_id, writer_id, contents, parent_id,
    target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
   projectRecruitData: `
-      select 
+      select
       t.*
       , fn_acceptedDeptCount(t.apply_dept_id  ) acc_count
       , fn_totalDeptCount(t.apply_dept_id ) total_count
@@ -107,7 +107,7 @@ module.exports = {
     select  t.*
             ,fn_get_username(t.applicant_id) user_nickname
             ,fn_get_applyDeptCode(apply_dept_id ) apply_dept_code
-      from apply_admin t 
+      from apply_admin t
         where t.apply_status = 'ACC' and t.project_id = ?`,
 
   getCount: `select count(project_id) as cnt from project where project.status_code = ?;`,
@@ -276,12 +276,12 @@ and t.project_id = ?
   /*-------------------  마이페이지    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  // parentId도 추가 필요..
-  registerRecruitComment: `insert into project_reply (project_id, writer_id, comment, parent_id,
-    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
-  registerReviewComment: `insert into review_reply (review_id, writer_id, comment, parent_id,
-     target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
-  projectDetail: `SELECT * FROM project where project_id = ?`,
+  // 추후 삭제
+  // registerRecruitComment: `insert into project_reply (project_id, writer_id, contents, parent_id,
+  //   target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
+  // registerReviewComment: `insert into review_reply (review_id, writer_id, contents, parent_id,
+  //    target_id, target_seq) values (?, ?, ?, ?, ?, ?) `,
+  // projectDetail: `SELECT * FROM project where project_id = ?`,
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
   /*--------------------------------------------------------------*/
@@ -293,13 +293,13 @@ and t.project_id = ?
   /*
   mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
   FROM rate
-  where rate_type = 'MENTOR' 
+  where rate_type = 'MENTOR'
   and (rated_target_id in (select user_id from mentor_info order by mentor_register_date desc))
   group by rated_target_id;`,
   */
   mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
   FROM rate
-  where rate_type = 'MENTOR' 
+  where rate_type = 'MENTOR'
   and rated_target_id = ?
   group by rated_target_id;`,
   // mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
