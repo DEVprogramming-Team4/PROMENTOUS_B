@@ -108,7 +108,7 @@ router.get("/:projectId/leader", async (req, res) => {
     projectId
   ]);
   leaderData[0].leaderHistory = leaderHistory;
-  //console.log(leaderData[0]); // leaderData 확인해보세요
+  console.log(leaderData[0]); // leaderData 확인해보세요
   res.send(leaderData[0]);
 });
 
@@ -168,6 +168,14 @@ router.get("/:projectId/currentMembers", async (req, res) => {
   //console.log(" sendData 확인해보세요");
   //console.log(sendData);
   res.send(sendData);
+});
+
+// GET
+// 후기 모아보기
+router.get("/:projectId/all_review", async (req, res) => {
+  let projectId = req.params.projectId;
+  const allReview = await mysql.query("getAllReview", [projectId]);
+  res.send(allReview);
 });
 
 module.exports = router; // NECCESARY END STATE

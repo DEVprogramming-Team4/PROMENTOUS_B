@@ -26,8 +26,7 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
     user_id,
     user_id,
     user_id
-  ]);
-  console.log("TESTTESTTESTTESTTEST");
+  ]); 
   res.send(mysql.changeSnake2Camel(teamListForManage));
 });
 
@@ -35,8 +34,7 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
 /* PARAM : project_id ( ex) 11   ) */
 router.get("/getTeamDatas/:project_id", async (req, res) => {
   const { project_id } = req.params;
-  const teamDatas = await mysql.query("getTeamDatas", project_id);
-  console.log(teamDatas);
+  const teamDatas = await mysql.query("getTeamDatas", project_id); 
   res.send(_.mapKeys(teamDatas, (value, key) => _.camelCase(key)));
 });
 
@@ -53,10 +51,10 @@ router.get("/getTeamCommunicateUrls/:project_id", async (req, res) => {
 
 // 팀 선택 시  . 팀 정보를 한꺼번에 끌어오는 ALL IN ONE API
 router.post("/getProjectInfo", async (req, res) => {
-  console.log("req.body ::" + req.body);
-  console.log(req.body);
+  // console.log("req.body ::" + req.body);
+  // console.log(req.body);
   const project_id = req.body.project_id;
-  console.log("req.body.project_id :  " + req.body.project_id);
+//  console.log("req.body.project_id :  " + req.body.project_id);
 
   let teamTotalResult = {}; //object 선언
   /*프로젝트 기본정보  그냥 project 테이블에서 땡겨옴.*/
@@ -129,7 +127,6 @@ router.post("/getProjectInfo", async (req, res) => {
     mentoringTotalPageCount
   );
   /*프로젝트 멘토링정보*/
-
   let mentorings = await mysql.query(
     "getTeamMentoringList",
     [req.body.project_id] //param object 가져오기
@@ -158,18 +155,9 @@ router.post("/getProjectInfo", async (req, res) => {
   //ALL IN ONE SEND
   res.send(teamTotalResult);
 });
-/* 페이지 선택해 멘토링정보 4단위로 가져오기 */
-router.post("/getMentoringsBySelectedPage", async (req, res) => {
-  let numberForEachPage = 4; //페이지 당 몇개씩 나오는가
-  let mentorings = await mysql.query("getTeamMentoringListBySelectedPage", [
-    req.body.project_id,
-    (req.body.project_id - 1) * numberForEachPage,
-    numberForEachPage
-  ]);
-  mentorings = mysql.changeSnake2Camel(mentorings);
 
-  res.send(mentorings);
-});
+
+
 /* 팀개요에서 정보 바꾼뒤 저장 시에 데이터 변경처리하기 */
 router.post("/saveTeamManageInfo", async (req, res) => {
   console.log("/saveTeamManageInfo");
@@ -206,77 +194,8 @@ router.post("/saveMentorRating", async (req, res) => {
 
   res.send(null);
 });
-
-/* param TESt  */
-router.post("/testInsert", async (req, res) => {
-  console.log("==============================111111111111111");
-  console.log(req);
-  console.log("==============================222222222222222");
-  console.log(req.body.param);
-  const params = [req.body.param.c1, req.body.param.c2, req.body.param.c3];
-
-  console.log(
-    "======================================================================================"
-  );
-  console.log(params);
-
-  const testRes = await mysql.query(
-    "testInsert",
-    // req.body.param //param 가져오기 //insert into test (c1, c2, c3) values `c1` = 1, `c2` = 'qq', `c3` = 'ww'
-    req.body.param //insert into test (c1, c2, c3) values 1
-  );
-  res.send(testRes);
-});
-//testMyTeamList
-router.get("/testMyTeamList", async (req, res) => {
-  const mentoringList = await mysql.query(
-    "testMyTeamList"
-    //param 가져오기
-  );
-  res.send(mentoringList);
-});
-
-//testGet
-router.post("/testGet", async (req, res) => {
-  console.log("==============================111111111111111");
-  //console.log(req);
-  console.log("==============================222222222222222");
-  console.log(req.body);
-  console.log("==============================3333333333333");
-  // array = [2, "a"];
-  //console.log(array);
-  console.log(
-    "======================================================================================"
-  );
-  //const propertyValues = Object.values(req.body.param);
-  const propertyValues = [{ c2: "zz" }, { c2: "xx" }, { limit: [0, 1] }];
-  console.log(propertyValues);
-
-  const result = await mysql.query(
-    "testGet",
-    // req.body.param //param 가져오기 //insert into test (c1, c2, c3) values `c1` = 1, `c2` = 'qq', `c3` = 'ww'
-    propertyValues // //insert into test (c1, c2, c3) values 1
-  );
-  console.log(typeof result);
-  console.log(result);
-  res.send(result);
-});
-
-router.post("/testGet2", async (req, res) => {
-  console.log("testGet2==============================111111111111111");
-  console.log(
-    "RESULT======================================================================"
-  );
-
-  const result = await mysql.queryWithBindings2(
-    "testGet2",
-    req.body // axios 가 보내주는 JSON 형태의 PARAMS들
-  );
-  console.log(typeof result);
-  console.log(result);
-  res.send(result);
-});
-
+   
+ 
 /*questions */
 /* 종료날짜 column 필요한게 아닐지..?  */
 
