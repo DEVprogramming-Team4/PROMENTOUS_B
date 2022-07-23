@@ -118,6 +118,7 @@ module.exports = {
   where post_category="RCB"
   and post_id = ?
   group by post_id;`,
+  getAllReview: `select * from review where project_id = ?`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
