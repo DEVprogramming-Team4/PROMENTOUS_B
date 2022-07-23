@@ -86,7 +86,9 @@ router.post("/getMentorDetail", async (req, res) => {
   ]);  //mentorReputations  score/comment 만 땡겨온다. 별점 상위순으로 . 
   
   for (let index = 0; index < temp.length; index++) {
-    const element = { href : temp[index].project_id , name :temp[index].title  } ;
+    /* 멘토링이력에 뜨는 프로젝트들의 모집글로 이동할 수 있게   backtick 으로 url 직접제공   */
+    let urlForElement = `/project/recruit/${temp[index].project_id}`;
+    const element = { href : urlForElement , name :temp[index].title  } ;
     mentorData.mentoringHistory.push(element)
   }
   console.log(mentorData.mentoringHistory); 
