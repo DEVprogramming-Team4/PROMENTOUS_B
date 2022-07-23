@@ -16,31 +16,58 @@ const pool = mysql.createPool({
 // 코드값  강제로 가져오기.
 const codes = {
   FE: "프론트엔드",
+  프론트엔드 :"FE" ,
   BE: "백엔드",
+  백엔드:"BE",
   FS: "풀스택",
+  풀스택 : "",
   DE: "디자인",
-  UU: "UI/UX",
+  디자인 : "",
+  UU: "UIUX",/*KEY에 UI/UX가 안들어간다.... */
+  UIUX : "UU",/**UIUX !! */
   PL: "기획",
-  PM: "PM",
+  기획: "",
+  PM: "PM", 
   DB: "데이터베이스",
-  AL: "알고리즘,자료구조",
+  데이터베이스: "DB",
+  AL: "알고리즘/자료구조",
+  알고리즘 : "AL", /**알고리즘!! */
   PB: "퍼블리싱",
+  퍼블리싱:"PB",
   DO: "데브옵스",
-  DA: "데이터 사이언스",
+  데브옵스:"DO",
+  DA: "데이터사이언스",
+  데이터사이언스:"DA",
   T01: "typescript",
+  typescript: "T01",
   R01: "react",
+  react: "R01",
   V01: "vue",
+  vue: "V01",
   J02: "java",
+  java:"J02",
   G01: "go",
+  go:"G01",
   P01: "python",
+  python:"P01",
   R02: "ruby",
+  ruby:"R02",
   S01: "swift",
+  swift:"S01",
   C01: "C",
+  C: "C01",
   C02: "C++",
+  C__: "C02",/**C__ !! */
   C03: "C#",
+  Csharp: "C03",/**Csharp!! */
   J01: "javascript"
   /* 추가 필요 */
 };
+/* CONVERT TO KOR*/
+const convertCode = ( codeValue ) => { 
+   return codes[codeValue];
+}
+
 /* getConnection :  APPJS 기본 MYSQL INIT  */
 const getConnection = async () => {
   return new Promise((resolve, reject) =>
@@ -190,11 +217,8 @@ const query = async (alias, values) => {
 };
 /* 02-2. queryDynamic  동적 쿼리 구현 SAMPLE */
 const queryDynamic = async (alias, values) => {
-  console.log("values:=====================");
-  console.log(values);
-  let v_alias = alias;
-  console.log("v_alias : " + v_alias);
-
+  //console.log("values:=====================");
+  //console.log(values); 
   let sql = `   select * from test t1 where  1=1 `;
   if (values.c2 != null && values.c2 != "") {
     sql += ` AND c2 = '${values.c2}'`;
@@ -202,13 +226,13 @@ const queryDynamic = async (alias, values) => {
   if (values.c3 != null && values.c3 != "") {
     sql += ` AND c3 = '${values.c2}'`;
   }
-  console.log("FULL SQL =============== ");
-  console.log(sql);
-  console.log("//FULL SQL =============== \n");
+  //console.log("FULL SQL =============== ");
+  //console.log(sql);
+  //console.log("//FULL SQL =============== \n");
   return new Promise((resolve, reject) =>
     pool.query(sql, values, (error, results) => {
       if (error) {
-        console.log(error);
+        //console.log(error);
         reject({ error });
       } else {
         resolve(results);
@@ -277,6 +301,77 @@ const getProjectList = async (alias, values) => {
   );
 };
 
+
+/* 02-3 getMentorInfoList  동적 쿼리로  멘토 리스트를 가져온다  */
+const getMentorInfoList = async (values) => {
+  console.log("values:=====================");
+  console.log(values);   
+  let sql = ` 
+  select
+  t1.mentor_info_id  
+  , t1.mentoring_title 
+  ,t1.mentoring_intro
+  ,t1.user_id  
+  ,fn_getMentorRate(t1.user_id  ) totalRate
+  ,fn_getMentorRateCount( t1.user_id )  rateCount
+  ,t2.user_nickname
+  ,t2.user_image
+  ,t2.user_account
+  ,t1.mentor_register_date
+  ,t1.mentoring_dept_code
+  ,fn_board_viewcnt ('MTB', t1.mentor_info_id ) view_count
+  from mentor_info t1 , user t2 
+ where    t2.user_id = t1.user_id   
+  `;
+  // values 는 프론트단에서 건너온 배열인데 이것을 체크
+  if (values.searchKeyWord != null && values.searchKeyWord != "") {
+    sql += ` 
+              /*조건1 검색어 */
+              and 
+              (t1.mentoring_title like '%${values.searchKeyWord}%'
+              OR 
+              t1.mentoring_intro like '%${values.searchKeyWord}%'
+              ) 
+             `;
+  }
+  /*dept_code 는  코드문자열로 들어온다고 전제함. */
+  if (values.dept_code != null && values.dept_code != "") {
+    sql += ` AND `;
+    // req.body.stack_code 가 어떻게 오느냐에 따라서 다르게 반응.
+    // 만약 문자열로 온다면. ex )  "T01,R01"
+    let deptcodes = values.dept_code;
+    let arr = deptcodes.split(","); // "J01,C01,D01"
+    sql += `(`;
+    for (let index = 0; index < arr.length; index++) {
+      const element = arr[index];
+      if (index == 0) {
+        sql += `t1.mentoring_dept_code  like '%${arr[index]}%'`; //      stack_code like '%$J01%
+      } else {
+        sql += `OR t1.mentoring_dept_code like '%${arr[index]}%'`; // OR   stack_code like '%$C01%
+      }
+    }
+    sql += `)`;
+  }
+  let offset = (values.selectedPage -1 ) * 8
+  sql +=  `limit 8 offset ${offset} /* (선택한 페이지-1)  *8 from 0   */`;
+  /*SQL끝.  */
+  console.log("FULL SQL =============== ");
+  console.log(sql);
+  console.log("//FULL SQL =============== \n");
+  return new Promise((resolve, reject) =>
+    pool.query(sql, values, (error, results) => {
+      if (error) {
+        console.log(error);
+        reject({ error });
+      } else {
+        resolve(results);
+      } // 쿼리 결과를 전달
+    })
+  );
+};
+
+
+
 const queryWithBindings_manage_mentoring = async (alias, values) => {
   console.log("values:=====================");
   console.log(values);
@@ -308,9 +403,12 @@ const queryWithBindings_manage_mentoring = async (alias, values) => {
 module.exports = {
   changeSnake2Camel,
   changeCamel2Snake,
+  convertCode,
   query,
   queryDynamic,
   getProjectList,
+  getMentorInfoList,
   queryWithBindings_manage_mentoring,
-  getConnection
+  getConnection,
+  
 };

@@ -250,24 +250,9 @@ and t.project_id = ?
           from mentoring t
               where t.mentoring_id in (
                      select v2.mentoring_id from mentoring v2 where v2.project_id = ?
-              )     /*최초 이므로 (하드코딩) limit 0 4 로만 땡겨온다.*/
-              LIMIT 0,4
+              )     
               `,
-  /* 멘토링정보 페이지 번호기준으로 가져오기  */
-  getTeamMentoringListBySelectedPage: `
-          select
-              fn_get_mentorStatusNum (fn_get_curr_mentoringstatus( t.mentoring_id )) AS "mentoring_status"
-              ,( select fn_getMentorname( fn_getMentorinfo( t.mentoring_id) )  )   "mentor_user_id" /*멘토닉네임*/
-              , (select v2.mentoring_title from mentor_info v2 where v2.mentor_info_id = fn_getMentorinfo( t.mentoring_id) )  "mentoring_title"
-              ,t.mentoring_id AS "mentoring_id"
-              ,'hardcodingdummydata'  AS "mentor_rating_comment"
-              ,'hardcodingdummydata'  AS "mentor_rating_score"
-          from mentoring t
-              where t.mentoring_id in (
-                     select v2.mentoring_id from mentoring v2 where v2.project_id = ?
-              )
-              LIMIT ?, ?
-              `,
+ 
   getMentoringInfo: `
             select
             t.rate  AS "score"
@@ -326,7 +311,8 @@ and t.project_id = ?
   // 멘토링 메뉴에서 보일 8개 리스트 _ TODO:정렬 검색 보완해야함
   getRate : `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? ` ,
   mentorList: `select * from mentor_info order by mentor_register_date desc desc limit 8`,
-
+  getDeptOfMentorInfo : `select mentoring_dept_code from mentor_info 
+     where mentor_info_id = ?  `,
 
     /*--------------------------------------------------------------*/
     /*-------------------  멘토디테일    영역--------------------------*/

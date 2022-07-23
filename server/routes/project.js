@@ -108,7 +108,7 @@ router.get("/:projectId/leader", async (req, res) => {
     projectId
   ]);
   leaderData[0].leaderHistory = leaderHistory;
-  //console.log(leaderData[0]); // leaderData 확인해보세요
+  console.log(leaderData[0]); // leaderData 확인해보세요
   res.send(leaderData[0]);
 });
 
