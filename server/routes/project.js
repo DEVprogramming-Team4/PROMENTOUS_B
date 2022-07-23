@@ -170,4 +170,12 @@ router.get("/:projectId/currentMembers", async (req, res) => {
   res.send(sendData);
 });
 
+// GET
+// 후기 모아보기
+router.get("/:projectId/all_review", async (req, res) => {
+  let projectId = req.params.projectId;
+  const allReview = await mysql.query("getAllReview", [projectId]);
+  res.send(allReview);
+});
+
 module.exports = router; // NECCESARY END STATE
