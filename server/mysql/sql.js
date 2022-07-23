@@ -25,6 +25,7 @@ module.exports = {
   common_boardTypes: `SELECT * FROM sb_code_data where code_class_id =8`, //지원상태분류가져오기
   common_TeamRatingInfo: ``,
   common_MentorRatingInfo: ``,
+  common_refUrlInfo : `select * from ref_url where post_category = ? and post_id = ?`,
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -185,6 +186,7 @@ module.exports = {
                         v.applicant_id
                         ,v.project_id
                         ,v.apply_dept_id
+                        ,fn_applyDeptCode(v.apply_dept_id ) "apply_dept_code"
                         ,fn_user_nickname(v.applicant_id) as "applicant_nickname"
                         ,fn_user_nickname(v.applicant_id) as "user_nickname"
                         ,fn_user_email(v.applicant_id) as "applicant_account"
@@ -333,17 +335,10 @@ and t.project_id = ?
   where rate_type = 'MENTOR'
   and rated_target_id = ?
   group by rated_target_id;`,
-  // mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
-  // FROM rate
-  // where rate_type = 'MENTOR'
-  // and (rated_target_id in (?,?,?,?,?))
-  // group by rated_target_id;`,
-  // 멘토링 메뉴에서 보일 8개 리스트 _ TODO:정렬 검색 보완해야함
-  getRate: `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
-  mentorList: `select * from mentor_info order by mentor_register_date desc desc limit 8`,
-
-  getDeptOfMentorInfo: `select mentoring_dept_code from mentor_info 
+  getRate : `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? ` ,
+  getDeptOfMentorInfo : `select mentoring_dept_code from mentor_info 
      where mentor_info_id = ?  `,
+  checkMentorInfoExist:`select mentor_info_id from mentor_info t where t.user_id =  ?  `,
 
   /*--------------------------------------------------------------*/
   /*-------------------  멘토디테일    영역--------------------------*/
