@@ -159,14 +159,16 @@ module.exports = {
                         ,v.project_id
                         ,v.apply_dept_id
                         ,fn_user_nickname(v.applicant_id) as "applicant_nickname"
+                        ,fn_user_nickname(v.applicant_id) as "user_nickname"
                         ,fn_user_email(v.applicant_id) as "applicant_account"
+                        ,fn_user_email(v.applicant_id) as "user_email"
                         ,fn_user_image(v.applicant_id) as "applicant_image"
                         ,fn_user_stack_code(v.applicant_id) as "like_stack_code"
                         ,fn_user_dept_code(v.applicant_id) as "like_dept_code"
                         ,max(v.insert_date ) as "insertDate"
                         ,max(v.stat) /*1지원중, 2승인, 3반려 */ stat
                         ,v.apply_status  as "apply_status"
-
+                        ,fn_user_image(v.applicant_id) as "user_image" /*유저이미지 추가*/   
                         from (
                         select t.applicant_id, t.project_id, t.apply_dept_id, t.insert_date, t.apply_status,
                         if(t.apply_status = 'NEW', 1, if(t.apply_status = 'ACC',2,  3) ) stat
