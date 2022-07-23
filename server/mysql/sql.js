@@ -165,6 +165,7 @@ module.exports = {
                         ,fn_user_image(v.applicant_id) as "applicant_image"
                         ,fn_user_stack_code(v.applicant_id) as "like_stack_code"
                         ,fn_user_dept_code(v.applicant_id) as "like_dept_code"
+                        ,fn_user_intro(v.applicant_id) as "user_intro"
                         ,max(v.insert_date ) as "insertDate"
                         ,max(v.stat) /*1지원중, 2승인, 3반려 */ stat
                         ,v.apply_status  as "apply_status"
