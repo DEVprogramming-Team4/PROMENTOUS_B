@@ -4,46 +4,73 @@ const _ = require("lodash");
 const mysql = require("../mysql");
 
 // localhost:3000/project/recruit
-async function getViewCount(projectList) {
+async function getRestData(projectList) {
   for (let i = 0; i < projectList.length; i++) {
-    // response : [{id: x, cnt: x}]
-    const response = await mysql.query(
+    const viewCntData = await mysql.query(
       "getProjectViewCount",
       projectList[i].project_id
     );
-    if (response[0] === undefined) {
-      projectList[i].viewCount = 0;
-    } else {
-      projectList[i].viewCount = response[0].viewCnt;
-    }
+    const totalPeopleData = await mysql.query(
+      "getTotalPeople",
+      projectList[i].project_id
+    );
+    const acceptedData = await mysql.query(
+      "getAcceptedData",
+      projectList[i].project_id
+    );
+    projectList[i].viewCount =
+      viewCntData[0] === undefined ? 0 : viewCntData[0].viewCnt;
+    projectList[i].totalPeople =
+      totalPeopleData[0] === undefined ? 0 : totalPeopleData[0].totalPeople;
+    projectList[i].acceptedCnt =
+      acceptedData[0] === undefined ? 0 : acceptedData[0].acceptedCount;
   }
 }
 
 // 메인화면에 보내줄 정렬이 필요없는 결과값 보내주기
 router.get("/", async (req, res) => {
   const projectListDefault = await mysql.query("projectListDefault");
-  await getViewCount(projectListDefault);
+  await getRestData(projectListDefault);
   res.send(projectListDefault);
 });
 
 // 프로젝트 모집
-// 임의의 정렬버튼을 클릭했을때 혹은 검색했을 때, 다시 요청을 받습니다. 넘겨받는 값에따라 결과값이 바뀌어집니다.
 router.post("/", async (req, res) => {
   try {
-    // 정렬원하는 파람들 정의해주는 구역
-    // console.log(req.body.param);
-    console.log(req.query);
-    // const page = req.body.param.page === undefined ? 0 : (req.body.param.page - 1) * 8;
+    console.log(req.body.param);
     const page = (req.body.param.page - 1) * 8;
     const recruitStatus = req.body.param.status;
-    // 정보 끌어와주는 구역
-    const count = await mysql.query("getCount", [recruitStatus]);
-    const projectRecruitList = await mysql.query("projectList", [
-      recruitStatus,
-      page
-    ]); // 배열안에 차례차례 담아주기
-    await getViewCount(projectRecruitList);
-    // 쏴주는 구역
+    const stacks = req.body.param.stacks;
+    const mainArea = `%${req.body.param.main_area}%`;
+    const restArea = `%${req.body.param.rest_area}%`;
+    const keyword = `%${req.body.param.keyword}%`;
+    const count = await mysql.query("getProjectCount", [recruitStatus]);
+    const stack1 = stacks[0] === undefined ? "%%" : `%${stacks[0]}%`;
+    let projectRecruitList = [];
+    // ======================================================
+    if (req.body.param.main_area === "ON") {
+      projectRecruitList = await mysql.query("projectListOnline", [
+        recruitStatus,
+        stack1,
+        "ON",
+        page
+      ]);
+    } else if (req.body.param.main_area === "") {
+      projectRecruitList = await mysql.query("projectList", [
+        recruitStatus,
+        stack1,
+        page
+      ]);
+    } else {
+      projectRecruitList = await mysql.query("projectListLargeCity", [
+        recruitStatus,
+        stack1,
+        mainArea,
+        page
+      ]);
+    }
+    // ======================================================
+    await getRestData(projectRecruitList);
     //console.log(projectRecruitList);
     res.send({ count, projectRecruitList }); // node express에서 숫자는 넘겨줄수 없다!!Buffer, String, object, Boolean, Array만 가능하다
   } catch (error) {
