@@ -49,21 +49,38 @@ router.post("/register/:project_id", async (req, res) => {
   res.send("댓글이 추가되었습니다.");
 });
 
-router.put("/update", function (req, res) {
-  res.send("댓글이 수정되었습니다..");
+// 수정
+router.patch("/edit/:comment_id", async (req, res) => {
+  let commentId = req.params.comment_id;
+  let body = req.body;
+  let query = "";
+  let queryData = _.concat(body.contents, commentId);
+  let pageType = body.pageType;
+
+  if (pageType === "projectRecruit") {
+    query = "updateRecruitComment";
+  } else if (pageType === "projectReview") {
+    query = "updateReviewComment";
+  }
+
+  const updateComment = await mysql.query(query, queryData);
+  res.send("댓글이 수정되었습니다.");
 });
 
 // 삭제
-router.put("/delete/:comment_id", function (req, res) {
+router.delete("/delete/:pageType/:commentId", async (req, res) => {
+  let commentId = req.params.commentId;
+  let pageType = req.params.pageType;
+
   let query = "";
-  query = "deleteRecruitComment";
-  // const registerComment = await mysql.query(query, queryData);
+  if (pageType === "projectRecruit") {
+    query = "deleteRecruitComment";
+  } else if (pageType === "projectReview") {
+    query = "deleteReviewComment";
+  }
 
-  res.send("댓글이 삭제되었습니다..");
+  const deleteComment = await mysql.query(query, commentId);
+  res.send("댓글이 삭제되었습니다.");
 });
-
-// router.delete("/delete/:comment_id", function (req, res) {
-//   res.send("comment/delete 경로,, 댓글이 삭제되었습니다.");
-// });
 
 module.exports = router;
