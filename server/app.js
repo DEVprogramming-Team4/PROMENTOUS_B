@@ -68,8 +68,7 @@ app.get("/common/stackList", async (req, res) => {
 /* project     프로젝트 메뉴  */
 /****************************/
 // projectId 기준 분야별 지원자 / 승인된 자 숫자 가져오기
-app.get("/project/applicantsPerDept", async (req, res) => {
-  console.log("req==>" + req);
+app.get("/project/applicantsPerDept", async (req, res) => { 
   const applicantsPerDept = await mysql.query("applicantsPerDept");
   res.send(applicantsPerDept);
 });

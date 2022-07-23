@@ -15,6 +15,50 @@ async function getRateData(mentorList) {
     }
   }
 }
+/**멘토링 카드리스트화면 페이지네이션 **/
+router.post("/getMentorInfo", async (req, res) => {
+  let numberForEachPage = 8; //페이지 당 몇개씩 나오는가
+  let mentorings = await mysql.query("getTeamMentoringListBySelectedPage", [
+    req.body.project_id,
+    (req.body.project_id - 1) * numberForEachPage,
+    numberForEachPage
+  ]);
+  mentorings = mysql.changeSnake2Camel(mentorings);
+
+  res.send(mentorings);
+});
+
+/*멘토링 리스트 페이지네이션 STANDARD  */
+router.post("/mentorList",async(req,res)=> {
+   let mentorList = await mysql.getMentorInfoList( req.body )
+   console.log("/mentorList")
+   console.log(mentorList)
+   for (let index = 0; index < mentorList.length; index++) {
+    mentorList[index].RATE =  await mysql.query("getRate", [
+      mentorList[index].user_id 
+   ]);
+   //console.log (index +"의 RATE ") 
+   //console.log (mentorList[index].RATE) 
+   console.log("=-=========")
+   console.log(mentorList[index].mentoring_dept_code)
+   mentorList[index].mentoring_dept_code_origin = mentorList[index].mentoring_dept_code;
+   let tempArr = _.split(mentorList[index].mentoring_dept_code,',');
+   mentorList[index].mentoring_dept_code = [];
+   mentorList[index].dept_code = [];
+   for (let j = 0; j < tempArr.length; j++) {
+     const element = tempArr[j];
+     console.log("loooooop ")
+     mentorList[index].mentoring_dept_code.push(mysql.convertCode(element));
+     mentorList[index].dept_code.push(mysql.convertCode(element));
+   }
+     
+  }
+  console.log(mentorList) 
+   res.send(mentorList);
+
+})
+
+
 
 /***** FOR MENTORINFO   +   MENTORING *****/
 router.get("/", async (req, res) => {
@@ -23,6 +67,9 @@ router.get("/", async (req, res) => {
   await getRateData(mentorList);
   res.send(mentorList);
 });
+
+
+
 /* 페이지 선택해 멘토링정보 4단위로 가져오기 */
 router.post("/getMentorInfo", async (req, res) => {
   let numberForEachPage = 4; //페이지 당 몇개씩 나오는가
@@ -36,31 +83,11 @@ router.post("/getMentorInfo", async (req, res) => {
   res.send(mentorings);
 });
 
-/* 페이지 선택해 멘토링정보 4단위로 가져오기 */
-router.post("/getMentorList", async (req, res) => {
-  
-  let numberForEachPage = 6; //페이지 당 몇개씩 나오는가
-  let currentPage = 0;
-  let mentorList = await mysql.query("mentorListAvail", [
-     numberForEachPage, currentPage
-  ]); 
-  console.log("/getMentorList"); 
-  console.log(mentorList)
-  for (let index = 0; index < mentorList.length; index++) {
-    mentorList[index].RATE =  await mysql.query("getRate", [
-      mentorList[index].user_id 
-   ]);
-   mentorList[index].dept_code = ['javascript','hardServer'];
-    console.log (index +"의 RATE ") 
-    console.log(mentorList[index].rate
-      )
-  }
-  res.send(mentorList);
-}); 
+ 
+
+/*멘토 디테일 가져오기  */
 router.post("/getMentorDetail", async (req, res) => {
-  console.log("/getMentorDetail 시작"+ req.body.mentorId); 
-  let numberForEachPage = 6; //페이지 당 몇개씩 나오는가
-  let currentPage = 0;
+  console.log("/getMentorDetail 시작"+ req.body.mentorId);  
   let mentorData = {};
   /*멘토기본정보 */
   mentorData.basicInfo = await mysql.query("mentorBasicInfo", [
@@ -70,15 +97,26 @@ router.post("/getMentorDetail", async (req, res) => {
   let temp = await mysql.query("mentorReputations", [
     req.body.mentorId
   ]);  //mentorReputations  score/comment 만 땡겨온다. 별점 상위순으로 . 
-  console.log(temp); 
+  //console.log(temp); 
   for (let index = 0; index < temp.length; index++) {
     const element = { score: temp[index].score , comment :temp[index].comment  } ;
     mentorData.reputations.push(element)
   }
   //console.log(mentorData.reputations)
   //console.log("/getMentorDetail"); 
-  
-  
+  mentorData.likePart = [];
+  console.log("mentorData.basicInfo.mentoring_dept_code")
+  mentorData.basicInfo[0].mentoring_dept_code_origin = mentorData.basicInfo[0].mentoring_dept_code;
+  console.log(mentorData.basicInfo[0].mentoring_dept_code)
+  let tempArr = _.split(mentorData.basicInfo[0].mentoring_dept_code,',')
+  for (let index = 0; index < tempArr.length; index++) {
+    const element = tempArr[index]; 
+    mentorData.likePart.push(mysql.convertCode(element));
+  }
+  mentorData.basicInfo[0].mentoring_dept_code = mentorData.likePart;
+  console.log(mentorData.likePart) 
+
+  /* 멘토링 이력. - 해당 멘토가 멘토링 완료까지달성해낸  프로젝트 모집글링크 안내용 */
   mentorData.mentoringHistory = [];
   temp = await mysql.query("mentorHistory", [
     /*TODO  임시제거하고 2로하드코딩 !! req.body.mentorId*/
@@ -91,7 +129,7 @@ router.post("/getMentorDetail", async (req, res) => {
     const element = { href : urlForElement , name :temp[index].title  } ;
     mentorData.mentoringHistory.push(element)
   }
-  console.log(mentorData.mentoringHistory); 
+  //console.log(mentorData.mentoringHistory); 
 
   
   res.send(mentorData);
