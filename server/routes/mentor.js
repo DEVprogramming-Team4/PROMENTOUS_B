@@ -36,4 +36,64 @@ router.post("/getMentorInfo", async (req, res) => {
   res.send(mentorings);
 });
 
+/* 페이지 선택해 멘토링정보 4단위로 가져오기 */
+router.post("/getMentorList", async (req, res) => {
+  
+  let numberForEachPage = 6; //페이지 당 몇개씩 나오는가
+  let currentPage = 0;
+  let mentorList = await mysql.query("mentorListAvail", [
+     numberForEachPage, currentPage
+  ]); 
+  console.log("/getMentorList"); 
+  console.log(mentorList)
+  for (let index = 0; index < mentorList.length; index++) {
+    mentorList[index].RATE =  await mysql.query("getRate", [
+      mentorList[index].user_id 
+   ]);
+   mentorList[index].dept_code = ['javascript','hardServer'];
+    console.log (index +"의 RATE ") 
+    console.log(mentorList[index].rate
+      )
+  }
+  res.send(mentorList);
+}); 
+router.post("/getMentorDetail", async (req, res) => {
+  console.log("/getMentorDetail 시작"+ req.body.mentorId); 
+  let numberForEachPage = 6; //페이지 당 몇개씩 나오는가
+  let currentPage = 0;
+  let mentorData = {};
+  /*멘토기본정보 */
+  mentorData.basicInfo = await mysql.query("mentorBasicInfo", [
+    req.body.mentorId
+  ]); 
+  mentorData.reputations  = []  
+  let temp = await mysql.query("mentorReputations", [
+    req.body.mentorId
+  ]);  //mentorReputations  score/comment 만 땡겨온다. 별점 상위순으로 . 
+  console.log(temp); 
+  for (let index = 0; index < temp.length; index++) {
+    const element = { score: temp[index].score , comment :temp[index].comment  } ;
+    mentorData.reputations.push(element)
+  }
+  //console.log(mentorData.reputations)
+  //console.log("/getMentorDetail"); 
+  
+  
+  mentorData.mentoringHistory = [];
+  temp = await mysql.query("mentorHistory", [
+    /*TODO  임시제거하고 2로하드코딩 !! req.body.mentorId*/
+    req.body.mentorId
+  ]);  //mentorReputations  score/comment 만 땡겨온다. 별점 상위순으로 . 
+  
+  for (let index = 0; index < temp.length; index++) {
+    const element = { href : temp[index].project_id , name :temp[index].title  } ;
+    mentorData.mentoringHistory.push(element)
+  }
+  console.log(mentorData.mentoringHistory); 
+
+  
+  res.send(mentorData);
+}); 
+
+
 module.exports = router; // NECCESARY END STATE
