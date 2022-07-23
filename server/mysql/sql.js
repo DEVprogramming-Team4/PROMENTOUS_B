@@ -31,27 +31,27 @@ module.exports = {
   /*------------------------------------------------------------- -*/
   applicantsPerDept: ``,
   manage_HeaderSelect: `select 'babo' from dual`,
-  projectList: `select t2.user_nickname , t.*
+  projectList: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ?
+  where t.leader_user = t2.user_id and t.status_code = ? and t.stack_code like ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
-  projectListOnline: `select t2.user_nickname , t.*
+  projectListOnline: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ? t.progress_method = ?
+  where t.leader_user = t2.user_id and t.status_code = ? and t.stack_code like ? and t.progress_method = ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
-  projectListLargeCity: `select t2.user_nickname , t.*
+  projectListLargeCity: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ? t.main_aria_code = ?
+  where t.leader_user = t2.user_id and t.status_code = ? and t.stack_code like ? and t.main_area_code like ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
-  projectListRestCity: `select t2.user_nickname , t.*
+  projectListRestCity: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ? t.sub_aria_code = ?
+  where t.leader_user = t2.user_id and t.status_code = ? and t.stack_code like ? and t.sub_aria_code = ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
-  projectListDefault: `select t2.user_nickname , t.*
+  projectListDefault: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
   where t.leader_user = t2.user_id and t.status_code = 'REC'
   order by t.created_datetime desc
@@ -116,18 +116,40 @@ module.exports = {
       from apply_admin t
         where t.apply_status = 'ACC' and t.project_id = ?`,
 
-  getCount: `select count(project_id) as cnt from project where project.status_code = ?;`,
+  getProjectCount: `SELECT count(project_id) as cnt 
+  FROM project
+  WHERE project.status_code = ?;`,
   getProjectViewCount: `SELECT post_id, count(post_id) as viewCnt
   FROM view_count
   where post_category="RCB"
   and post_id = ?
   group by post_id;`,
   getAllReview: `select * from review where project_id = ?`,
+  getProjectStack: `SELECT project_id, stack_code
+  FROM project
+  WHERE status_code = ? and stack_code LIKE ?`,
+  getTotalPeople: `select project_id, sum(apply_dept.to) totalPeople
+  from apply_dept
+  where project_id = ?
+  group by project_id;`,
+  getAcceptedData: `SELECT project_id, count(project_id) as acceptedCount
+  FROM team4.apply_admin 
+  where apply_status = 'ACC' and project_id = ?
+  group by project_id;`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  reviewList: `select * from review`,
+  reviewList: `select t2.user_nickname, t3.stack_code, t.* 
+  from review t, user t2, project t3
+  where t.writer_id = t2.user_id and t.project_id = t3.project_id
+  order by t.created_datetime desc
+  limit 8`,
+  getReviewViewCount: `SELECT post_id, count(post_id) as viewCnt
+  FROM view_count
+  where post_category="RVB"
+  and post_id = ?
+  group by post_id;`,
   reviewDetail: `SELECT * FROM review where review_id = ?`,
   reviewOutcomeUrl: `SELECT * FROM review_outcome_url where review_id = ?`,
 
@@ -257,7 +279,7 @@ and t.project_id = ?
                      select v2.mentoring_id from mentoring v2 where v2.project_id = ?
               )     
               `,
- 
+
   getMentoringInfo: `
             select
             t.rate  AS "score"
@@ -284,10 +306,13 @@ and t.project_id = ?
   /*-------------------  멘토리스트    영역--------------------------*/
   /*------------------------------------------------------------- -*/
   // 메인페이지에서 보일 6개 리스트
-  mentorListDefault: `select * from mentor_info order by mentor_register_date desc limit 6`,
+  mentorListDefault: `select t2.user_nickname, t2.user_image, t.* 
+  from mentor_info t, user t2
+  where t.user_id = t2.user_id and t.mentoring_availability = 'Y'
+  order by mentor_register_date desc limit 6`,
   // 멘토링 단에서 보이는 리스트
   mentorListAvail: `/*멘토정보 리스트 가져오기 */
-
+  
   select   fn_getMantorRate( t1.user_id ) totalRate
           ,fn_getMentorRateCount(t1.user_id ) rateCount
           ,t1.*
@@ -317,13 +342,13 @@ and t.project_id = ?
   getRate: `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
   mentorList: `select * from mentor_info order by mentor_register_date desc desc limit 8`,
 
-  getDeptOfMentorInfo : `select mentoring_dept_code from mentor_info 
+  getDeptOfMentorInfo: `select mentoring_dept_code from mentor_info 
      where mentor_info_id = ?  `,
 
-    /*--------------------------------------------------------------*/
-    /*-------------------  멘토디테일    영역--------------------------*/
-    /*------------------------------------------------------------- -*/
-  mentorBasicInfo : ` /*멘토링 기본정보끌고오기 */
+  /*--------------------------------------------------------------*/
+  /*-------------------  멘토디테일    영역--------------------------*/
+  /*------------------------------------------------------------- -*/
+  mentorBasicInfo: ` /*멘토링 기본정보끌고오기 */
   select   fn_getMantorRate( t1.user_id ) totalRate
   ,fn_getMentorRateCount(t1.user_id ) rateCount
   ,t1.*
@@ -332,8 +357,8 @@ where t2.user_id = t1.user_id
 and t1.user_id = ?
 and t1.mentoring_availability ='Y'
   `,
-  mentorReputations: `select t1.rate "score" , t1.rate_comment "comment"
-  from rate  t1
+  mentorReputations: `select t1.rate "score" , t1.rate_comment "comment" 
+  from rate  t1  
   where t1.rate_type ='MENTOR' and t1.rated_target_id = ?
   order by t1.rate desc, rate_register_date desc   ;`,
   mentorHistory: `

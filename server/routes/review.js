@@ -4,10 +4,26 @@ const mysql = require("../mysql"); // 이폴더의 index.js 자동추적
 const _ = require("lodash");
 
 // 프로젝트 후기
+async function getViewCount(reviewList) {
+  for (let i = 0; i < reviewList.length; i++) {
+    // response : [{id: x, cnt: x}]
+    const response = await mysql.query(
+      "getProjectViewCount",
+      reviewList[i].project_id
+    );
+    if (response[0] === undefined) {
+      reviewList[i].viewCount = 0;
+    } else {
+      reviewList[i].viewCount = response[0].viewCnt;
+    }
+  }
+}
+
 // GET
 router.get("/", async (req, res) => {
-  const projectRecruitList = await mysql.query("projectRecruitList");
-  res.send(projectRecruitList);
+  const reviewList = await mysql.query("reviewList");
+  await getViewCount(reviewList);
+  res.send(reviewList);
 });
 // POST
 router.post("/insert", async (req, res) => {
