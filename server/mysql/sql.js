@@ -97,6 +97,8 @@ module.exports = {
   target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
   updateRecruitComment: `update project_reply set contents = ? where reply_id = ?`,
   updateReviewComment: ``,
+  deleteRecruitComment: `delete from project_reply where reply_id = ?`,
+  deleteReviewComment: ``,
   // deleteRecruitComment: `update project_reply set del_yn = 'Y' where project_reply_id = ?`,
   registerReviewComment: `insert into review_reply (review_id, writer_id, contents, parent_id,
    target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
