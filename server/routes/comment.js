@@ -49,8 +49,21 @@ router.post("/register/:project_id", async (req, res) => {
   res.send("댓글이 추가되었습니다.");
 });
 
-router.put("/update", function (req, res) {
-  res.send("댓글이 수정되었습니다..");
+// 수정
+router.patch("/edit/:comment_id", async (req, res) => {
+  let commentId = req.params.comment_id;
+  let body = req.body;
+  let queryData = _.concat(body.contents, commentId);
+  let pageType = body.pageType;
+
+  if (pageType === "projectRecruit") {
+    query = "updateRecruitComment";
+  } else if (pageType === "projectReview") {
+    query = "updateReviewComment";
+  }
+
+  const updateComment = await mysql.query(query, queryData);
+  res.send("댓글이 수정되었습니다.");
 });
 
 // 삭제
