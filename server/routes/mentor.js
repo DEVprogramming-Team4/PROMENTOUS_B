@@ -29,31 +29,39 @@ router.post("/getMentorInfo", async (req, res) => {
 });
 
 /*멘토링 리스트 페이지네이션 STANDARD  */
-router.post("/mentorList", async (req, res) => {
-  let mentorList = await mysql.getMentorInfoList(req.body);
-  console.log("/mentorList");
-  console.log(mentorList);
-  for (let index = 0; index < mentorList.length; index++) {
-    mentorList[index].RATE = await mysql.query("getRate", [
-      mentorList[index].user_id
-    ]);
-    //console.log (index +"의 RATE ")
-    //console.log (mentorList[index].RATE)
-    console.log("=-=========");
-    console.log(mentorList[index].mentoring_dept_code);
-    mentorList[index].mentoring_dept_code_origin =
-      mentorList[index].mentoring_dept_code;
-    let tempArr = _.split(mentorList[index].mentoring_dept_code, ",");
-    mentorList[index].mentoring_dept_code = [];
-    mentorList[index].dept_code = [];
-    for (let j = 0; j < tempArr.length; j++) {
-      const element = tempArr[j];
-      console.log("loooooop ");
-      mentorList[index].mentoring_dept_code.push(mysql.convertCode(element));
-      mentorList[index].dept_code.push(mysql.convertCode(element));
-    }
-  }
-  console.log(mentorList);
+router.post("/mentorList",async(req,res)=> {
+   let mentorList = await mysql.getMentorInfoList( req.body );
+   console.log("/mentorList");
+   console.log(mentorList);
+   for (let index = 0; index < mentorList.length; index++) {
+    mentorList[index].RATE =  await mysql.query("getRate", [
+      mentorList[index].user_id 
+   ]);
+   //console.log (index +"의 RATE ") 
+   //console.log (mentorList[index].RATE) 
+   console.log("=-=========")
+   console.log(mentorList[index].mentoring_dept_code)
+   mentorList[index].mentoring_dept_code_origin = mentorList[index].mentoring_dept_code;
+   let tempArr = _.split(mentorList[index].mentoring_dept_code,',');
+   mentorList[index].mentoring_dept_code = [];
+   mentorList[index].dept_code = [];
+   for (let j = 0; j < tempArr.length; j++) {
+     const element = tempArr[j]; 
+     mentorList[index].mentoring_dept_code.push(mysql.convertCode(element));
+     mentorList[index].dept_code.push(mysql.convertCode(element));
+   }     
+  }  
+  let count = await mysql.getMentorInfoTotalCount( req.body ); 
+   res.send({count ,mentorList});
+})
+
+
+
+/***** FOR MENTORINFO   +   MENTORING *****/
+router.get("/", async (req, res) => {
+  const mentorList = await mysql.query("mentorListDefault"); // [{}, ... , {}]
+  // const mentorID = await mysql.query("mentorID");
+  await getRateData(mentorList);
   res.send(mentorList);
 });
 
@@ -121,9 +129,25 @@ router.post("/getMentorDetail", async (req, res) => {
     const element = { href: urlForElement, name: temp[index].title };
     mentorData.mentoringHistory.push(element);
   }
-  //console.log(mentorData.mentoringHistory);
-
+  //console.log(mentorData.mentoringHistory); 
+  console.log(mentorData.basicInfo[0].mentor_info_id)
+  mentorData.url_list = await mysql.query("common_refUrlInfo", [ 
+    'MTB' ,mentorData.basicInfo[0].mentor_info_id
+  ]);
   res.send(mentorData);
+}); 
+
+/* MENTOR EXIST VALIDATION 멘토 등록 화면용  */
+//checkMentorInfoExist
+
+router.post("/checkMentorInfoExist", async (req, res) => { 
+  let result = await mysql.query("checkMentorInfoExist", [
+    req.body.user_id
+  ]); 
+ console.log("/checkMentorInfoExist")
+ console.log(result)
+  res.send(result);
 });
+
 
 module.exports = router; // NECCESARY END STATE

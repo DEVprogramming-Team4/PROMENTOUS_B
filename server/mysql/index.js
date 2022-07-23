@@ -370,21 +370,45 @@ const getMentorInfoList = async (values) => {
   );
 };
 
-
-
-const queryWithBindings_manage_mentoring = async (alias, values) => {
+const getMentorInfoTotalCount =async (values) => {
   console.log("values:=====================");
-  console.log(values);
-  let v_alias = alias;
-  console.log("v_alias : " + v_alias);
-
-  let sql = `   select * from test t1 where  1=1 `;
-  if (values.project_id != null && values.project_id != "") {
-    sql += ` AND project_id = '${values.project_id}'`;
+  console.log(values);   
+  let sql = ` 
+  select
+  count(t1.mentor_info_id ) count
+  from mentor_info t1 , user t2 
+ where    t2.user_id = t1.user_id   
+  `;
+  // values 는 프론트단에서 건너온 배열인데 이것을 체크
+  if (values.searchKeyWord != null && values.searchKeyWord != "") {
+    sql += ` 
+              /*조건1 검색어 */
+              and 
+              (t1.mentoring_title like '%${values.searchKeyWord}%'
+              OR 
+              t1.mentoring_intro like '%${values.searchKeyWord}%'
+              ) 
+             `;
   }
-  if (values.page != null && values.page != "") {
-    sql += ` AND limit = '${values.page}'`;
+  /*dept_code 는  코드문자열로 들어온다고 전제함. */
+  if (values.dept_code != null && values.dept_code != "") {
+    sql += ` AND `;
+    // req.body.stack_code 가 어떻게 오느냐에 따라서 다르게 반응.
+    // 만약 문자열로 온다면. ex )  "T01,R01"
+    let deptcodes = values.dept_code;
+    let arr = deptcodes.split(","); // "J01,C01,D01"
+    sql += `(`;
+    for (let index = 0; index < arr.length; index++) {
+      const element = arr[index];
+      if (index == 0) {
+        sql += `t1.mentoring_dept_code  like '%${arr[index]}%'`; //      stack_code like '%$J01%
+      } else {
+        sql += `OR t1.mentoring_dept_code like '%${arr[index]}%'`; // OR   stack_code like '%$C01%
+      }
+    }
+    sql += `)`;
   }
+  /*SQL끝.  */
   console.log("FULL SQL =============== ");
   console.log(sql);
   console.log("//FULL SQL =============== \n");
@@ -398,7 +422,7 @@ const queryWithBindings_manage_mentoring = async (alias, values) => {
       } // 쿼리 결과를 전달
     })
   );
-};
+}
 
 module.exports = {
   changeSnake2Camel,
@@ -408,7 +432,7 @@ module.exports = {
   queryDynamic,
   getProjectList,
   getMentorInfoList,
-  queryWithBindings_manage_mentoring,
+  getMentorInfoTotalCount,
   getConnection,
   
 };
