@@ -42,6 +42,7 @@ const projectRoute = require("./routes/project"); // 프로젝트 모집 관련�
 const reviewRoute = require("./routes/review"); // 프로젝트 후기 관련입니다.
 const commentRoute = require("./routes/comment"); // 댓글 관련 API
 const mentorRoute = require("./routes/mentor"); // 멘토링 관련 API
+const userRoute = require("./routes/user"); // 멘토링 관련 API
 
 app.use(cors(corsOptions));
 
@@ -51,6 +52,7 @@ app.use("/project/recruit", projectRoute);
 app.use("/project/review", reviewRoute);
 app.use("/comment", commentRoute);
 app.use("/mentor", mentorRoute);
+app.use("/user", userRoute);
 
 /****************************/
 /* common       공통sql      */
@@ -68,7 +70,7 @@ app.get("/common/stackList", async (req, res) => {
 /* project     프로젝트 메뉴  */
 /****************************/
 // projectId 기준 분야별 지원자 / 승인된 자 숫자 가져오기
-app.get("/project/applicantsPerDept", async (req, res) => { 
+app.get("/project/applicantsPerDept", async (req, res) => {
   const applicantsPerDept = await mysql.query("applicantsPerDept");
   res.send(applicantsPerDept);
 });
