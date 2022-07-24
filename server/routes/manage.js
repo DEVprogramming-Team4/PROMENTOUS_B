@@ -172,6 +172,7 @@ router.patch("/saveTeamManageInfo/:project_id", async (req, res) => {
     body.project,
     project_id
   ]);
+  /*상태 변경 시마다 insert 진행 [TABLE  :  project_status ] */
   result = await mysql.query("insertProjectStatus", [
     body.project_status
   ]);
