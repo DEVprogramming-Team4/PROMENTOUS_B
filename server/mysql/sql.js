@@ -206,13 +206,21 @@ module.exports = {
                         ,fn_user_intro(v.applicant_id) as "user_intro"
                         ,max(v.insert_date ) as "insertDate"
                         ,max(v.stat) /*1지원중, 2승인, 3반려 */ stat
-                        ,v.apply_status  as "apply_status"
+                        , ( select apply_status from apply_admin 
+                          where apply_admin_id in (
+                          select max(t3.apply_admin_id) 
+                             from apply_admin t3 
+                             where  t3.applicant_id = v.applicant_id
+                               and t3.project_id =v.project_id
+                               )
+                          )   
+                          as "apply_status" 
                         ,fn_user_image(v.applicant_id) as "user_image" /*유저이미지 추가*/
                         from (
                         select t.applicant_id, t.project_id, t.apply_dept_id, t.insert_date, t.apply_status,
                         if(t.apply_status = 'NEW', 1, if(t.apply_status = 'ACC',2,  3) ) stat
                         from apply_admin t where t.project_id = ?
-                          and apply_status ='NEW'
+                          
                         ) v
                         group by applicant_id
                         order by stat `,
