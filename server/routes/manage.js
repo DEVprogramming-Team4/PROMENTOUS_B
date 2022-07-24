@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("../mysql");
 const _ = require("lodash");
+const { iteratee } = require("lodash");
 const router = express.Router();
 
 const MAIN_CODES = async () => {
@@ -26,7 +27,7 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
     user_id,
     user_id,
     user_id
-  ]); 
+  ]);  
   res.send(mysql.changeSnake2Camel(teamListForManage));
 });
 
@@ -51,10 +52,7 @@ router.get("/getTeamCommunicateUrls/:project_id", async (req, res) => {
 
 // 팀 선택 시  . 팀 정보를 한꺼번에 끌어오는 ALL IN ONE API
 router.post("/getProjectInfo", async (req, res) => {
-  // console.log("req.body ::" + req.body);
-  // console.log(req.body);
   const project_id = req.body.project_id;
-//  console.log("req.body.project_id :  " + req.body.project_id);
 
   let teamTotalResult = {}; //object 선언
   /*프로젝트 기본정보  그냥 project 테이블에서 땡겨옴.*/
@@ -64,10 +62,12 @@ router.post("/getProjectInfo", async (req, res) => {
   /*프로젝트 관련링크정보*/
   let refUrls = await mysql.query("getTeamRefUrls", [req.body.project_id]);
   teamTotalResult.refUrls = mysql.changeSnake2Camel(refUrls);
+
   /*프로젝트 지원자정보*/
   let applicants = await mysql.query("getTeamApplicants", [
     req.body.project_id
   ]);
+
   teamTotalResult.applicants = mysql.changeSnake2Camel(applicants);
   /*프로젝트 멤버정보들*/
   let members = await mysql.query("getTeamMembers", [
@@ -75,6 +75,10 @@ router.post("/getProjectInfo", async (req, res) => {
     req.body.project_id
   ]);
   teamTotalResult.members = mysql.changeSnake2Camel(members);
+  if( typeof  teamTotalResult.members == "object"){
+    teamTotalResult.members = [teamTotalResult.members];
+  }
+
   /*소셜링크가져와서 각각 멤버에 심어주기.*/
   for (let index = 0; index < teamTotalResult.members.length; index++) {
     /* 멤버 소셜 집어넣기 */
@@ -82,6 +86,7 @@ router.post("/getProjectInfo", async (req, res) => {
       "getUserSocialUrls",
       [teamTotalResult.members[index].userId]
     );
+
     /* 멤버 평가여부 집어넣기 멘토링ID 처럼 고유값이 아님. rate user id 및 project까지 다필요함.  */
     teamTotalResult.members[index].rating = await mysql.query(
       "getMemberRating",
@@ -92,6 +97,8 @@ router.post("/getProjectInfo", async (req, res) => {
         req.body.project_id
       ]
     );
+    console.log("testtttttttttttttttttttttttttt");
+    console.log(teamTotalResult.members[index].rating )
     /*만일 rating 없으면..  */
     if (teamTotalResult.members[index].rating.length === 0) {
       tempArr = [];
@@ -102,30 +109,34 @@ router.post("/getProjectInfo", async (req, res) => {
       });
       teamTotalResult.members[index].rating = tempArr;
     }
-    //console.log("testtttttttttttttttttttttttttt");
-    //console.log(teamTotalResult.members[index].rating);
+
+    console.log(teamTotalResult.members[index]);
     /* 멤버 각 역할 집어넣기  */
+    console.log(teamTotalResult.members[index].leaderYn)
     if (_.isEqual("Y", teamTotalResult.members[index].leaderYn)) {
       teamTotalResult.members[index].role = "리더"; // TODO.리더 아님!!
     } else {
+
+      console.log([
+        req.body.project_id,//20
+        teamTotalResult.members[index].userId//32
+      ])
       t_role = await mysql.query("getMemberRole", [
         req.body.project_id,
         teamTotalResult.members[index].userId
       ]);
+      console.log(t_role)
+      if(t_role.length == 0 ){
+        teamTotalResult.members[index].role = ""
+      }else{
       teamTotalResult.members[index].role = t_role[0].role;
+      }
     }
   }
+
   // console.log("------------------------------------------");
   // console.log(teamTotalResult.members);
-
-  /*멘토링 페이지 총계 정보 */
-  let mentoringTotalPageCount = await mysql.query(
-    "getTeamMentoringTotalPage",
-    [req.body.project_id] //param object 가져오기
-  );
-  teamTotalResult.mentoringTotalPageCount = mysql.changeSnake2Camel(
-    mentoringTotalPageCount
-  );
+ 
   /*프로젝트 멘토링정보*/
   let mentorings = await mysql.query(
     "getTeamMentoringList",
@@ -151,6 +162,8 @@ router.post("/getProjectInfo", async (req, res) => {
     }
   }
   //ALL IN ONE SEND
+  console.log("teamTotalResult-----------------------")
+  console.log(teamTotalResult)
   res.send(teamTotalResult);
 });
 
