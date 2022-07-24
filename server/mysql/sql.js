@@ -23,35 +23,36 @@ module.exports = {
   common_statusList: `SELECT * FROM sb_code_data where code_class_id =6  `, //팀상태분류가져오기
   common_applyStatusList: `SELECT * FROM sb_code_data where code_class_id =7`, //지원상태분류가져오기
   common_boardTypes: `SELECT * FROM sb_code_data where code_class_id =8`, //지원상태분류가져오기
-  common_TeamRatingInfo:``,
+  common_TeamRatingInfo: ``,
   common_MentorRatingInfo: ``,
+  common_refUrlInfo : `select * from ref_url where post_category = ? and post_id = ?`,
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
   applicantsPerDept: ``,
   manage_HeaderSelect: `select 'babo' from dual`,
-  projectList: `select t2.user_nickname , t.*
+  projectList: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ?
+  where t.leader_user = t2.user_id and t.status_code = ? and t.stack_code like ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
-  projectListOnline: `select t2.user_nickname , t.*
+  projectListOnline: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ? t.progress_method = ?
+  where t.leader_user = t2.user_id and t.status_code = ? and t.stack_code like ? and t.progress_method = ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
-  projectListLargeCity: `select t2.user_nickname , t.*
+  projectListLargeCity: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ? t.main_aria_code = ?
+  where t.leader_user = t2.user_id and t.status_code = ? and t.stack_code like ? and t.main_area_code like ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
-  projectListRestCity: `select t2.user_nickname , t.*
+  projectListRestCity: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id and t.status_code = ? t.sub_aria_code = ?
+  where t.leader_user = t2.user_id and t.status_code = ? and t.stack_code like ? and t.sub_aria_code = ?
   order by t.created_datetime desc
   limit 8 offset ?;`,
-  projectListDefault: `select t2.user_nickname , t.*
+  projectListDefault: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
   where t.leader_user = t2.user_id and t.status_code = 'REC'
   order by t.created_datetime desc
@@ -95,7 +96,11 @@ module.exports = {
   getReviewCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
   registerRecruitComment: `insert into project_reply (project_id, writer_id, contents, parent_id,
   target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
-  deleteRecruitComment: `update project_reply set del_yn = 'Y' where project_reply_id = ?`,
+  updateRecruitComment: `update project_reply set contents = ? where reply_id = ?`,
+  updateReviewComment: ``,
+  deleteRecruitComment: `delete from project_reply where reply_id = ?`,
+  deleteReviewComment: ``,
+  // deleteRecruitComment: `update project_reply set del_yn = 'Y' where project_reply_id = ?`,
   registerReviewComment: `insert into review_reply (review_id, writer_id, contents, parent_id,
    target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
   projectRecruitData: `
@@ -112,18 +117,40 @@ module.exports = {
       from apply_admin t
         where t.apply_status = 'ACC' and t.project_id = ?`,
 
-  getCount: `select count(project_id) as cnt from project where project.status_code = ?;`,
+  getProjectCount: `SELECT count(project_id) as cnt 
+  FROM project
+  WHERE project.status_code = ?;`,
   getProjectViewCount: `SELECT post_id, count(post_id) as viewCnt
   FROM view_count
   where post_category="RCB"
   and post_id = ?
   group by post_id;`,
   getAllReview: `select * from review where project_id = ?`,
+  getProjectStack: `SELECT project_id, stack_code
+  FROM project
+  WHERE status_code = ? and stack_code LIKE ?`,
+  getTotalPeople: `select project_id, sum(apply_dept.to) totalPeople
+  from apply_dept
+  where project_id = ?
+  group by project_id;`,
+  getAcceptedData: `SELECT project_id, count(project_id) as acceptedCount
+  FROM team4.apply_admin 
+  where apply_status = 'ACC' and project_id = ?
+  group by project_id;`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  reviewList: `select * from review`,
+  reviewList: `select t2.user_nickname, t3.stack_code, t.* 
+  from review t, user t2, project t3
+  where t.writer_id = t2.user_id and t.project_id = t3.project_id
+  order by t.created_datetime desc
+  limit 8`,
+  getReviewViewCount: `SELECT post_id, count(post_id) as viewCnt
+  FROM view_count
+  where post_category="RVB"
+  and post_id = ?
+  group by post_id;`,
   reviewDetail: `SELECT * FROM review where review_id = ?`,
   reviewOutcomeUrl: `SELECT * FROM review_outcome_url where review_id = ?`,
 
@@ -159,6 +186,7 @@ module.exports = {
                         v.applicant_id
                         ,v.project_id
                         ,v.apply_dept_id
+                        ,fn_applyDeptCode(v.apply_dept_id ) "apply_dept_code"
                         ,fn_user_nickname(v.applicant_id) as "applicant_nickname"
                         ,fn_user_nickname(v.applicant_id) as "user_nickname"
                         ,fn_user_email(v.applicant_id) as "applicant_account"
@@ -170,7 +198,7 @@ module.exports = {
                         ,max(v.insert_date ) as "insertDate"
                         ,max(v.stat) /*1지원중, 2승인, 3반려 */ stat
                         ,v.apply_status  as "apply_status"
-                        ,fn_user_image(v.applicant_id) as "user_image" /*유저이미지 추가*/   
+                        ,fn_user_image(v.applicant_id) as "user_image" /*유저이미지 추가*/
                         from (
                         select t.applicant_id, t.project_id, t.apply_dept_id, t.insert_date, t.apply_status,
                         if(t.apply_status = 'NEW', 1, if(t.apply_status = 'ACC',2,  3) ) stat
@@ -253,7 +281,7 @@ and t.project_id = ?
                      select v2.mentoring_id from mentoring v2 where v2.project_id = ?
               )     
               `,
- 
+
   getMentoringInfo: `
             select
             t.rate  AS "score"
@@ -275,20 +303,23 @@ and t.project_id = ?
   // projectDetail: `SELECT * FROM project where project_id = ?`,
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
-  userDetail : `select * from user t where user_id = ? `,
+  userDetail: `select * from user t where user_id = ? `,
   /*--------------------------------------------------------------*/
   /*-------------------  멘토리스트    영역--------------------------*/
   /*------------------------------------------------------------- -*/
   // 메인페이지에서 보일 6개 리스트
-  mentorListDefault: `select * from mentor_info order by mentor_register_date desc limit 6`,
-  // 멘토링 단에서 보이는 리스트 
-  mentorListAvail : `/*멘토정보 리스트 가져오기 */
+  mentorListDefault: `select t2.user_nickname, t2.user_image, t.* 
+  from mentor_info t, user t2
+  where t.user_id = t2.user_id and t.mentoring_availability = 'Y'
+  order by mentor_register_date desc limit 6`,
+  // 멘토링 단에서 보이는 리스트
+  mentorListAvail: `/*멘토정보 리스트 가져오기 */
   
   select   fn_getMantorRate( t1.user_id ) totalRate
           ,fn_getMentorRateCount(t1.user_id ) rateCount
           ,t1.*
           ,t2.*  from mentor_info t1, user t2
-  where t2.user_id = t1.user_id  
+  where t2.user_id = t1.user_id
   and t1.mentoring_availability ='Y'
   `,
   // mentorID: `select user_id from mentor_info order by mentor_register_date desc limit 6`,
@@ -304,49 +335,41 @@ and t.project_id = ?
   where rate_type = 'MENTOR'
   and rated_target_id = ?
   group by rated_target_id;`,
-  // mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
-  // FROM rate
-  // where rate_type = 'MENTOR'
-  // and (rated_target_id in (?,?,?,?,?))
-  // group by rated_target_id;`,
-  // 멘토링 메뉴에서 보일 8개 리스트 _ TODO:정렬 검색 보완해야함
   getRate : `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? ` ,
-  mentorList: `select * from mentor_info order by mentor_register_date desc desc limit 8`,
   getDeptOfMentorInfo : `select mentoring_dept_code from mentor_info 
      where mentor_info_id = ?  `,
+  checkMentorInfoExist:`select mentor_info_id from mentor_info t where t.user_id =  ?  `,
 
-    /*--------------------------------------------------------------*/
-    /*-------------------  멘토디테일    영역--------------------------*/
-    /*------------------------------------------------------------- -*/
-  mentorBasicInfo : ` /*멘토링 기본정보끌고오기 */
+  /*--------------------------------------------------------------*/
+  /*-------------------  멘토디테일    영역--------------------------*/
+  /*------------------------------------------------------------- -*/
+  mentorBasicInfo: ` /*멘토링 기본정보끌고오기 */
   select   fn_getMantorRate( t1.user_id ) totalRate
   ,fn_getMentorRateCount(t1.user_id ) rateCount
   ,t1.*
   ,t2.*  from mentor_info t1, user t2
-where t2.user_id = t1.user_id  
+where t2.user_id = t1.user_id
 and t1.user_id = ?
 and t1.mentoring_availability ='Y'
   `,
-  mentorReputations : `select t1.rate "score" , t1.rate_comment "comment" 
+  mentorReputations: `select t1.rate "score" , t1.rate_comment "comment" 
   from rate  t1  
   where t1.rate_type ='MENTOR' and t1.rated_target_id = ?
   order by t1.rate desc, rate_register_date desc   ;`,
   mentorHistory: `
-  select  
-    t1.project_id   
+  select
+    t1.project_id
   ,(select v.title from project v where v.project_id = t1.project_id) "title"
   from mentoring t1, mentoring_admin t2
-  where t2.mentoring_id = t1.mentoring_id 
+  where t2.mentoring_id = t1.mentoring_id
   and t2.mentoring_status = 'FIN'
   and t1.mentor_info_id = fn_get_mentorinfo( ?  )
-  group by t1.project_id   
+  group by t1.project_id
   `,
   /*TODO 멘토인포 등록하는 멘토입장에서 > 나 어디어디 멘토링하고싶은지 입력하는 부분 + 가져오는 부분 다필요하다!  */
 
-
-    /*--------------------------------------------------------------*/
-    /*-------------------  멘토링 신청하기 영역--------------------------*/
-    /*------------------------------------------------------------- -*/
-  mentoringRequestFormData : ``/*TODO ! > 신청분야리스트 처리 필요하다. */
-
+  /*--------------------------------------------------------------*/
+  /*-------------------  멘토링 신청하기 영역--------------------------*/
+  /*------------------------------------------------------------- -*/
+  mentoringRequestFormData: `` /*TODO ! > 신청분야리스트 처리 필요하다. */
 };

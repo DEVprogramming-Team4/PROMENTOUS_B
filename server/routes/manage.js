@@ -168,12 +168,7 @@ router.post("/saveTeamManageInfo", async (req, res) => {
     numberForEachPage
   ]);
 
-  /* ref_url 테이블 관련 -- 관련 링크..  */
-  res = await mysql.query("getTeamMentoringListBySelectedPage", [
-    req.body.project_id,
-    (req.body.project_id - 1) * numberForEachPage,
-    numberForEachPage
-  ]);
+ 
 
   res.send(res);
 });
