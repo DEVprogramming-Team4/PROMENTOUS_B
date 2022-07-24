@@ -25,8 +25,8 @@ module.exports = {
   common_boardTypes: `SELECT * FROM sb_code_data where code_class_id =8`, //지원상태분류가져오기
   common_TeamRatingInfo: ``,
   common_MentorRatingInfo: ``,
-  common_refUrlInfo : `select * from ref_url where post_category = ? and post_id = ?`,
-  common_selectMaxId : `select max(?)+1  from  ? `,
+  common_refUrlInfo: `select * from ref_url where post_category = ? and post_id = ?`,
+  common_selectMaxId: `select max(?)+1  from  ? `,
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -300,16 +300,13 @@ and t.project_id = ?
           from rate  t
           where t.rated_target_id = ?
           and t.rate_type ='MENTOR' /*--하드코딩*/ `,
-  updateProject :  `
+  updateProject: `
               update project set ? where project_id = ? 
   
   `,
-  insertProjectStatus : `
+  insertProjectStatus: `
        insert into project_status set ? 
   `,
-
-  
-
 
   /*--------------------------------------------------------------*/
   /*-------------------  마이페이지    영역--------------------------*/
@@ -324,6 +321,11 @@ and t.project_id = ?
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
   userDetail: `select * from user t where user_id = ? `,
+  userRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
+  FROM rate
+  where rate_type = 'USER'
+  and rated_target_id = ?
+  group by rated_target_id;`,
   /*--------------------------------------------------------------*/
   /*-------------------  멘토리스트    영역--------------------------*/
   /*------------------------------------------------------------- -*/
@@ -355,22 +357,17 @@ and t.project_id = ?
   where rate_type = 'MENTOR'
   and rated_target_id = ?
   group by rated_target_id;`,
-  getRate : `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? ` ,
-  getDeptOfMentorInfo : `select mentoring_dept_code from mentor_info 
+  getRate: `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
+  getDeptOfMentorInfo: `select mentoring_dept_code from mentor_info 
      where mentor_info_id = ?  `,
-  checkMentorInfoExist:`select mentor_info_id from mentor_info t where t.user_id =  ?  `,
-
+  checkMentorInfoExist: `select mentor_info_id from mentor_info t where t.user_id =  ?  `,
 
   /*--------------------------------------------------------------*/
   /*-------------------  멘토 등록신청   영역--------------------------*/
   /*------------------------------------------------------------- -*/
-  getMentorInfoMax:`select max(mentor_info_id)+1  "max"  from mentor_info `,
+  getMentorInfoMax: `select max(mentor_info_id)+1  "max"  from mentor_info `,
   insertMentorInfo: `insert into mentor_info set ?`,
-  insertRefUrlForMentor:`insert into ref_url set ? `,
-
-
-
-  
+  insertRefUrlForMentor: `insert into ref_url set ? `,
 
   /*--------------------------------------------------------------*/
   /*-------------------  멘토디테일    영역--------------------------*/
