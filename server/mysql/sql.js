@@ -25,8 +25,8 @@ module.exports = {
   common_boardTypes: `SELECT * FROM sb_code_data where code_class_id =8`, //지원상태분류가져오기
   common_TeamRatingInfo: ``,
   common_MentorRatingInfo: ``,
-  common_refUrlInfo: `select * from ref_url where post_category = ? and post_id = ?`,
-  common_selectMaxId: `select max(?)+1  from  ? `,
+  common_refUrlInfo : `select * from ref_url where post_category = ? and post_id = ?`,
+  common_selectMaxId : `select max(?)+1  from  ? `,
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -212,14 +212,17 @@ module.exports = {
                         select t.applicant_id, t.project_id, t.apply_dept_id, t.insert_date, t.apply_status,
                         if(t.apply_status = 'NEW', 1, if(t.apply_status = 'ACC',2,  3) ) stat
                         from apply_admin t where t.project_id = ?
+                          and apply_status ='NEW'
                         ) v
                         group by applicant_id
                         order by stat `,
   //getTeamMembers  > ? 2개
+  
   getTeamMembers: `select 'Y' leader_yn
                   ,fn_user_stack_code(t.user_id) as "like_stack_code"
                   ,fn_user_dept_code(t.user_id) as "like_dept_code"
                   ,fn_user_image(t.user_id) as "member_image"
+                  ,fn_user_image(t.user_id) as "user_image"
                   ,fn_user_email(t.user_id) as "member_email"
                   ,t.* from user t
                    where t.user_id = (select  t2.leader_user  from project  t2 where t2.project_id =  ?      )
@@ -228,6 +231,7 @@ module.exports = {
                   ,fn_user_stack_code(t2.user_id) as "like_stack_code"
                   ,fn_user_dept_code(t2.user_id) as "like_dept_code"
                   ,fn_user_image(t2.user_id) as "member_image"
+                  ,fn_user_image(t2.user_id) as "user_image"
                   ,fn_user_email(t2.user_id) as "member_email"
                   ,t2.* from user t2
                   where t2.user_id in
@@ -300,7 +304,7 @@ and t.project_id = ?
           from rate  t
           where t.rated_target_id = ?
           and t.rate_type ='MENTOR' /*--하드코딩*/ `,
-  updateProject: `
+          updateProject: `
               update project set ? where project_id = ? 
   
   `,
@@ -321,11 +325,6 @@ and t.project_id = ?
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_nickname = ?`, // 컬럼을 지정해도 왜 라잌 스택 뎁트코드를 가져오냐?
   userDetail: `select * from user t where user_id = ? `,
-  userRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
-  FROM rate
-  where rate_type = 'USER'
-  and rated_target_id = ?
-  group by rated_target_id;`,
   /*--------------------------------------------------------------*/
   /*-------------------  멘토리스트    영역--------------------------*/
   /*------------------------------------------------------------- -*/
@@ -357,17 +356,22 @@ and t.project_id = ?
   where rate_type = 'MENTOR'
   and rated_target_id = ?
   group by rated_target_id;`,
-  getRate: `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
-  getDeptOfMentorInfo: `select mentoring_dept_code from mentor_info 
+  getRate : `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? ` ,
+  getDeptOfMentorInfo : `select mentoring_dept_code from mentor_info 
      where mentor_info_id = ?  `,
-  checkMentorInfoExist: `select mentor_info_id from mentor_info t where t.user_id =  ?  `,
+  checkMentorInfoExist:`select mentor_info_id from mentor_info t where t.user_id =  ?  `,
+
 
   /*--------------------------------------------------------------*/
   /*-------------------  멘토 등록신청   영역--------------------------*/
   /*------------------------------------------------------------- -*/
-  getMentorInfoMax: `select max(mentor_info_id)+1  "max"  from mentor_info `,
+  getMentorInfoMax:`select max(mentor_info_id)+1  "max"  from mentor_info `,
   insertMentorInfo: `insert into mentor_info set ?`,
-  insertRefUrlForMentor: `insert into ref_url set ? `,
+  insertRefUrlForMentor:`insert into ref_url set ? `,
+
+
+
+  
 
   /*--------------------------------------------------------------*/
   /*-------------------  멘토디테일    영역--------------------------*/

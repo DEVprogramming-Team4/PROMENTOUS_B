@@ -35,6 +35,8 @@ router.get("/getTeamStatusListForTeamManage", async (req, res) => {
     temp.push(statusList[index].code_data_desc);
   }
   //단순배열전송
+  console.log("temp")
+  console.log(temp);
   res.send(temp);
 
   // obejct 배열전송
