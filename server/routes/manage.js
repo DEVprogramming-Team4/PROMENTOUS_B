@@ -149,9 +149,7 @@ router.post("/getProjectInfo", async (req, res) => {
       });
       teamTotalResult.mentorings[index].mentorRating = tempArr;
     }
-    //console.log("test");
   }
-
   //ALL IN ONE SEND
   res.send(teamTotalResult);
 });
@@ -159,18 +157,25 @@ router.post("/getProjectInfo", async (req, res) => {
 
 
 /* 팀개요에서 정보 바꾼뒤 저장 시에 데이터 변경처리하기 */
-router.post("/saveTeamManageInfo", async (req, res) => {
-  console.log("/saveTeamManageInfo");
+router.patch("/saveTeamManageInfo/:project_id", async (req, res) => {
+  let  project_id  = req.params.project_id;
+  let body = req.body;
+  console.log("/saveTeamManageInfo 시작!! ");
   /* project table관련  */
-  res = await mysql.query("getTeamMentoringListBySelectedPage", [
-    req.body.project_id,
-    (req.body.project_id - 1) * numberForEachPage,
-    numberForEachPage
+  console.log("====================")
+  console.log(body) 
+  console.log("====================")
+  console.log(project_id)
+  console.log("====================")
+  /*PROJECT TABLE 건드려주기  */
+  let result = await mysql.query("updateProject", [
+    body.project,
+    project_id
   ]);
-
- 
-
-  res.send(res);
+  result = await mysql.query("insertProjectStatus", [
+    body.project_status
+  ]);
+  res.send(result);
 });
 /********************************************************************** */
 /********************************************************************** */
@@ -178,7 +183,6 @@ router.post("/saveTeamManageInfo", async (req, res) => {
 /********************************************************************** */
 /********************************************************************** */
 router.post("/saveMentorRating", async (req, res) => {
-  let numberForEachPage = 4; //페이지 당 몇개씩 나오는가
   console.log(
     "/*************       INSERT   / UPDATE                ***************** */"
   );
