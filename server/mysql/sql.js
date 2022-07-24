@@ -26,6 +26,7 @@ module.exports = {
   common_TeamRatingInfo: ``,
   common_MentorRatingInfo: ``,
   common_refUrlInfo : `select * from ref_url where post_category = ? and post_id = ?`,
+  common_selectMaxId : `select max(?)+1  from  ? `,
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -290,6 +291,16 @@ and t.project_id = ?
           from rate  t
           where t.rated_target_id = ?
           and t.rate_type ='MENTOR' /*--하드코딩*/ `,
+  updateProject :  `
+              update project set ? where project_id = ? 
+  
+  `,
+  insertProjectStatus : `
+       insert into project_status set ? 
+  `,
+
+  
+
 
   /*--------------------------------------------------------------*/
   /*-------------------  마이페이지    영역--------------------------*/
@@ -339,6 +350,18 @@ and t.project_id = ?
   getDeptOfMentorInfo : `select mentoring_dept_code from mentor_info 
      where mentor_info_id = ?  `,
   checkMentorInfoExist:`select mentor_info_id from mentor_info t where t.user_id =  ?  `,
+
+
+  /*--------------------------------------------------------------*/
+  /*-------------------  멘토 등록신청   영역--------------------------*/
+  /*------------------------------------------------------------- -*/
+  getMentorInfoMax:`select max(mentor_info_id)+1  "max"  from mentor_info `,
+  insertMentorInfo: `insert into mentor_info set ?`,
+  insertRefUrlForMentor:`insert into ref_url set ? `,
+
+
+
+  
 
   /*--------------------------------------------------------------*/
   /*-------------------  멘토디테일    영역--------------------------*/

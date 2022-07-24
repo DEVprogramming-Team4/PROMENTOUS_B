@@ -20,13 +20,13 @@ const codes = {
   BE: "백엔드",
   백엔드:"BE",
   FS: "풀스택",
-  풀스택 : "",
+  풀스택 : "FS",
   DE: "디자인",
-  디자인 : "",
+  디자인 : "DE",
   UU: "UIUX",/*KEY에 UI/UX가 안들어간다.... */
   UIUX : "UU",/**UIUX !! */
   PL: "기획",
-  기획: "",
+  기획: "PL",
   PM: "PM", 
   DB: "데이터베이스",
   데이터베이스: "DB",
@@ -65,9 +65,33 @@ const codes = {
 };
 /* CONVERT TO KOR*/
 const convertCode = ( codeValue ) => { 
-   return codes[codeValue];
-}
-
+  let keyword = codeValue;
+  if(keyword == "UI/UX")
+   keyword = "UIUX";
+  if(keyword == "알고리즘/자료구조")
+   keyword = "알고리즘";
+  if(keyword == "C++")
+   keyword = "C__"; 
+  if(keyword == "C#")
+   keyword = "Csharp";  
+   return codes[keyword];
+};
+/*joinWebCodes - 웹에서 받아온 코드뭉치 배열ARRAY를 재료로 받고, 
+   여기 요소들을 코드화하여 join 해서 단일 문자열화 한다.
+   TABLE 에 insert / update 할때 사용한다.  */
+const joinWebCodes =  ( webCodeArray ) => {
+  let arr = [];
+  for (let j = 0; j < webCodeArray.length; j++) {
+    const element = webCodeArray[j]; 
+    arr.push(convertCode(element))
+  }   
+  return arr.join();
+};
+/* getNewPostId  테이블이름 + 테이블 키값 을 재료로 주면 , 새로이 등록될 
+ 글의  post id 값을 가져올수 있다.  "신규 등록 글" 이 참고링크가 달려 있는 경우에
+  새로이 생성될 놈의 post_id 값을 넣어 주어야 하므로, 이때 사용한다.   */
+const getNewPostId = async ( tableName , autoIncrementColumn  ) => {
+};
 /* getConnection :  APPJS 기본 MYSQL INIT  */
 const getConnection = async () => {
   return new Promise((resolve, reject) =>
@@ -352,6 +376,10 @@ const getMentorInfoList = async (values) => {
     }
     sql += `)`;
   }
+  // SQL  ORDERBY 영역 
+  sql += `order by t1.mentor_register_date desc  `
+  
+  // SQL  LIMIT 영역 
   let offset = (values.selectedPage -1 ) * 8
   sql +=  `limit 8 offset ${offset} /* (선택한 페이지-1)  *8 from 0   */`;
   /*SQL끝.  */
@@ -428,6 +456,8 @@ module.exports = {
   changeSnake2Camel,
   changeCamel2Snake,
   convertCode,
+  joinWebCodes,
+  getNewPostId,
   query,
   queryDynamic,
   getProjectList,
