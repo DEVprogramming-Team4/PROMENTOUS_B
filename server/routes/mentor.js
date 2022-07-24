@@ -73,18 +73,7 @@ router.get("/", async (req, res) => {
   res.send(mentorList);
 });
 
-/* 페이지 선택해 멘토링정보 4단위로 가져오기 */
-router.post("/getMentorInfo", async (req, res) => {
-  let numberForEachPage = 4; //페이지 당 몇개씩 나오는가
-  let mentorings = await mysql.query("getTeamMentoringListBySelectedPage", [
-    req.body.project_id,
-    (req.body.project_id - 1) * numberForEachPage,
-    numberForEachPage
-  ]);
-  mentorings = mysql.changeSnake2Camel(mentorings);
-
-  res.send(mentorings);
-});
+ 
 
 /*멘토 디테일 가져오기  */
 router.post("/getMentorDetail", async (req, res) => {
@@ -138,8 +127,6 @@ router.post("/getMentorDetail", async (req, res) => {
 }); 
 
 /* MENTOR EXIST VALIDATION 멘토 등록 화면용  */
-//checkMentorInfoExist
-
 router.post("/checkMentorInfoExist", async (req, res) => { 
   let result = await mysql.query("checkMentorInfoExist", [
     req.body.user_id
@@ -148,6 +135,32 @@ router.post("/checkMentorInfoExist", async (req, res) => {
  console.log(result)
   res.send(result);
 });
-
-
+/* 멘토 등록신청하기 최초등록 시 */
+router.post("/registerMentorInfo", async (req, res) => { 
+ console.log("/registerMentorInfo");
+ let lastMentorInfoId = await mysql.query("getMentorInfoMax", [
+]); 
+//무식하지만 max + 1 사용.. 
+ let newPostId = lastMentorInfoId[0].max;
+ let body = req.body;
+ console.log(body);
+  body.mentor_info.mentoring_dept_code = mysql.joinWebCodes(body.mentor_info.mentoring_dept_code);
+  console.log(body.mentor_info.mentoring_dept_code);
+   let result = await mysql.query("insertMentorInfo", [
+    body.mentor_info
+  ]); 
+  //멘토등록시 참고링크 써둔 경우에만 작동하게 조건 걸어둠. not 필수값 
+  if(body.ref_url.length > 0){
+  for (let index = 0; index < body.ref_url.length; index++) {
+    const element = body.ref_url[index];
+    element.post_category = 'MTB';
+    element.post_id  =  newPostId;
+    result = await mysql.query("insertRefUrlForMentor", [
+      element 
+    ]);     
+  }
+}
+ res.send(result);
+});
+ 
 module.exports = router; // NECCESARY END STATE
