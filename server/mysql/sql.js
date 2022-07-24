@@ -154,6 +154,14 @@ module.exports = {
   group by post_id;`,
   reviewDetail: `SELECT * FROM review where review_id = ?`,
   reviewOutcomeUrl: `SELECT * FROM review_outcome_url where review_id = ?`,
+    /*--------------------------------------------------------------*/
+  /*-프로젝트 지원 및 승인반려[apply_admin 테이블] (VALIDATION / INSERT )*/ 
+  /*------------------------------------------------------------- -*/
+  checkApplyAble : `select  max( applicant_id) flag from apply_admin
+  where  project_id = ?
+  and applicant_id = ?`,
+  insertApplyAdmin : `insert into apply_admin set ? `,
+  //insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
 
   /*--------------------------------------------------------------*/
   /*-------------------  팀 개요    영역--------------------------*/
@@ -232,6 +240,7 @@ module.exports = {
                       where apply_status  = 'ACC'
                       and project_id =  ?
                       and applicant_id = ?
+                      limit 1
                     ) ;
   `,
   getMemberRating: `            select
