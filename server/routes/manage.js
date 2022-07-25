@@ -74,10 +74,20 @@ router.post("/getProjectInfo", async (req, res) => {
     req.body.project_id,
     req.body.project_id
   ]);
+
   teamTotalResult.members = mysql.changeSnake2Camel(members);
-  if( typeof  teamTotalResult.members == "object"){
+  if(members.length == 1 ){
     teamTotalResult.members = [teamTotalResult.members];
   }
+  console.log("+++++++++++++++++++++++++++++++++")
+  console.log(teamTotalResult.members)
+  console.log(typeof  teamTotalResult.members)
+  console.log( typeof  teamTotalResult.members == "object")
+  // if( typeof  teamTotalResult.members == "object"){
+  //   temp = [];
+  //   temp.push(teamTotalResult.members)
+  // }
+  // console.log(temp)
 
   /*소셜링크가져와서 각각 멤버에 심어주기.*/
   for (let index = 0; index < teamTotalResult.members.length; index++) {

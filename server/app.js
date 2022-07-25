@@ -80,7 +80,7 @@ app.post("/login", async (req, res) => {
     await mysql.query("insertUser", req.body.param);
     const loginUser = await mysql.query(
       "getLoginUser",
-      req.body.param[0].user_nickname
+      req.body.param[0].user_account
     );
     if (req.body.param.length > 0) {
       for (let key in req.body.param[0])
