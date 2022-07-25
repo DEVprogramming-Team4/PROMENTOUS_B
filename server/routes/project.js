@@ -40,34 +40,49 @@ router.post("/", async (req, res) => {
     console.log(req.body.param);
     const page = (req.body.param.page - 1) * 8;
     const recruitStatus = req.body.param.status;
-    const stacks = req.body.param.stacks;
     const mainArea = `%${req.body.param.main_area}%`;
     const restArea = `%${req.body.param.rest_area}%`;
     const keyword = `%${req.body.param.keyword}%`;
-    const count = await mysql.query("getProjectCount", [recruitStatus]);
+    const stacks = req.body.param.stacks;
     const stack1 = stacks[0] === undefined ? "%%" : `%${stacks[0]}%`;
-    let projectRecruitList = [];
     // ======================================================
+    let count = [];
+    // const count = await mysql.query("getProjectCount", [recruitStatus]); // [{cnt:9}]
+    console.log(count);
+    // ======================================================
+    let projectRecruitList = [];
     if (req.body.param.main_area === "ON") {
       projectRecruitList = await mysql.query("projectListOnline", [
         recruitStatus,
         stack1,
         "ON",
+        keyword,
+        keyword,
+        keyword,
         page
       ]);
+      count = await mysql.query("getProjectCount", [recruitStatus]);
     } else if (req.body.param.main_area === "") {
       projectRecruitList = await mysql.query("projectList", [
         recruitStatus,
         stack1,
+        keyword,
+        keyword,
+        keyword,
         page
       ]);
+      count = await mysql.query("getProjectCount", [recruitStatus]);
     } else {
       projectRecruitList = await mysql.query("projectListLargeCity", [
         recruitStatus,
         stack1,
         mainArea,
+        keyword,
+        keyword,
+        keyword,
         page
       ]);
+      count = await mysql.query("getProjectCount", [recruitStatus]);
     }
     // ======================================================
     await getRestData(projectRecruitList);
@@ -197,17 +212,16 @@ router.get("/:projectId/currentMembers", async (req, res) => {
   res.send(sendData);
 });
 
-
 /*projectApply_최초지원 VALIDATION   */
 router.post("/checkApplyAble", async (req, res) => {
   console.log("/checkApplyAble");
   try {
-    let project_id = req.body.project_id; 
-    let user_id =  req.body.user_id;
-    console.log( [ project_id ,user_id]);
-  const result = await mysql.query("checkApplyAble", [ project_id ,user_id]);  
-  console.log(result);
-  res.send(result);
+    let project_id = req.body.project_id;
+    let user_id = req.body.user_id;
+    console.log([project_id, user_id]);
+    const result = await mysql.query("checkApplyAble", [project_id, user_id]);
+    console.log(result);
+    res.send(result);
   } catch (error) {
     res.send(error);
   }
@@ -217,10 +231,10 @@ router.post("/projectApplyNew", async (req, res) => {
   console.log("/projectApplyNEW body");
   try {
     let body = req.body;
-    body.apply_status = 'NEW';
+    body.apply_status = "NEW";
     console.log(body);
-  const result = await mysql.query("insertApplyAdmin", body);  
-  res.send(result);
+    const result = await mysql.query("insertApplyAdmin", body);
+    res.send(result);
   } catch (error) {
     res.send(error);
   }
@@ -230,10 +244,10 @@ router.post("/projectApplyAccept", async (req, res) => {
   console.log("/projectApplyACC body");
   try {
     let body = req.body;
-    body.apply_status = 'ACC';
+    body.apply_status = "ACC";
     console.log(body);
-  const result = await mysql.query("insertApplyAdmin",body);  
-  res.send(result);
+    const result = await mysql.query("insertApplyAdmin", body);
+    res.send(result);
   } catch (error) {
     res.send(error);
   }
@@ -243,21 +257,21 @@ router.post("/projectApplyReject", async (req, res) => {
   console.log("/projectApplyREJ body");
   try {
     let body = req.body;
-    body.apply_status = 'REJ';
+    body.apply_status = "REJ";
     console.log(body);
-  const result = await mysql.query("insertApplyAdmin", body );  
-  res.send(result);
+    const result = await mysql.query("insertApplyAdmin", body);
+    res.send(result);
   } catch (error) {
     res.send(error);
   }
 });
 
 // /* 멘토 등록신청하기 최초등록 시 */
-// router.post("/registerMentorInfo", async (req, res) => { 
+// router.post("/registerMentorInfo", async (req, res) => {
 //   console.log("/registerMentorInfo");
 //   let lastMentorInfoId = await mysql.query("getMentorInfoMax", [
-//  ]); 
-//  //무식하지만 max + 1 사용.. 
+//  ]);
+//  //무식하지만 max + 1 사용..
 //   let newPostId = lastMentorInfoId[0].max;
 //   let body = req.body;
 //   console.log(body);
@@ -265,22 +279,20 @@ router.post("/projectApplyReject", async (req, res) => {
 //    console.log(body.mentor_info.mentoring_dept_code);
 //     let result = await mysql.query("insertMentorInfo", [
 //      body.mentor_info
-//    ]); 
-//    //멘토등록시 참고링크 써둔 경우에만 작동하게 조건 걸어둠. not 필수값 
+//    ]);
+//    //멘토등록시 참고링크 써둔 경우에만 작동하게 조건 걸어둠. not 필수값
 //    if(body.ref_url.length > 0){
 //    for (let index = 0; index < body.ref_url.length; index++) {
 //      const element = body.ref_url[index];
 //      element.post_category = 'MTB';
 //      element.post_id  =  newPostId;
 //      result = await mysql.query("insertRefUrlForMentor", [
-//        element 
-//      ]);     
+//        element
+//      ]);
 //    }
 //  }
 //   res.send(result);
 //  });
-
-
 
 // GET
 // 후기 모아보기
