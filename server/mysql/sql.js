@@ -130,8 +130,13 @@ module.exports = {
         where t.apply_status = 'ACC' and t.project_id = ?`,
 
   getProjectCount: `SELECT count(project_id) as cnt 
-  FROM project
-  WHERE project.status_code = ?;`,
+  FROM (select t2.user_nickname, t.project_id
+    from project t , user t2
+    where t.leader_user = t2.user_id 
+    and t.status_code = ?
+    and t.stack_code like ?
+    and (t.title like ? or t2.user_nickname like ? or t.project_desc like ?)
+    )ta`,
   getProjectViewCount: `SELECT post_id, count(post_id) as viewCnt
   FROM view_count
   where post_category="RCB"

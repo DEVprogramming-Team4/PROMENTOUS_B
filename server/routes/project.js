@@ -61,7 +61,13 @@ router.post("/", async (req, res) => {
         keyword,
         page
       ]);
-      count = await mysql.query("getProjectCount", [recruitStatus]);
+      count = await mysql.query("getProjectCount", [
+        recruitStatus,
+        stack1,
+        keyword,
+        keyword,
+        keyword
+      ]);
     } else if (req.body.param.main_area === "") {
       projectRecruitList = await mysql.query("projectList", [
         recruitStatus,
@@ -71,7 +77,13 @@ router.post("/", async (req, res) => {
         keyword,
         page
       ]);
-      count = await mysql.query("getProjectCount", [recruitStatus]);
+      count = await mysql.query("getProjectCount", [
+        recruitStatus,
+        stack1,
+        keyword,
+        keyword,
+        keyword
+      ]);
     } else {
       projectRecruitList = await mysql.query("projectListLargeCity", [
         recruitStatus,
@@ -82,7 +94,13 @@ router.post("/", async (req, res) => {
         keyword,
         page
       ]);
-      count = await mysql.query("getProjectCount", [recruitStatus]);
+      count = await mysql.query("getProjectCount", [
+        recruitStatus,
+        stack1,
+        keyword,
+        keyword,
+        keyword
+      ]);
     }
     // ======================================================
     await getRestData(projectRecruitList);
