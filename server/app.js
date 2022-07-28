@@ -36,6 +36,37 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// 이미지 업로드 세팅
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+
+try {
+  fs.readdirSync("uploads");
+} catch (error) {
+  console.error("uploads 폴더가 없어 uploads 폴더를 생성합니다.");
+  fs.mkdirSync("uploads");
+}
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, "uploads/");
+    },
+    filename(req, file, done) {
+      const ext = path.extname(file.originalname);
+      done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+    }
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+app.post("/img", upload.single("image"), (req, res) => {
+  console.log(req.file);
+  // res.send("ok");
+  res.json({ url: `/img/${req.file.filename}` });
+});
+// 이미지 업로드 세팅
+
 const commonRoute = require("./routes/common"); // 공통요소
 const manageRoute = require("./routes/manage"); // 팀개요 관련입니다.
 const projectRoute = require("./routes/project"); // 프로젝트 모집 관련입니다.

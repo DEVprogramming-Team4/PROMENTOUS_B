@@ -27,15 +27,22 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
     user_id,
     user_id,
     user_id
-  ]);  
-  res.send(mysql.changeSnake2Camel(teamListForManage));
+  ]);
+  /* 자료 1개만 있는 경우를 위한 처리.. */
+  if (teamListForManage.length == 1) {
+    let temp = [];
+    temp.push(mysql.changeSnake2Camel(teamListForManage));
+    res.send(temp);
+  } else {
+    res.send(mysql.changeSnake2Camel(teamListForManage));
+  }
 });
 
 // 팀 관리화면 곳곳에 뿌려질 기초 팀정보들을 가져옴
 /* PARAM : project_id ( ex) 11   ) */
 router.get("/getTeamDatas/:project_id", async (req, res) => {
   const { project_id } = req.params;
-  const teamDatas = await mysql.query("getTeamDatas", project_id); 
+  const teamDatas = await mysql.query("getTeamDatas", project_id);
   res.send(_.mapKeys(teamDatas, (value, key) => _.camelCase(key)));
 });
 
@@ -53,7 +60,6 @@ router.get("/getTeamCommunicateUrls/:project_id", async (req, res) => {
 // 팀 선택 시  . 팀 정보를 한꺼번에 끌어오는 ALL IN ONE API
 router.post("/getProjectInfo", async (req, res) => {
   const project_id = req.body.project_id;
-
   let teamTotalResult = {}; //object 선언
   /*프로젝트 기본정보  그냥 project 테이블에서 땡겨옴.*/
   let basicInfo = await mysql.query("getTeamDatas", [req.body.project_id]);
@@ -76,18 +82,10 @@ router.post("/getProjectInfo", async (req, res) => {
   ]);
 
   teamTotalResult.members = mysql.changeSnake2Camel(members);
-  if(members.length == 1 ){
+  // 1개있으면 배열로 안오는 현상때문에 배열화 처리함..
+  if (members.length == 1) {
     teamTotalResult.members = [teamTotalResult.members];
   }
-  console.log("+++++++++++++++++++++++++++++++++")
-  console.log(teamTotalResult.members)
-  console.log(typeof  teamTotalResult.members)
-  console.log( typeof  teamTotalResult.members == "object")
-  // if( typeof  teamTotalResult.members == "object"){
-  //   temp = [];
-  //   temp.push(teamTotalResult.members)
-  // }
-  // console.log(temp)
 
   /*소셜링크가져와서 각각 멤버에 심어주기.*/
   for (let index = 0; index < teamTotalResult.members.length; index++) {
@@ -107,8 +105,7 @@ router.post("/getProjectInfo", async (req, res) => {
         req.body.project_id
       ]
     );
-    console.log("testtttttttttttttttttttttttttt");
-    console.log(teamTotalResult.members[index].rating )
+    //console.log(teamTotalResult.members[index].rating);
     /*만일 rating 없으면..  */
     if (teamTotalResult.members[index].rating.length === 0) {
       tempArr = [];
@@ -119,34 +116,33 @@ router.post("/getProjectInfo", async (req, res) => {
       });
       teamTotalResult.members[index].rating = tempArr;
     }
-
+    console.log("멤버 +" + index);
     console.log(teamTotalResult.members[index]);
     /* 멤버 각 역할 집어넣기  */
-    console.log(teamTotalResult.members[index].leaderYn)
+    //console.log(teamTotalResult.members[index].leaderYn);
     if (_.isEqual("Y", teamTotalResult.members[index].leaderYn)) {
       teamTotalResult.members[index].role = "리더"; // TODO.리더 아님!!
     } else {
-
       console.log([
-        req.body.project_id,//20
-        teamTotalResult.members[index].userId//32
-      ])
+        req.body.project_id, //20
+        teamTotalResult.members[index].userId //32
+      ]);
       t_role = await mysql.query("getMemberRole", [
         req.body.project_id,
         teamTotalResult.members[index].userId
       ]);
-      console.log(t_role)
-      if(t_role.length == 0 ){
-        teamTotalResult.members[index].role = ""
-      }else{
-      teamTotalResult.members[index].role = t_role[0].role;
+      console.log(t_role);
+      if (t_role.length == 0) {
+        teamTotalResult.members[index].role = "";
+      } else {
+        teamTotalResult.members[index].role = t_role[0].role;
       }
     }
   }
 
   // console.log("------------------------------------------");
   // console.log(teamTotalResult.members);
- 
+
   /*프로젝트 멘토링정보*/
   let mentorings = await mysql.query(
     "getTeamMentoringList",
@@ -172,38 +168,31 @@ router.post("/getProjectInfo", async (req, res) => {
     }
   }
   //ALL IN ONE SEND
-  console.log("teamTotalResult-----------------------")
-  console.log(teamTotalResult)
+  console.log("최종 SEND 직전! teamTotalResult-----------------------");
+  console.log(teamTotalResult);
   res.send(teamTotalResult);
 });
 
-
-
-/* 팀개요에서 정보 바꾼뒤 저장 시에 데이터 변경처리하기 */
+/* 팀개요에서 정보 바꾸고 [저장] 시에 데이터 변경처리하기 */
 router.patch("/saveTeamManageInfo/:project_id", async (req, res) => {
-  let  project_id  = req.params.project_id;
+  let project_id = req.params.project_id;
   let body = req.body;
   console.log("/saveTeamManageInfo 시작!! ");
   /* project table관련  */
-  console.log("====================")
-  console.log(body) 
-  console.log("====================")
-  console.log(project_id)
-  console.log("====================")
+  console.log("====================");
+  console.log(body);
+  console.log("====================");
+  console.log(project_id);
+  console.log("====================");
   /*PROJECT TABLE 건드려주기  */
-  let result = await mysql.query("updateProject", [
-    body.project,
-    project_id
-  ]);
+  let result = await mysql.query("updateProject", [body.project, project_id]);
   /*상태 변경 시마다 insert 진행 [TABLE  :  project_status ] */
-  result = await mysql.query("insertProjectStatus", [
-    body.project_status
-  ]);
+  result = await mysql.query("insertProjectStatus", [body.project_status]);
   res.send(result);
 });
 /********************************************************************** */
 /********************************************************************** */
-/*************       INSERT   / UPDATE                ***************** */
+/*************       INSERT   / UPDATE 레이팅 관련..                  *** */
 /********************************************************************** */
 /********************************************************************** */
 router.post("/saveMentorRating", async (req, res) => {
@@ -217,8 +206,7 @@ router.post("/saveMentorRating", async (req, res) => {
 
   res.send(null);
 });
-   
- 
+
 /*questions */
 /* 종료날짜 column 필요한게 아닐지..?  */
 
