@@ -210,7 +210,21 @@ router.get("/:projectId/currentMembers", async (req, res) => {
   //console.log(currentMembers);
   sendData = {};
   deptIdArray = [];
-  for (let index = 0; index < currentMembers.length; index++) {
+
+  const len = currentMembers.length;
+  for (let i = 0; i < len; i++) {
+    let memberId = currentMembers[i].applicant_id;
+    // 프로젝트 진행이력, 후기 작성 내역 넣어주는 부분
+    let reviewHistory = await mysql.query("getUserReviewHistory", [memberId]);
+    currentMembers[i].review = reviewHistory;
+    let projectHistory = await mysql.query("leaderHistory", [
+      memberId,
+      memberId
+    ]);
+    currentMembers[i].project = projectHistory;
+  }
+
+  for (let index = 0; index < len; index++) {
     const element = currentMembers[index];
 
     if (_.indexOf(deptIdArray, element.apply_dept_code) == -1) {
@@ -226,7 +240,7 @@ router.get("/:projectId/currentMembers", async (req, res) => {
     //console.log(deptIdArray);
   }
   //console.log(" sendData 확인해보세요");
-  //console.log(sendData);
+  // console.log(sendData);
   res.send(sendData);
 });
 
