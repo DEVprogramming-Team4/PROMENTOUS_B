@@ -48,9 +48,15 @@ router.get("/:reviewId", async (req, res) => {
     reviewDetail[0].writer_id
   ]);
 
+  let writerImage = await mysql.query("getUserImage", [
+    reviewDetail[0].writer_id
+  ]);
+
   // 결과물링크
   let reviewOutcomeUrl = await mysql.query("reviewOutcomeUrl", [reviewId]);
-  res.send(_.merge(reviewDetail[0], writerName[0], reviewOutcomeUrl[0]));
+  res.send(
+    _.merge(reviewDetail[0], writerName[0], reviewOutcomeUrl[0], writerImage[0])
+  );
 });
 
 module.exports = router;
