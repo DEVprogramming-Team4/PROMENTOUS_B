@@ -5,6 +5,7 @@ module.exports = {
   /*--------------------------------------------------------------*/
   getMainCodes: `select t.* from sb_code_data t where t.code_class_id in ('1','2','5','6','7','8')`,
   getUserNickName: `select user_nickname from user where user_id = ?`,
+  getUserImage: `select user_image from user where user_id = ?`,
   sblList: `select * from sb_code_data`,
   applicantsPerDept: `select v.dept_desc "dept_desc",count(v.status) "count",v.status , v.apply_dept_id  "applyDeptId"
       from
@@ -38,26 +39,26 @@ module.exports = {
   manage_HeaderSelect: `select 'babo' from dual`,
   projectList: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id 
+  where t.leader_user = t2.user_id
   and t.status_code = ?
-  and t.stack_code like ? 
+  and t.stack_code like ?
   and (t.title like ? or t2.user_nickname like ? or t.project_desc like ?)
   order by t.created_datetime desc
   limit 8 offset ?;`,
   projectListOnline: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id 
-  and t.status_code = ? 
-  and t.stack_code like ? 
+  where t.leader_user = t2.user_id
+  and t.status_code = ?
+  and t.stack_code like ?
   and t.progress_method = ?
   and (t.title like ? or t2.user_nickname like ? or t.project_desc like ?)
   order by t.created_datetime desc
   limit 8 offset ?;`,
   projectListLargeCity: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2
-  where t.leader_user = t2.user_id 
-  and t.status_code = ? 
-  and t.stack_code like ? 
+  where t.leader_user = t2.user_id
+  and t.status_code = ?
+  and t.stack_code like ?
   and t.main_area_code like ?
   and (t.title like ? or t2.user_nickname like ? or t.project_desc like ?)
   order by t.created_datetime desc
@@ -108,16 +109,16 @@ module.exports = {
  end
  limit  ? , 3 `,
   getRecruitCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
-  getReviewCommentList: `select * from project_reply where project_id = ? and del_yn = 'N'`,
+  getReviewCommentList: `select * from review_reply where review_id = ? and del_yn = 'N'`,
   registerRecruitComment: `insert into project_reply (project_id, writer_id, contents, parent_id,
   target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
-  updateRecruitComment: `update project_reply set contents = ? where reply_id = ?`,
-  updateReviewComment: ``,
-  deleteRecruitComment: `delete from project_reply where reply_id = ?`,
-  deleteReviewComment: ``,
-  // deleteRecruitComment: `update project_reply set del_yn = 'Y' where project_reply_id = ?`,
   registerReviewComment: `insert into review_reply (review_id, writer_id, contents, parent_id,
-   target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
+    target_id, sequence) values (?, ?, ?, ?, ?, ?) `,
+  updateRecruitComment: `update project_reply set contents = ? where reply_id = ?`,
+  updateReviewComment: `update review_reply set contents = ? where reply_id = ?`,
+  deleteRecruitComment: `delete from project_reply where reply_id = ?`,
+  deleteReviewComment: `delete from review_reply where reply_id = ?`,
+  // deleteRecruitComment: `update project_reply set del_yn = 'Y' where project_reply_id = ?`,
   projectRecruitData: `
       select
       t.*
@@ -132,10 +133,10 @@ module.exports = {
       from apply_admin t
         where t.apply_status = 'ACC' and t.project_id = ?`,
 
-  getProjectCount: `SELECT count(project_id) as cnt 
+  getProjectCount: `SELECT count(project_id) as cnt
   FROM (select t2.user_nickname, t.project_id
     from project t , user t2
-    where t.leader_user = t2.user_id 
+    where t.leader_user = t2.user_id
     and t.status_code = ?
     and t.stack_code like ?
     and (t.title like ? or t2.user_nickname like ? or t.project_desc like ?)
@@ -154,14 +155,14 @@ module.exports = {
   where project_id = ?
   group by project_id;`,
   getAcceptedData: `SELECT project_id, count(project_id) as acceptedCount
-  FROM team4.apply_admin 
+  FROM team4.apply_admin
   where apply_status = 'ACC' and project_id = ?
   group by project_id;`,
   /*--------------------------------------------------------------*/
   /*-------------------  후기    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  reviewList: `select t2.user_nickname, t3.stack_code, t.* 
+  reviewList: `select t2.user_nickname, t3.stack_code, t.*
   from review t, user t2, project t3
   where t.writer_id = t2.user_id and t.project_id = t3.project_id
   order by t.created_datetime desc
@@ -225,21 +226,21 @@ module.exports = {
                         ,fn_user_intro(v.applicant_id) as "user_intro"
                         ,max(v.insert_date ) as "insertDate"
                         ,max(v.stat) /*1지원중, 2승인, 3반려 */ stat
-                        , ( select apply_status from apply_admin 
+                        , ( select apply_status from apply_admin
                           where apply_admin_id in (
-                          select max(t3.apply_admin_id) 
-                             from apply_admin t3 
+                          select max(t3.apply_admin_id)
+                             from apply_admin t3
                              where  t3.applicant_id = v.applicant_id
                                and t3.project_id =v.project_id
                                )
-                          )   
-                          as "apply_status" 
+                          )
+                          as "apply_status"
                         ,fn_user_image(v.applicant_id) as "user_image" /*유저이미지 추가*/
                         from (
                         select t.applicant_id, t.project_id, t.apply_dept_id, t.insert_date, t.apply_status,
                         if(t.apply_status = 'NEW', 1, if(t.apply_status = 'ACC',2,  3) ) stat
                         from apply_admin t where t.project_id = ?
-                          
+
                         ) v
                         group by applicant_id
                         order by stat `,
@@ -320,7 +321,7 @@ and t.project_id = ?
           from mentoring t
               where t.mentoring_id in (
                      select v2.mentoring_id from mentoring v2 where v2.project_id = ?
-              )     
+              )
               `,
 
   getMentoringInfo: `
@@ -332,11 +333,11 @@ and t.project_id = ?
           where t.rated_target_id = ?
           and t.rate_type ='MENTOR' /*--하드코딩*/ `,
   updateProject: `
-              update project set ? where project_id = ? 
-  
+              update project set ? where project_id = ?
+
   `,
   insertProjectStatus: `
-       insert into project_status set ? 
+       insert into project_status set ?
   `,
 
   /*--------------------------------------------------------------*/
@@ -362,13 +363,13 @@ and t.project_id = ?
   /*-------------------  멘토리스트    영역--------------------------*/
   /*------------------------------------------------------------- -*/
   // 메인페이지에서 보일 6개 리스트
-  mentorListDefault: `select t2.user_nickname, t2.user_image, t.* 
+  mentorListDefault: `select t2.user_nickname, t2.user_image, t.*
   from mentor_info t, user t2
   where t.user_id = t2.user_id and t.mentoring_availability = 'Y'
   order by mentor_register_date desc limit 6`,
   // 멘토링 단에서 보이는 리스트
   mentorListAvail: `/*멘토정보 리스트 가져오기 */
-  
+
   select   fn_getMantorRate( t1.user_id ) totalRate
           ,fn_getMentorRateCount(t1.user_id ) rateCount
           ,t1.*
@@ -390,7 +391,7 @@ and t.project_id = ?
   and rated_target_id = ?
   group by rated_target_id;`,
   getRate: `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
-  getDeptOfMentorInfo: `select mentoring_dept_code from mentor_info 
+  getDeptOfMentorInfo: `select mentoring_dept_code from mentor_info
      where mentor_info_id = ?  `,
   checkMentorInfoExist: `select mentor_info_id from mentor_info t where t.user_id =  ?  `,
 
@@ -413,8 +414,8 @@ where t2.user_id = t1.user_id
 and t1.user_id = ?
 and t1.mentoring_availability ='Y'
   `,
-  mentorReputations: `select t1.rate "score" , t1.rate_comment "comment" 
-  from rate  t1  
+  mentorReputations: `select t1.rate "score" , t1.rate_comment "comment"
+  from rate  t1
   where t1.rate_type ='MENTOR' and t1.rated_target_id = ?
   order by t1.rate desc, rate_register_date desc   ;`,
   mentorHistory: `
