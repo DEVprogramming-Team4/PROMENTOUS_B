@@ -60,7 +60,8 @@ const codes = {
   C__: "C02" /**C__ !! */,
   C03: "C#",
   Csharp: "C03" /**Csharp!! */,
-  J01: "javascript"
+  J01: "javascript",
+  javascript: "J01"
   /* 추가 필요 */
 };
 /* CONVERT TO KOR*/
@@ -116,19 +117,128 @@ const splitDbCodesWithLoop = (query_result) => {
   } else {
     console.log("배열아님다.");
   }
-  // let arr = [];
-  // console.log(dbCodeString);
-  // if (dbCodeString != "" && !_.isNull(dbCodeString)) {
-  //   let temp = dbCodeString.split(",");
-
-  //   for (let j = 0; j < temp.length; j++) {
-  //     const element = temp[j];
-  //     //console.log(convertCode(element));
-  //     arr.push(convertCode(element));
-  //   }
-  // }
   return query_result;
 };
+/**
+ *
+ * @param {*} queryResult  query 함수의 결과값을 parameter로 삼는다. (보통은 배열)
+ * @returns  query 함수 결과값에서,  stack_code / like_dept_code  / like_stack_code 가 있다면, 이것을  자연어 문자열로 바꿔치기한 상태로 return한다.
+ */
+const convertCodeToNaturalString = (queryResult) => {
+  // console.log("convertCodeToNaturalString");
+  // console.log(queryResult);
+  // console.log("조건에 맞는가? ");
+
+  console.log(queryResult.length > 0);
+  if (queryResult.length > 0) {
+    for (let index = 0; index < queryResult.length; index++) {
+      let element = queryResult[index];
+      console.log("1차 LOOP ELEMENT ");
+      console.log(element);
+      if (!_.isNull(element.stack_code) && !_.isUndefined(element.stack_code)) {
+        console.log("element.stack_code");
+        queryResult[index].stack_code_origin = queryResult[index].stack_code;
+        queryResult[index].stack_code = convertCommaCodeStringToNatural(
+          element.stack_code
+        );
+      }
+
+      if (
+        !_.isNull(element.like_stack_code) &&
+        !_.isUndefined(element.like_stack_code)
+      ) {
+        queryResult[index].like_stack_code_origin =
+          queryResult[index].like_stack_code;
+        queryResult[index].like_stack_code = convertCommaCodeStringToNatural(
+          queryResult[index].like_stack_code
+        );
+      }
+
+      if (
+        !_.isNull(element.like_dept_code) &&
+        !_.isUndefined(element.like_dept_code)
+      ) {
+        queryResult[index].like_dept_code_origin =
+          queryResult[index].like_dept_code;
+        queryResult[index].like_dept_code = convertCommaCodeStringToNatural(
+          queryResult[index].like_dept_code
+        );
+      }
+    }
+  } else {
+    console.log(
+      "============================================================일단 ELSE 탐. "
+    );
+    console.log("왜 ELSE인지.. 모양확인 ");
+    console.log(queryResult.length);
+    console.log("왜 ELSE인지.. 모양확인 ");
+    console.log(queryResult);
+    console.log("왜 ELSE인지.. 모양확인 끄으으으으으읕 ");
+    console.log("check1111");
+    console.log(
+      !_.isNull(queryResult.stack_code) &&
+        !_.isUndefined(queryResult.stack_code)
+    );
+    if (
+      !_.isNull(queryResult.stack_code) &&
+      !_.isUndefined(queryResult.stack_code)
+    ) {
+      console.log("element.stack_code");
+      queryResult.stack_code_origin = queryResult.stack_code;
+      queryResult.stack_code = convertCommaCodeStringToNatural(
+        queryResult.stack_code
+      );
+    }
+    console.log("check22222");
+    if (
+      !_.isNull(queryResult.like_stack_code) &&
+      !_.isUndefined(queryResult.like_stack_code)
+    ) {
+      queryResult.like_stack_code_origin = queryResult.like_stack_code;
+      queryResult.like_stack_code = convertCommaCodeStringToNatural(
+        queryResult.like_stack_code
+      );
+    }
+    console.log("check3333");
+    console.log(
+      !_.isNull(queryResult.like_dept_code) &&
+        !_.isUndefined(queryResult.like_dept_code)
+    );
+
+    if (
+      !_.isNull(queryResult.like_dept_code) &&
+      !_.isUndefined(queryResult.like_dept_code)
+    ) {
+      queryResult.like_dept_code_origin = queryResult.like_dept_code;
+      queryResult.like_dept_code = convertCommaCodeStringToNatural(
+        queryResult.like_dept_code
+      );
+    }
+  }
+  console.log("convertCodeToNaturalString ㄲㄲㄲㄲㄲ");
+  console.log(queryResult);
+  return queryResult;
+};
+const convertCommaCodeStringToNatural = (commaCodeString) => {
+  console.log("convertCommaCodeStringToNatural 에 뭐가들어왔길래.");
+  console.log(commaCodeString);
+  let arr = commaCodeString.split(",");
+  let resArr = [];
+  let resultString = "";
+  console.log(arr);
+  if (arr.length > 0) {
+    arr.forEach((element) => {
+      //console.log("==================자연어  처리 진행");
+      resArr.push(convertCode(element));
+      // console.log("2");
+    });
+  } else {
+    //console.log("==================자연어  처리 미진행");
+  }
+
+  return resArr.join();
+};
+
 /* getNewPostId  테이블이름 + 테이블 키값 을 재료로 주면 , 새로이 등록될 
  글의  post id 값을 가져올수 있다.  "신규 등록 글" 이 참고링크가 달려 있는 경우에
   새로이 생성될 놈의 post_id 값을 넣어 주어야 하므로, 이때 사용한다.   */
@@ -215,13 +325,13 @@ const query = async (alias, values) => {
         console.log(error);
         reject({ error });
       } else {
-        console.log("query ========================");
-        console.log("query ========================");
+        // console.log("query ========================");
+        console.log("호출된 query alias========================");
         console.log(alias);
-        console.log("query ========================");
-        console.log(results);
-        console.log("query ========================");
-        console.log("query ========================");
+        //console.log("query alias========================");
+        // console.log(results);
+        // console.log("query ========================");
+        // console.log("query ========================");
         resolve(results);
       } // 쿼리 결과를 전달
     })
@@ -450,6 +560,8 @@ module.exports = {
   joinWebCodes,
   splitDbCodesWithConvertCode,
   splitDbCodesWithLoop,
+  convertCodeToNaturalString,
+  convertCommaCodeStringToNatural,
   getNewPostId,
   query,
   queryDynamic,
