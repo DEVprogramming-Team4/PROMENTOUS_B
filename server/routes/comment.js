@@ -3,9 +3,17 @@ const router = express.Router();
 const mysql = require("../mysql");
 const _ = require("lodash");
 
-router.get("/recruit/get/:projectId", async (req, res) => {
-  let projectId = req.params.projectId;
-  let commmentList = await mysql.query("getRecruitCommentList", [projectId]);
+router.get("/recruit/get/:pageType/:paramId", async (req, res) => {
+  let paramId = req.params.paramId;
+  let pageType = req.params.pageType;
+
+  let query = "";
+  if (pageType === "projectRecruit") {
+    query = "getRecruitCommentList";
+  } else if (pageType === "projectReview") {
+    query = "getReviewCommentList";
+  }
+  let commmentList = await mysql.query(query, [paramId]);
 
   // 작성자 id -> 작성자 Name 반환, 작성자 이미지보내주기
   const len = commmentList.length;
@@ -26,12 +34,12 @@ router.get("/recruit/get/:projectId", async (req, res) => {
 // 댓글 추가
 // 받아야되는 인자: 페이지 유형(review인지,, 모집인지,, )- 그거에 따라 대상 테이블 분기.,
 // 작성자 아이디, 댓글 내용, 비밀글 여부, 타겟 댓글 아이디.. - 어디서 달앗냐에 따라.. + 시퀀스?
-router.post("/register/:project_id", async (req, res) => {
-  let projectId = req.params.project_id;
+router.post("/register/:paramId", async (req, res) => {
+  let paramId = req.params.paramId;
   let body = req.body;
   let query = "";
   let queryData = _.concat(
-    projectId,
+    paramId,
     body.writerId,
     body.commentText,
     body.parentId,
