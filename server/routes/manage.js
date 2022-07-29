@@ -19,8 +19,7 @@ const MAIN_CODES = async () => {
 /* PARAM : user_id ( ex) 3    ) */
 router.get("/getTeamListForManage/:user_id", async (req, res) => {
   const { user_id } = req.params;
-  //console.log("/getTeamListForManage/:user_id 실행  " + user_id);
-  const teamListForManage = await mysql.query("manage_topSelect", [
+  let teamListParam = [
     user_id,
     user_id,
     user_id,
@@ -28,7 +27,12 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
     user_id,
     user_id,
     user_id
-  ]);
+  ];
+  //console.log("/getTeamListForManage/:user_id 실행  " + user_id);
+  const teamListForManage = await mysql.query(
+    "manage_topSelect",
+    teamListParam
+  );
   /* 자료 1개만 있는 경우를 위한 처리.. */
   if (teamListForManage.length == 1) {
     let temp = [];
@@ -61,6 +65,7 @@ router.get("/getTeamCommunicateUrls/:project_id", async (req, res) => {
 // 팀 선택 시  . 팀 정보를 한꺼번에 끌어오는 ALL IN ONE API
 router.post("/getProjectInfo", async (req, res) => {
   const project_id = req.body.project_id;
+  const sessionUserId = req.body.sessionUserId;
   let teamTotalResult = {}; //object 선언
   /*프로젝트 기본정보  그냥 project 테이블에서 땡겨옴.*/
   let basicInfo = await mysql.query("getTeamDatas", [req.body.project_id]);
@@ -71,9 +76,15 @@ router.post("/getProjectInfo", async (req, res) => {
   teamTotalResult.refUrls = mysql.changeSnake2Camel(refUrls);
 
   /*프로젝트 지원자정보*/
-  let applicants = await mysql.query("getTeamApplicants", [
-    req.body.project_id
-  ]);
+  let applicants = await mysql.query("getTeamApplicants", [project_id]);
+  console.log("============================");
+  console.log("============================");
+  console.log("============================");
+  console.log("============================");
+  console.log("============================");
+  console.log("============================");
+  console.log(applicants);
+  console.log(_.isArray(applicants));
 
   teamTotalResult.applicants = mysql.changeSnake2Camel(applicants);
   /*소셜링크가져와서 각각 멤버에 심어주기.*/
@@ -103,10 +114,18 @@ router.post("/getProjectInfo", async (req, res) => {
   }
   console.log("============APPPLICANTS!!++++");
   console.log(teamTotalResult.applicants);
+  // if (applicants.length == 1) {
+  //   teamTotalResult.applicants = [teamTotalResult.applicants];
+  // }
+  if (applicants.length == 0) {
+    teamTotalResult.applicants = [];
+  }
+
   /*프로젝트 멤버정보들*/
   let members = await mysql.query("getTeamMembers", [
-    req.body.project_id,
-    req.body.project_id
+    project_id,
+    project_id,
+    project_id
   ]);
 
   teamTotalResult.members = mysql.changeSnake2Camel(members);
@@ -129,8 +148,8 @@ router.post("/getProjectInfo", async (req, res) => {
       [
         teamTotalResult.members[index].userId,
         teamTotalResult.members[index].userId,
-        "1" /*TODO 1에서 sessionUserid로 변경!! */,
-        req.body.project_id
+        sessionUserId /*TODO 1에서 sessionUserId로 변경!! */,
+        project_id
       ]
     );
     //console.log(teamTotalResult.members[index].rating);
@@ -172,14 +191,14 @@ router.post("/getProjectInfo", async (req, res) => {
     /* 멤버 각 역할 집어넣기  */
     //console.log(teamTotalResult.members[index].leaderYn);
     if (_.isEqual("Y", teamTotalResult.members[index].leaderYn)) {
-      teamTotalResult.members[index].role = "리더"; // TODO.리더 아님!!
+      teamTotalResult.members[index].role = "리더"; // TODO_DONE.리더넣기로 합의함..
     } else {
       console.log([
-        req.body.project_id, //20
+        project_id, //20
         teamTotalResult.members[index].userId //32
       ]);
       t_role = await mysql.query("getMemberRole", [
-        req.body.project_id,
+        project_id,
         teamTotalResult.members[index].userId
       ]);
       console.log(t_role);
@@ -197,7 +216,7 @@ router.post("/getProjectInfo", async (req, res) => {
   /*프로젝트 멘토링정보*/
   let mentorings = await mysql.query(
     "getTeamMentoringList",
-    [req.body.project_id] //param object 가져오기
+    [project_id] //param object 가져오기
   );
   teamTotalResult.mentorings = mysql.changeSnake2Camel(mentorings);
   //mentorRating: { comment: "a", score: 1, rated: "yes" }            2,  1  4  3
@@ -219,7 +238,7 @@ router.post("/getProjectInfo", async (req, res) => {
     }
   }
   //ALL IN ONE SEND
-  console.log("최종 SEND 직전! teamTotalResult-----------------------");
+  //console.log("최종 SEND 직전! teamTotalResult-----------------------");
   //console.log(teamTotalResult);
   res.send(teamTotalResult);
 });
