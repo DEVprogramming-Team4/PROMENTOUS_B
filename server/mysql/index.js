@@ -90,7 +90,7 @@ const joinWebCodes = (webCodeArray) => {
 const splitDbCodesWithConvertCode = (dbCodeString) => {
   let arr = [];
   //console.log(dbCodeString);
-  if (dbCodeString != "") {
+  if (dbCodeString != "" || dbCodeString != null) {
     let temp = dbCodeString.split(",");
 
     for (let j = 0; j < temp.length; j++) {
