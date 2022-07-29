@@ -73,76 +73,68 @@ router.post("/getProjectInfo", async (req, res) => {
 
   /*프로젝트 관련링크정보*/
   let refUrls = await mysql.query("getTeamRefUrls", [req.body.project_id]);
-  teamTotalResult.refUrls = mysql.changeSnake2Camel(refUrls);
+  if (refUrls.length == 1) {
+    teamTotalResult.refUrls = [mysql.changeSnake2Camel(refUrls)];
+  } else {
+    teamTotalResult.refUrls = mysql.changeSnake2Camel(refUrls);
+  }
+  if (refUrls.length == 0) {
+    teamTotalResult.refUrls = [];
+  }
 
-  /*프로젝트 지원자정보*/
+  /*프로젝트 지원자정보 시작 */
   let applicants = await mysql.query("getTeamApplicants", [project_id]);
   console.log("============================");
   console.log("============================");
   console.log("============================");
-  console.log("============================");
+  console.log("==========applicants==================");
   console.log("============================");
   console.log("============================");
   console.log(applicants);
   console.log(_.isArray(applicants));
-
-  teamTotalResult.applicants = mysql.changeSnake2Camel(applicants);
-  /*소셜링크가져와서 각각 멤버에 심어주기.*/
-  for (let index = 0; index < teamTotalResult.applicants.length; index++) {
-    if (
-      teamTotalResult.applicants[index].likeDeptCode != "" ||
-      teamTotalResult.applicants[index].likeDeptCode != null
-    ) {
-      teamTotalResult.applicants[index].likeDeptCodeOrigin =
-        teamTotalResult.applicants[index].likeDeptCode;
-      teamTotalResult.applicants[index].likeDeptCode =
-        mysql.splitDbCodesWithConvertCode(
-          teamTotalResult.applicants[index].likeDeptCodeOrigin
-        );
-    }
-    if (
-      teamTotalResult.applicants[index].likeStackCode != "" ||
-      teamTotalResult.applicants[index].likeStackCode != null
-    ) {
-      teamTotalResult.applicants[index].likeStackCodeOrigin =
-        teamTotalResult.applicants[index].likeStackCode;
-      teamTotalResult.applicants[index].likeStackCode =
-        mysql.splitDbCodesWithConvertCode(
-          teamTotalResult.applicants[index].likeStackCodeOrigin
-        );
-    }
-  }
-  console.log("============APPPLICANTS!!++++");
-  console.log(teamTotalResult.applicants);
+  applicants = mysql.convertCodeToNaturalString(applicants);
   if (applicants.length == 1) {
-    teamTotalResult.applicants = [teamTotalResult.applicants];
+    teamTotalResult.applicants = [mysql.changeSnake2Camel(applicants)];
+  } else {
+    teamTotalResult.applicants = mysql.changeSnake2Camel(applicants);
   }
+
   if (applicants.length == 0) {
     teamTotalResult.applicants = [];
   }
 
-  /*프로젝트 멤버정보들*/
+  console.log("============APPPLICANTS!!++++");
+  console.log(teamTotalResult.applicants);
+  /*프로젝트 지원자정보 끝.  */
+
+  /*프로젝트 멤버정보들   시작 . */
   let members = await mysql.query("getTeamMembers", [
     project_id,
     project_id,
     project_id
   ]);
-  // 1개있으면 배열로 안오는 현상때문에 배열화 처리함..
+  members = mysql.convertCodeToNaturalString(members);
   if (members.length == 1) {
-    teamTotalResult.members = [teamTotalResult.applicants];
+    // 1개있으면 배열로 안오는 현상때문에 배열화 처리함..
+    teamTotalResult.members = [mysql.changeSnake2Camel(members)];
+  } else {
+    teamTotalResult.members = mysql.changeSnake2Camel(members);
   }
+
   if (members.length == 0) {
     teamTotalResult.members = [];
   }
-  teamTotalResult.members = mysql.changeSnake2Camel(members);
 
   /*소셜링크가져와서 각각 멤버에 심어주기.*/
   for (let index = 0; index < teamTotalResult.members.length; index++) {
+    //console.log("각각 멤버에 심어주기.");
     /* 멤버 소셜 집어넣기 */
     teamTotalResult.members[index].userSocialUrl = await mysql.query(
       "getUserSocialUrls",
       [teamTotalResult.members[index].userId]
     );
+    //console.log("teamTotalResult.members[index].userSocialUrl");
+    //console.log(teamTotalResult.members[index].userSocialUrl);
 
     /* 멤버 평가여부 집어넣기 멘토링ID 처럼 고유값이 아님. rate user id 및 project까지 다필요함.  */
     teamTotalResult.members[index].rating = await mysql.query(
@@ -166,28 +158,28 @@ router.post("/getProjectInfo", async (req, res) => {
       teamTotalResult.members[index].rating = tempArr;
     }
 
-    if (
-      teamTotalResult.members[index].likeDeptCode != "" ||
-      teamTotalResult.members[index].likeDeptCode != null
-    ) {
-      teamTotalResult.members[index].likeDeptCodeOrigin =
-        teamTotalResult.members[index].likeDeptCode;
-      teamTotalResult.members[index].likeDeptCode =
-        mysql.splitDbCodesWithConvertCode(
-          teamTotalResult.members[index].likeDeptCodeOrigin
-        );
-    }
-    if (
-      teamTotalResult.members[index].likeStackCode != "" ||
-      teamTotalResult.members[index].likeStackCode != null
-    ) {
-      teamTotalResult.members[index].likeStackCodeOrigin =
-        teamTotalResult.members[index].likeStackCode;
-      teamTotalResult.members[index].likeStackCode =
-        mysql.splitDbCodesWithConvertCode(
-          teamTotalResult.members[index].likeStackCodeOrigin
-        );
-    }
+    // if (
+    //   teamTotalResult.members[index].likeDeptCode != "" ||
+    //   teamTotalResult.members[index].likeDeptCode != null
+    // ) {
+    //   teamTotalResult.members[index].likeDeptCodeOrigin =
+    //     teamTotalResult.members[index].likeDeptCode;
+    //   teamTotalResult.members[index].likeDeptCode =
+    //     mysql.splitDbCodesWithConvertCode(
+    //       teamTotalResult.members[index].likeDeptCodeOrigin
+    //     );
+    // }
+    // if (
+    //   teamTotalResult.members[index].likeStackCode != "" ||
+    //   teamTotalResult.members[index].likeStackCode != null
+    // ) {
+    //   teamTotalResult.members[index].likeStackCodeOrigin =
+    //     teamTotalResult.members[index].likeStackCode;
+    //   teamTotalResult.members[index].likeStackCode =
+    //     mysql.splitDbCodesWithConvertCode(
+    //       teamTotalResult.members[index].likeStackCodeOrigin
+    //     );
+    // }
     console.log("멤버 +" + index);
     console.log(teamTotalResult.members[index]);
     /* 멤버 각 역할 집어넣기  */
@@ -220,7 +212,16 @@ router.post("/getProjectInfo", async (req, res) => {
     "getTeamMentoringList",
     [project_id] //param object 가져오기
   );
-  teamTotalResult.mentorings = mysql.changeSnake2Camel(mentorings);
+
+  if (mentorings.length == 1) {
+    teamTotalResult.mentorings = [mysql.changeSnake2Camel(mentorings)];
+  } else {
+    teamTotalResult.mentorings = mysql.changeSnake2Camel(mentorings);
+  }
+
+  if (mentorings.length == 0) {
+    teamTotalResult.mentorings = [];
+  }
   //mentorRating: { comment: "a", score: 1, rated: "yes" }            2,  1  4  3
   for (let index = 0; index < teamTotalResult.mentorings.length; index++) {
     obj = await mysql.query("getMentoringInfo", [
@@ -240,8 +241,8 @@ router.post("/getProjectInfo", async (req, res) => {
     }
   }
   //ALL IN ONE SEND
-  //console.log("최종 SEND 직전! teamTotalResult-----------------------");
-  //console.log(teamTotalResult);
+  console.log("최종 SEND 직전! teamTotalResult-----------------------");
+  console.log(teamTotalResult);
   res.send(teamTotalResult);
 });
 
