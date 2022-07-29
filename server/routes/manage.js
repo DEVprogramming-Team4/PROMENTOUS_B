@@ -114,9 +114,9 @@ router.post("/getProjectInfo", async (req, res) => {
   }
   console.log("============APPPLICANTS!!++++");
   console.log(teamTotalResult.applicants);
-  // if (applicants.length == 1) {
-  //   teamTotalResult.applicants = [teamTotalResult.applicants];
-  // }
+  if (applicants.length == 1) {
+    teamTotalResult.applicants = [teamTotalResult.applicants];
+  }
   if (applicants.length == 0) {
     teamTotalResult.applicants = [];
   }
@@ -127,12 +127,14 @@ router.post("/getProjectInfo", async (req, res) => {
     project_id,
     project_id
   ]);
-
-  teamTotalResult.members = mysql.changeSnake2Camel(members);
   // 1개있으면 배열로 안오는 현상때문에 배열화 처리함..
   if (members.length == 1) {
-    teamTotalResult.members = [teamTotalResult.members];
+    teamTotalResult.members = [teamTotalResult.applicants];
   }
+  if (members.length == 0) {
+    teamTotalResult.members = [];
+  }
+  teamTotalResult.members = mysql.changeSnake2Camel(members);
 
   /*소셜링크가져와서 각각 멤버에 심어주기.*/
   for (let index = 0; index < teamTotalResult.members.length; index++) {
