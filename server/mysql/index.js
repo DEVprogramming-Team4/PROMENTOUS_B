@@ -190,63 +190,64 @@ const query = async (alias, values) => {
       } else {
         /*  QUERY . */
         //select 문 한정으로  stacks 내지 depts 는 변환한다
-        if (sql[alias].includes("select") || sql[alias].includes("SELECT")) {
-          //console.log("-------------------query result----------");
-          //console.log(results);
-          //console.log(Object.keys(results));
-          //console.log(results[0].stack_code);
-          // 추후 함수화 필요....
-          // result 요소들 순회한다
-          for (let index = 0; index < Object.keys(results).length; index++) {
-            if (
-              !_.isNull(results[0].like_stack_code) &&
-              !_.isEmpty(results[index].like_stack_code)
-            ) {
-              //not null check
-              let likestackKor = "";
-              results[index].like_stack_code_origin =
-                results[index].like_stack_code;
-              likestackArr = _.split(results[index].like_stack_code, ",");
-              likestackArr.forEach((element) => {
-                likestackKor += `${codes[element]},`;
-              });
-              //stacksKor 예시  = "자바스크립트,타입스크립트";
+        /* 20220730 핫픽스로 전부 삭제!!!!!  */
+        // if (sql[alias].includes("select") || sql[alias].includes("SELECT")) {
+        //   //console.log("-------------------query result----------");
+        //   //console.log(results);
+        //   //console.log(Object.keys(results));
+        //   //console.log(results[0].stack_code);
+        //   // 추후 함수화 필요....
+        //   // result 요소들 순회한다
+        //   for (let index = 0; index < Object.keys(results).length; index++) {
+        //     if (
+        //       !_.isNull(results[0].like_stack_code) &&
+        //       !_.isEmpty(results[index].like_stack_code)
+        //     ) {
+        //       //not null check
+        //       let likestackKor = "";
+        //       results[index].like_stack_code_origin =
+        //         results[index].like_stack_code;
+        //       likestackArr = _.split(results[index].like_stack_code, ",");
+        //       likestackArr.forEach((element) => {
+        //         likestackKor += `${codes[element]},`;
+        //       });
+        //       //stacksKor 예시  = "자바스크립트,타입스크립트";
 
-              results[index].like_stack_code = likestackKor; //????stackArr 을 던져줘도 프론트가 모름
-            }
-            if (
-              !_.isNull(results[0].like_dept_code) &&
-              !_.isEmpty(results[index].like_dept_code)
-            ) {
-              //not null check
-              let deptKor = "";
-              results[index].like_dept_code_origin =
-                results[index].like_dept_code;
-              deptArr = _.split(results[index].like_dept_code, ",");
-              deptArr.forEach((element) => {
-                deptKor += `${codes[element]},`;
-              });
-              //deptKor 예시  = "기획,데이터베이스";
-              results[index].like_dept_code = deptKor;
-            }
-            if (
-              !_.isNull(results[0].stack_code) &&
-              !_.isEmpty(results[index].stack_code)
-            ) {
-              //not null check
-              let stackKor = "";
-              results[index].stack_code_origin = results[index].stack_code;
-              stackArr = _.split(results[index].stack_code, ",");
-              stackArr.forEach((element) => {
-                stackKor += `${codes[element]},`;
-              });
-              //deptKor 예시  = "기획,데이터베이스";
-              results[index].stack_code = stackKor;
-            }
-          }
-          // console.log(results);
-          // console.log("-------------------query result----------");
-        }
+        //       results[index].like_stack_code = likestackKor; //????stackArr 을 던져줘도 프론트가 모름
+        //     }
+        //     if (
+        //       !_.isNull(results[0].like_dept_code) &&
+        //       !_.isEmpty(results[index].like_dept_code)
+        //     ) {
+        //       //not null check
+        //       let deptKor = "";
+        //       results[index].like_dept_code_origin =
+        //         results[index].like_dept_code;
+        //       deptArr = _.split(results[index].like_dept_code, ",");
+        //       deptArr.forEach((element) => {
+        //         deptKor += `${codes[element]},`;
+        //       });
+        //       //deptKor 예시  = "기획,데이터베이스";
+        //       results[index].like_dept_code = deptKor;
+        //     }
+        //     if (
+        //       !_.isNull(results[0].stack_code) &&
+        //       !_.isEmpty(results[index].stack_code)
+        //     ) {
+        //       //not null check
+        //       let stackKor = "";
+        //       results[index].stack_code_origin = results[index].stack_code;
+        //       stackArr = _.split(results[index].stack_code, ",");
+        //       stackArr.forEach((element) => {
+        //         stackKor += `${codes[element]},`;
+        //       });
+        //       //deptKor 예시  = "기획,데이터베이스";
+        //       results[index].stack_code = stackKor;
+        //     }
+        //   }
+        //   // console.log(results);
+        //   // console.log("-------------------query result----------");
+        // }
         resolve(results);
       } // 쿼리 결과를 전달
     })
