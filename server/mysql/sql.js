@@ -79,6 +79,7 @@ module.exports = {
   urlInsert: `insert into ref_url set ?`,
   deptInsert: `insert into apply_dept set ?`,
   projectLeaderData: `select t.* from user t where t.user_id = ( select t2.leader_user from project t2 where t2.project_id = ? )`,
+  getUserReviewHistory: `select * from review where writer_id = ?`,
   leaderProjectHistory: `select t.* from project t where t.project_id in (
     select project_id t where apply_admin v1, project v2 where v1.applicant_id = (select leader_user from project where project_id = ? )
     and v1.apply_status = 'ACC' and v2.status_code ='FIN'
