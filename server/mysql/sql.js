@@ -160,9 +160,22 @@ module.exports = {
   where apply_status = 'ACC' and project_id = ?
   group by project_id;`,
   /*--------------------------------------------------------------*/
-  /*-------------------  후기    영역     --------------------------*/
+  /*-------------------  후기(리뷰)    영역     --------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
+  /* 내가 리뷰를 안쓴 +  (내가 리더인+내가ACC받은 프로젝트 ) 의 projectId 와 LIST를 가져옴. */
+  ReviewAvailProjectList: `  
+  WITH
+  ct1 AS ( select v3.project_id from review  v3 where v3.writer_id = ?  and v3.del_yn ='N'  )       
+     SELECT *  from project  
+     
+     where project_id in (
+        select vv.project_Id from 
+        (select v1.project_id from project v1 where v1.leader_user = ?
+        union all
+        select v2.project_Id from apply_admin v2 where v2.apply_status ='ACC' and  v2.applicant_id = ?)  vv
+        )
+     and project_id not in (select project_id from ct1 )`,
   reviewList: `select t2.user_nickname, t3.stack_code, t.*
   from review t, user t2, project t3
   where t.writer_id = t2.user_id and t.project_id = t3.project_id
@@ -245,8 +258,6 @@ module.exports = {
                         ) v
                         group by applicant_id
                         order by stat `,
-  //getTeamMembers  > ? 2개
-
   getTeamMembers: `select 'Y' leader_yn
                   ,fn_user_stack_code(t.user_id) as "like_stack_code"
                   ,fn_user_dept_code(t.user_id) as "like_dept_code"

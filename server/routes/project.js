@@ -103,6 +103,10 @@ router.post("/", async (req, res) => {
       ]);
     }
     // ======================================================
+    console.log("===========projectRecruitList================");
+    //console.log(projectRecruitList);
+    console.log("===========projectRecruitList================");
+    mysql.convertCodeToNaturalString(projectRecruitList);
     await getRestData(projectRecruitList);
     //console.log(projectRecruitList);
     res.send({ count, projectRecruitList }); // node express에서 숫자는 넘겨줄수 없다!!Buffer, String, object, Boolean, Array만 가능하다
@@ -149,13 +153,13 @@ router.delete("/delete", async (req, res) => {
   res.send("/project/recruit/delete 라우트 루트");
 });
 
-// 모집글 상세 GET
+// 모집글 상세 GET -- 유일한 값을 가져옴 [0] 으로 호출
 router.get("/:projectId", async (req, res) => {
   let projectId = req.params.projectId;
   const projectDetail = await mysql.query("projectDetail", [projectId]);
   //console.log("실행---------------------");
   //console.log(projectDetail[0]);
-  res.send(projectDetail[0]);
+  res.send(mysql.convertCodeToNaturalString(projectDetail)[0]);
 });
 
 // GET
@@ -167,8 +171,10 @@ router.get("/:projectId/leader", async (req, res) => {
     projectId,
     projectId
   ]);
-  leaderData[0].leaderHistory = leaderHistory;
-  console.log(leaderData[0]); // leaderData 확인해보세요
+  /* 값이 단일값이고/ object 로 query 가 꺼내오는 우를 범하는 경우.  일단 내가 send 칠 녀석에  컨버트메서드돌린 놈을 가져온다. */
+  leaderData[0].leaderHistory = mysql.convertCodeToNaturalString(leaderHistory);
+  console.log(mysql.convertCodeToNaturalString(leaderData[0])); // leaderData 확인해보세요
+  console.log("leaderData 확인해보세요");
   res.send(leaderData[0]);
 });
 
