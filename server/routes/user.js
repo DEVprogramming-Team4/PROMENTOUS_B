@@ -22,16 +22,14 @@ router.get("/:userId", async (req, res) => {
   //console.log("userDetail return---------------------");
   //console.log(userDetail[0]);
   // like dept  / like stack 문자열을  (배열화+convert) 하여 자연어로 WEB에 가져다 줌
-  userDetail[0].like_stack_code_origin = userDetail[0].like_stack_code;
   userDetail[0].like_stack_code = mysql.splitDbCodesWithConvertCode(
-    userDetail[0].like_stack_code
+    userDetail[0].like_stack_code_origin
   );
-  userDetail[0].like_dept_code_origin = userDetail[0].like_dept_code;
   userDetail[0].like_dept_code = mysql.splitDbCodesWithConvertCode(
-    userDetail[0].like_dept_code
+    userDetail[0].like_dept_code_origin
   );
-  // console.log("check... ");
-  // console.log(userDetail[0]);
+  //console.log("check... ");
+  //console.log(userDetail[0]);
   res.send(userDetail[0]);
 });
 

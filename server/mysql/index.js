@@ -88,12 +88,16 @@ const joinWebCodes = (webCodeArray) => {
     이때 convertCode 를 활용한다. (WithConvertCode)
    TABLE의 자료를 SELECT할때 사용한다  */
 const splitDbCodesWithConvertCode = (dbCodeString) => {
-  let temp = dbCodeString.split(",");
   let arr = [];
-  for (let j = 0; j < temp.length; j++) {
-    const element = temp[j];
-    console.log(convertCode(element));
-    arr.push(convertCode(element));
+  //console.log(dbCodeString);
+  if (dbCodeString != "") {
+    let temp = dbCodeString.split(",");
+
+    for (let j = 0; j < temp.length; j++) {
+      const element = temp[j];
+      //console.log(convertCode(element));
+      arr.push(convertCode(element));
+    }
   }
   return arr;
 };
