@@ -326,8 +326,8 @@ const query = async (alias, values) => {
         reject({ error });
       } else {
         // console.log("query ========================");
-        console.log("호출된 query alias========================");
-        console.log(alias);
+        console.log("방금 호출된 query alias========================");
+        console.log("/sql/" + alias);
         //console.log("query alias========================");
         // console.log(results);
         // console.log("query ========================");
