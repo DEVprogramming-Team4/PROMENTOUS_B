@@ -264,7 +264,8 @@ module.exports = {
                   ,fn_user_email(t2.user_id) as "member_email"
                   ,t2.* from user t2
                   where t2.user_id in
-                  (select  t3.applicant_id   from apply_admin  t3 where t3.project_id = ?     and t3.apply_status = 'ACC'  ) `,
+                  (select  t3.applicant_id   from apply_admin  t3 where t3.project_id = ?     and t3.apply_status = 'ACC'  )
+                  and t2.user_id <> (select v1.leader_user from project v1 where project_Id =  ? ) `,
   getMemberRole: `SELECT fn_apply_dept_desc(apply_dept_id) AS "role"
                   FROM apply_dept
                   where apply_dept_id =
