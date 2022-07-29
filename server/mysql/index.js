@@ -101,6 +101,34 @@ const splitDbCodesWithConvertCode = (dbCodeString) => {
   }
   return arr;
 };
+
+/* 선택적으로 사용됨!!!! query 의 결과물 중 like_dept_code . like_stack_code 있는 경우 
+  FOR LOOP 돌면서 각 요소요소를 splitDbCodesWithConvertCode 처리 해주는 공통 영역 메서드!!   */
+const splitDbCodesWithLoop = (query_result) => {
+  console.log("splitDbCodesWithLoop");
+  console.log("splitDbCodesWithLoop");
+  console.log(_.isArray(query_result));
+  console.log("TRUE 여부");
+  console.log(query_result);
+  if (_.isArray(query_result)) {
+    console.log("배열이다.");
+    console.log(query_result.length);
+  } else {
+    console.log("배열아님다.");
+  }
+  // let arr = [];
+  // console.log(dbCodeString);
+  // if (dbCodeString != "" && !_.isNull(dbCodeString)) {
+  //   let temp = dbCodeString.split(",");
+
+  //   for (let j = 0; j < temp.length; j++) {
+  //     const element = temp[j];
+  //     //console.log(convertCode(element));
+  //     arr.push(convertCode(element));
+  //   }
+  // }
+  return query_result;
+};
 /* getNewPostId  테이블이름 + 테이블 키값 을 재료로 주면 , 새로이 등록될 
  글의  post id 값을 가져올수 있다.  "신규 등록 글" 이 참고링크가 달려 있는 경우에
   새로이 생성될 놈의 post_id 값을 넣어 주어야 하므로, 이때 사용한다.   */
@@ -185,69 +213,15 @@ const query = async (alias, values) => {
       if (error) {
         // 에러가 발생
         console.log(error);
-
         reject({ error });
       } else {
-        /*  QUERY . */
-        //select 문 한정으로  stacks 내지 depts 는 변환한다
-        /* 20220730 핫픽스로 전부 삭제!!!!!  */
-        // if (sql[alias].includes("select") || sql[alias].includes("SELECT")) {
-        //   //console.log("-------------------query result----------");
-        //   //console.log(results);
-        //   //console.log(Object.keys(results));
-        //   //console.log(results[0].stack_code);
-        //   // 추후 함수화 필요....
-        //   // result 요소들 순회한다
-        //   for (let index = 0; index < Object.keys(results).length; index++) {
-        //     if (
-        //       !_.isNull(results[0].like_stack_code) &&
-        //       !_.isEmpty(results[index].like_stack_code)
-        //     ) {
-        //       //not null check
-        //       let likestackKor = "";
-        //       results[index].like_stack_code_origin =
-        //         results[index].like_stack_code;
-        //       likestackArr = _.split(results[index].like_stack_code, ",");
-        //       likestackArr.forEach((element) => {
-        //         likestackKor += `${codes[element]},`;
-        //       });
-        //       //stacksKor 예시  = "자바스크립트,타입스크립트";
-
-        //       results[index].like_stack_code = likestackKor; //????stackArr 을 던져줘도 프론트가 모름
-        //     }
-        //     if (
-        //       !_.isNull(results[0].like_dept_code) &&
-        //       !_.isEmpty(results[index].like_dept_code)
-        //     ) {
-        //       //not null check
-        //       let deptKor = "";
-        //       results[index].like_dept_code_origin =
-        //         results[index].like_dept_code;
-        //       deptArr = _.split(results[index].like_dept_code, ",");
-        //       deptArr.forEach((element) => {
-        //         deptKor += `${codes[element]},`;
-        //       });
-        //       //deptKor 예시  = "기획,데이터베이스";
-        //       results[index].like_dept_code = deptKor;
-        //     }
-        //     if (
-        //       !_.isNull(results[0].stack_code) &&
-        //       !_.isEmpty(results[index].stack_code)
-        //     ) {
-        //       //not null check
-        //       let stackKor = "";
-        //       results[index].stack_code_origin = results[index].stack_code;
-        //       stackArr = _.split(results[index].stack_code, ",");
-        //       stackArr.forEach((element) => {
-        //         stackKor += `${codes[element]},`;
-        //       });
-        //       //deptKor 예시  = "기획,데이터베이스";
-        //       results[index].stack_code = stackKor;
-        //     }
-        //   }
-        //   // console.log(results);
-        //   // console.log("-------------------query result----------");
-        // }
+        console.log("query ========================");
+        console.log("query ========================");
+        console.log(alias);
+        console.log("query ========================");
+        console.log(results);
+        console.log("query ========================");
+        console.log("query ========================");
         resolve(results);
       } // 쿼리 결과를 전달
     })
@@ -278,67 +252,10 @@ const queryDynamic = async (alias, values) => {
     })
   );
 };
-/* 02-2. getProjectList  동적 쿼리로  모집글 리스트를 가져온다  */
-const getProjectList = async (alias, values) => {
-  console.log("values:=====================");
-  console.log(values);
-  let v_alias = alias;
-  console.log("v_alias : " + v_alias);
 
-  let sql = `  select t2.user_nickname , t.*
-  from project t , user t2
-  where t.leader_user = t2.user_id  
-  `;
-  // values 는 프론트단에서 건너온 배열인데 이것을 체크
-  if (values.searchKeyWord != null && values.searchKeyWord != "") {
-    sql += ` AND 
-             (project_desc like '%${values.searchKeyWord}%'
-               OR 
-              project_title like '%${values.searchKeyWord}%'  
-             ) `;
-  }
-  if (values.status != null && values.status != "") {
-    sql += ` AND status_code = '${values.status}'`;
-  }
-  if (values.main_area_code != null && values.main_area_code != "") {
-    sql += ` AND main_area_code = '${values.main_area_code}'`;
-  }
-  if (values.sub_area_code != null && values.sub_area_code != "") {
-    sql += ` AND sub_area_code = '${values.sub_area_code}'`;
-  }
-  if (values.stack_code != null && values.stack_code != "") {
-    sql += ` AND `;
-    // req.body.stack_code 가 어떻게 오느냐에 따라서 다르게 반응.
-    // 만약 문자열로 온다면. ex )  "T01,R01"
-    let stackcodes = values.stack_code;
-    let arr = stackcodes.split(","); // "J01,C01,D01"
-    sql += `(`;
-    for (let index = 0; index < arr.length; index++) {
-      const element = arr[index];
-      if (index == 0) {
-        sql += `stack_code like '%${arr[index]}%'`; //      stack_code like '%$J01%
-      } else {
-        sql += `OR stack_code like '%${arr[index]}%'`; // OR   stack_code like '%$C01%
-      }
-    }
-    sql += `)`;
-  }
-
-  console.log("FULL SQL =============== ");
-  console.log(sql);
-  console.log("//FULL SQL =============== \n");
-  return new Promise((resolve, reject) =>
-    pool.query(sql, values, (error, results) => {
-      if (error) {
-        console.log(error);
-        reject({ error });
-      } else {
-        resolve(results);
-      } // 쿼리 결과를 전달
-    })
-  );
-};
-
+/*========================================================================================*/
+/*멘토리스트 화면 페이징을 위한 dynamic query  getMentorInfoList /  getMentorInfoTotalCount */
+/*========================================================================================*/
 /* 02-3 getMentorInfoList  동적 쿼리로  멘토 리스트를 가져온다  */
 const getMentorInfoList = async (values) => {
   console.log("values:=====================");
@@ -464,17 +381,78 @@ const getMentorInfoTotalCount = async (values) => {
     })
   );
 };
+/*========================================================================================*/
+/* 02-2. getProjectList  동적 쿼리로  모집글 리스트를 가져온다 -사용하지 않아서 비활성 처리하고 아래로 내림.  */
+/*========================================================================================*/
+// const getProjectList = async (alias, values) => {
+//   console.log("values:=====================");
+//   console.log(values);
+//   let v_alias = alias;
+//   console.log("v_alias : " + v_alias);
 
+//   let sql = `  select t2.user_nickname , t.*
+//   from project t , user t2
+//   where t.leader_user = t2.user_id
+//   `;
+//   // values 는 프론트단에서 건너온 배열인데 이것을 체크
+//   if (values.searchKeyWord != null && values.searchKeyWord != "") {
+//     sql += ` AND
+//              (project_desc like '%${values.searchKeyWord}%'
+//                OR
+//               project_title like '%${values.searchKeyWord}%'
+//              ) `;
+//   }
+//   if (values.status != null && values.status != "") {
+//     sql += ` AND status_code = '${values.status}'`;
+//   }
+//   if (values.main_area_code != null && values.main_area_code != "") {
+//     sql += ` AND main_area_code = '${values.main_area_code}'`;
+//   }
+//   if (values.sub_area_code != null && values.sub_area_code != "") {
+//     sql += ` AND sub_area_code = '${values.sub_area_code}'`;
+//   }
+//   if (values.stack_code != null && values.stack_code != "") {
+//     sql += ` AND `;
+//     // req.body.stack_code 가 어떻게 오느냐에 따라서 다르게 반응.
+//     // 만약 문자열로 온다면. ex )  "T01,R01"
+//     let stackcodes = values.stack_code;
+//     let arr = stackcodes.split(","); // "J01,C01,D01"
+//     sql += `(`;
+//     for (let index = 0; index < arr.length; index++) {
+//       const element = arr[index];
+//       if (index == 0) {
+//         sql += `stack_code like '%${arr[index]}%'`; //      stack_code like '%$J01%
+//       } else {
+//         sql += `OR stack_code like '%${arr[index]}%'`; // OR   stack_code like '%$C01%
+//       }
+//     }
+//     sql += `)`;
+//   }
+
+//   console.log("FULL SQL =============== ");
+//   console.log(sql);
+//   console.log("//FULL SQL =============== \n");
+//   return new Promise((resolve, reject) =>
+//     pool.query(sql, values, (error, results) => {
+//       if (error) {
+//         console.log(error);
+//         reject({ error });
+//       } else {
+//         resolve(results);
+//       } // 쿼리 결과를 전달
+//     })
+//   );
+// };
 module.exports = {
   changeSnake2Camel,
   changeCamel2Snake,
   convertCode,
   joinWebCodes,
   splitDbCodesWithConvertCode,
+  splitDbCodesWithLoop,
   getNewPostId,
   query,
   queryDynamic,
-  getProjectList,
   getMentorInfoList,
   getMentorInfoTotalCount,
   getConnection
