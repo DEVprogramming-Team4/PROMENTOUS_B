@@ -174,7 +174,7 @@ router.get("/:projectId/leader", async (req, res) => {
 
 // GET
 // 리더 프로젝트 진행이력 ( 삭제. leaderData.leaderHistory 에 있음.)
-// TODO: 데이터 추가 후 테스트 필요
+// TODO: 삭제(위에서 처리)
 router.get("/:projectId/leaderhistory", async (req, res) => {
   let projectId = req.params.projectId;
   // TODO: 질문: leaderProjectHistory 쿼리문 -> leaderHistory 이렇게 짜도 되는지.

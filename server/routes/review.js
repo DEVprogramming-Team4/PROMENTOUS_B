@@ -59,4 +59,13 @@ router.get("/:reviewId", async (req, res) => {
   );
 });
 
+// GET
+// 유저가 작성한 리뷰 목록
+router.get("/history/:userId", async (req, res) => {
+  let userId = req.params.userId;
+  const reviewHistory = await mysql.query("getUserReviewHistory", [userId]);
+
+  res.send(reviewHistory);
+});
+
 module.exports = router;
