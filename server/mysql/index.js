@@ -16,28 +16,28 @@ const pool = mysql.createPool({
 // 코드값  강제로 가져오기.
 const codes = {
   FE: "프론트엔드",
-  프론트엔드 :"FE" ,
+  프론트엔드: "FE",
   BE: "백엔드",
-  백엔드:"BE",
+  백엔드: "BE",
   FS: "풀스택",
-  풀스택 : "FS",
+  풀스택: "FS",
   DE: "디자인",
-  디자인 : "DE",
-  UU: "UIUX",/*KEY에 UI/UX가 안들어간다.... */
-  UIUX : "UU",/**UIUX !! */
+  디자인: "DE",
+  UU: "UIUX" /*KEY에 UI/UX가 안들어간다.... */,
+  UIUX: "UU" /**UIUX !! */,
   PL: "기획",
   기획: "PL",
-  PM: "PM", 
+  PM: "PM",
   DB: "데이터베이스",
   데이터베이스: "DB",
   AL: "알고리즘/자료구조",
-  알고리즘 : "AL", /**알고리즘!! */
+  알고리즘: "AL" /**알고리즘!! */,
   PB: "퍼블리싱",
-  퍼블리싱:"PB",
+  퍼블리싱: "PB",
   DO: "데브옵스",
-  데브옵스:"DO",
+  데브옵스: "DO",
   DA: "데이터사이언스",
-  데이터사이언스:"DA",
+  데이터사이언스: "DA",
   T01: "typescript",
   typescript: "T01",
   R01: "react",
@@ -45,53 +45,66 @@ const codes = {
   V01: "vue",
   vue: "V01",
   J02: "java",
-  java:"J02",
+  java: "J02",
   G01: "go",
-  go:"G01",
+  go: "G01",
   P01: "python",
-  python:"P01",
+  python: "P01",
   R02: "ruby",
-  ruby:"R02",
+  ruby: "R02",
   S01: "swift",
-  swift:"S01",
+  swift: "S01",
   C01: "C",
   C: "C01",
   C02: "C++",
-  C__: "C02",/**C__ !! */
+  C__: "C02" /**C__ !! */,
   C03: "C#",
-  Csharp: "C03",/**Csharp!! */
+  Csharp: "C03" /**Csharp!! */,
   J01: "javascript"
   /* 추가 필요 */
 };
 /* CONVERT TO KOR*/
-const convertCode = ( codeValue ) => { 
+const convertCode = (codeValue) => {
   let keyword = codeValue;
-  if(keyword == "UI/UX")
-   keyword = "UIUX";
-  if(keyword == "알고리즘/자료구조")
-   keyword = "알고리즘";
-  if(keyword == "C++")
-   keyword = "C__"; 
-  if(keyword == "C#")
-   keyword = "Csharp";  
-   return codes[keyword];
+  if (keyword == "UI/UX") keyword = "UIUX";
+  if (keyword == "알고리즘/자료구조") keyword = "알고리즘";
+  if (keyword == "C++") keyword = "C__";
+  if (keyword == "C#") keyword = "Csharp";
+  return codes[keyword];
 };
 /*joinWebCodes - 웹에서 받아온 코드뭉치 배열ARRAY를 재료로 받고, 
    여기 요소들을 코드화하여 join 해서 단일 문자열화 한다.
    TABLE 에 insert / update 할때 사용한다.  */
-const joinWebCodes =  ( webCodeArray ) => {
+const joinWebCodes = (webCodeArray) => {
   let arr = [];
   for (let j = 0; j < webCodeArray.length; j++) {
-    const element = webCodeArray[j]; 
-    arr.push(convertCode(element))
-  }   
+    let element = webCodeArray[j];
+    arr.push(convertCode(element));
+  }
   return arr.join();
+};
+/*splitDbCodes -  DB에저장되는 형태 ex ) "J01,C01"
+   여기 요소들을 split 하여, 자연어로 된 배열화 한다.
+    이때 convertCode 를 활용한다. (WithConvertCode)
+   TABLE의 자료를 SELECT할때 사용한다  */
+const splitDbCodesWithConvertCode = (dbCodeString) => {
+  let arr = [];
+  //console.log(dbCodeString);
+  if (dbCodeString != "") {
+    let temp = dbCodeString.split(",");
+
+    for (let j = 0; j < temp.length; j++) {
+      const element = temp[j];
+      //console.log(convertCode(element));
+      arr.push(convertCode(element));
+    }
+  }
+  return arr;
 };
 /* getNewPostId  테이블이름 + 테이블 키값 을 재료로 주면 , 새로이 등록될 
  글의  post id 값을 가져올수 있다.  "신규 등록 글" 이 참고링크가 달려 있는 경우에
   새로이 생성될 놈의 post_id 값을 넣어 주어야 하므로, 이때 사용한다.   */
-const getNewPostId = async ( tableName , autoIncrementColumn  ) => {
-};
+const getNewPostId = async (tableName, autoIncrementColumn) => {};
 /* getConnection :  APPJS 기본 MYSQL INIT  */
 const getConnection = async () => {
   return new Promise((resolve, reject) =>
@@ -242,7 +255,7 @@ const query = async (alias, values) => {
 /* 02-2. queryDynamic  동적 쿼리 구현 SAMPLE */
 const queryDynamic = async (alias, values) => {
   //console.log("values:=====================");
-  //console.log(values); 
+  //console.log(values);
   let sql = `   select * from test t1 where  1=1 `;
   if (values.c2 != null && values.c2 != "") {
     sql += ` AND c2 = '${values.c2}'`;
@@ -325,11 +338,10 @@ const getProjectList = async (alias, values) => {
   );
 };
 
-
 /* 02-3 getMentorInfoList  동적 쿼리로  멘토 리스트를 가져온다  */
 const getMentorInfoList = async (values) => {
   console.log("values:=====================");
-  console.log(values);   
+  console.log(values);
   let sql = ` 
   select
   t1.mentor_info_id  
@@ -376,12 +388,12 @@ const getMentorInfoList = async (values) => {
     }
     sql += `)`;
   }
-  // SQL  ORDERBY 영역 
-  sql += `order by t1.mentor_register_date desc  `
-  
-  // SQL  LIMIT 영역 
-  let offset = (values.selectedPage -1 ) * 8
-  sql +=  `limit 8 offset ${offset} /* (선택한 페이지-1)  *8 from 0   */`;
+  // SQL  ORDERBY 영역
+  sql += `order by t1.mentor_register_date desc  `;
+
+  // SQL  LIMIT 영역
+  let offset = (values.selectedPage - 1) * 8;
+  sql += `limit 8 offset ${offset} /* (선택한 페이지-1)  *8 from 0   */`;
   /*SQL끝.  */
   console.log("FULL SQL =============== ");
   console.log(sql);
@@ -398,9 +410,9 @@ const getMentorInfoList = async (values) => {
   );
 };
 
-const getMentorInfoTotalCount =async (values) => {
+const getMentorInfoTotalCount = async (values) => {
   console.log("values:=====================");
-  console.log(values);   
+  console.log(values);
   let sql = ` 
   select
   count(t1.mentor_info_id ) count
@@ -450,19 +462,19 @@ const getMentorInfoTotalCount =async (values) => {
       } // 쿼리 결과를 전달
     })
   );
-}
+};
 
 module.exports = {
   changeSnake2Camel,
   changeCamel2Snake,
   convertCode,
   joinWebCodes,
+  splitDbCodesWithConvertCode,
   getNewPostId,
   query,
   queryDynamic,
   getProjectList,
   getMentorInfoList,
   getMentorInfoTotalCount,
-  getConnection,
-  
+  getConnection
 };

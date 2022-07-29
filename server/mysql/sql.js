@@ -27,6 +27,9 @@ module.exports = {
   common_MentorRatingInfo: ``,
   common_refUrlInfo: `select * from ref_url where post_category = ? and post_id = ?`,
   common_selectMaxId: `select max(?)+1  from  ? `,
+  common_urlDelete: `delete ref_url where post_category =? and post_id =? `,
+  common_urlInsert: `insert into ref_url set ?`,
+  common_urlUpdate: `update ref_url where post_category =? and post_id =? `,
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -354,6 +357,7 @@ and t.project_id = ?
   where rate_type = 'USER'
   and rated_target_id = ?
   group by rated_target_id;`,
+  updateUserInfo: `update user set ? where user_id = ? `,
   /*--------------------------------------------------------------*/
   /*-------------------  멘토리스트    영역--------------------------*/
   /*------------------------------------------------------------- -*/
