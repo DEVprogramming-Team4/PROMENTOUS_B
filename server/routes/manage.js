@@ -76,6 +76,33 @@ router.post("/getProjectInfo", async (req, res) => {
   ]);
 
   teamTotalResult.applicants = mysql.changeSnake2Camel(applicants);
+  /*소셜링크가져와서 각각 멤버에 심어주기.*/
+  for (let index = 0; index < teamTotalResult.applicants.length; index++) {
+    if (
+      teamTotalResult.applicants[index].likeDeptCode != "" ||
+      teamTotalResult.applicants[index].likeDeptCode != null
+    ) {
+      teamTotalResult.applicants[index].likeDeptCodeOrigin =
+        teamTotalResult.applicants[index].likeDeptCode;
+      teamTotalResult.applicants[index].likeDeptCode =
+        mysql.splitDbCodesWithConvertCode(
+          teamTotalResult.applicants[index].likeDeptCodeOrigin
+        );
+    }
+    if (
+      teamTotalResult.applicants[index].likeStackCode != "" ||
+      teamTotalResult.applicants[index].likeStackCode != null
+    ) {
+      teamTotalResult.applicants[index].likeStackCodeOrigin =
+        teamTotalResult.applicants[index].likeStackCode;
+      teamTotalResult.applicants[index].likeStackCode =
+        mysql.splitDbCodesWithConvertCode(
+          teamTotalResult.applicants[index].likeStackCodeOrigin
+        );
+    }
+  }
+  console.log("============APPPLICANTS!!++++");
+  console.log(teamTotalResult.applicants);
   /*프로젝트 멤버정보들*/
   let members = await mysql.query("getTeamMembers", [
     req.body.project_id,
@@ -87,8 +114,6 @@ router.post("/getProjectInfo", async (req, res) => {
   if (members.length == 1) {
     teamTotalResult.members = [teamTotalResult.members];
   }
-  console.log("===========MEMBERS!=================");
-  console.log(teamTotalResult.members);
 
   /*소셜링크가져와서 각각 멤버에 심어주기.*/
   for (let index = 0; index < teamTotalResult.members.length; index++) {
@@ -120,7 +145,10 @@ router.post("/getProjectInfo", async (req, res) => {
       teamTotalResult.members[index].rating = tempArr;
     }
 
-    if (teamTotalResult.members[index].likeDeptCode != "") {
+    if (
+      teamTotalResult.members[index].likeDeptCode != "" ||
+      teamTotalResult.members[index].likeDeptCode != null
+    ) {
       teamTotalResult.members[index].likeDeptCodeOrigin =
         teamTotalResult.members[index].likeDeptCode;
       teamTotalResult.members[index].likeDeptCode =
@@ -128,7 +156,10 @@ router.post("/getProjectInfo", async (req, res) => {
           teamTotalResult.members[index].likeDeptCodeOrigin
         );
     }
-    if (teamTotalResult.members[index].likeStackCode != "") {
+    if (
+      teamTotalResult.members[index].likeStackCode != "" ||
+      teamTotalResult.members[index].likeStackCode != null
+    ) {
       teamTotalResult.members[index].likeStackCodeOrigin =
         teamTotalResult.members[index].likeStackCode;
       teamTotalResult.members[index].likeStackCode =
