@@ -7,12 +7,16 @@ router.get("/recruit/get/:projectId", async (req, res) => {
   let projectId = req.params.projectId;
   let commmentList = await mysql.query("getRecruitCommentList", [projectId]);
 
-  // 작성자 id -> 작성자 Name 반환
+  // 작성자 id -> 작성자 Name 반환, 작성자 이미지보내주기
   const len = commmentList.length;
   for (var i = 0; i < len; i++) {
     commmentList[i].writer_nickname = (
       await mysql.query("getUserNickName", [commmentList[i].writer_id])
     )[0].user_nickname;
+
+    commmentList[i].writer_image = (
+      await mysql.query("getUserImage", [commmentList[i].writer_id])
+    )[0].user_image;
   }
 
   res.send(commmentList);
