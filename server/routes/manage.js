@@ -19,6 +19,7 @@ const MAIN_CODES = async () => {
 /* PARAM : user_id ( ex) 3    ) */
 router.get("/getTeamListForManage/:user_id", async (req, res) => {
   const { user_id } = req.params;
+  //console.log("/getTeamListForManage/:user_id 실행  " + user_id);
   const teamListForManage = await mysql.query("manage_topSelect", [
     user_id,
     user_id,
