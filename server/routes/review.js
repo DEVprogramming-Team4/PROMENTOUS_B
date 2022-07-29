@@ -19,6 +19,16 @@ async function getViewCount(reviewList) {
   }
 }
 
+//GET  내가 현재 시점에서 후기 작성 가능한 프로젝트 리스트를 가져온다.
+router.get("/getReviewAvailProjectList", async (req, res) => {
+  const { sessionUserId } = res.sessionUserId;
+  const reviewAvailProjectList = await mysql.query("ReviewAvailProjectList", [
+    sessionUserId,
+    sessionUserId,
+    sessionUserId
+  ]);
+  res.send(reviewAvailProjectList);
+});
 // GET
 router.get("/", async (req, res) => {
   const reviewList = await mysql.query("reviewList");
