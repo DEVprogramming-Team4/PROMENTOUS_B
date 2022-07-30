@@ -28,18 +28,22 @@ router.get("/getTeamListForManage/:user_id", async (req, res) => {
     user_id,
     user_id
   ];
-  //console.log("/getTeamListForManage/:user_id 실행  " + user_id);
+  console.log("/getTeamListForManage/:user_id 실행  " + user_id);
+  //console.log(teamListParam);
   const teamListForManage = await mysql.query(
     "manage_topSelect",
     teamListParam
   );
+  //console.log(teamListForManage);
   /* 자료 1개만 있는 경우를 위한 처리.. */
   if (teamListForManage.length == 1) {
     let temp = [];
     temp.push(mysql.changeSnake2Camel(teamListForManage));
     res.send(temp);
-  } else {
+  } else if (teamListForManage.length > 1) {
     res.send(mysql.changeSnake2Camel(teamListForManage));
+  } else {
+    res.send([]);
   }
 });
 
