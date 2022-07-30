@@ -489,8 +489,8 @@ const query = async (alias, values) => {
         reject({ error });
       } else {
         // console.log("query ========================");
-        console.log("방금 호출된 query alias========================");
-        console.log("/sql/" + alias);
+        //console.log("방금 호출된 query alias========================");
+        //console.log("/sql/" + alias);
         //console.log("query alias========================");
         // console.log(results);
         // console.log("query ========================");
@@ -512,8 +512,8 @@ const replaceRefUrls = async (category, id, urlArray) => {
         console.log(error);
       } else {
         // console.log("query ========================");
-        console.log("방금 호출된 query ============");
-        console.log(sql[`common_urlDelete`]);
+        //console.log("방금 호출된 query ============");
+        //console.log(sql[`common_urlDelete`]);
 
         urlArray.forEach(
           (element) => {
@@ -531,8 +531,8 @@ const replaceRefUrls = async (category, id, urlArray) => {
                 reject({ error });
               } else {
                 // console.log("query ========================");
-                console.log("방금 호출된 query ==========");
-                console.log(sql[`common_urlInsert`]);
+                //console.log("방금 호출된 query ==========");
+                //console.log(sql[`common_urlInsert`]);
               } // 쿼리 결과를 전달
             });
           } // 쿼리 결과를 전달

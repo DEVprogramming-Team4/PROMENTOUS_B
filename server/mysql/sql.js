@@ -27,6 +27,8 @@ module.exports = {
   common_TeamRatingInfo: ``,
   common_MentorRatingInfo: ``,
   common_getRefUrlInfo: `select * from ref_url where post_category = ? and post_id = ?`,
+  common_getRefUrlInfoCustomize: `select t.url_title AS "title", t.url_address AS "address" FROM ref_url t
+  //where t.post_category = ?  and t.post_id = ?  `,
   common_selectMaxId: `select max(?)+1  from  ? `,
   common_urlDelete: `delete from ref_url where post_category =? and post_id =? `,
   common_urlInsert: `insert into ref_url set ?`,
