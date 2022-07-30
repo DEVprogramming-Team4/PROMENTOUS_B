@@ -500,7 +500,19 @@ const query = async (alias, values) => {
     })
   );
 };
-/* 02-2. REF URL  전부 delte 치고 .새로 입력하기!  */
+/* 02-2. REF URL -DB에저장 때마다 전부 delte 치고 .새로 입력하는 로직임  */
+/**
+ * 
+ * @param {*} category -  첫번째 매개변수 --  type ::   USB유저소셜참조링크  / RCB 모집용 참조링크 /  MTB멘토info 용 참조링크 / RVB 후기용 참조링크 
+ * @param {*} id - 두번째 매개변수 -- target_id ::  USB -  userID (user테이블 )  /  RCB - project_id (project테이블 )
+                 / MTB mentor_info_id ( mentor_info테이블)  /  RVB  review_id ( review 테이블) 
+ * @param {*} urlArray  -  세번째 매개변수 --  배열 속에  title , address  있는 object들 들어있으면 됨. 
+                          [
+                            { title: '데모 프로젝트1 ', address: 'www.naver.com' },
+                            { title: '참조 링크 2 ', address: 'www.tesla.com' }
+                          ]
+ * @returns 
+ */
 const replaceRefUrls = async (category, id, urlArray) => {
   //alias, values
   return new Promise((resolve, reject) => {
