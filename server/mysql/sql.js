@@ -92,9 +92,9 @@ module.exports = {
     desc limit 3`, // 쿼리문 에러나서 밑의 걸로 다시 짬. - (질문하기)
   leaderHistory: `/*leaderHistory */
    select   title, project_id  from
-  (select title, project_id  from project where leader_user = ?
+  (select title, project_id  from project where leader_user = ? and status_code = 'FIN'
    union
-   select title, project_id  from project where project_id in (select project_id from apply_admin where (applicant_id = ? and apply_status = 'ACC'))
+   select title, project_id  from project where project_id in (select project_id from apply_admin where (applicant_id = ? and apply_status = 'ACC' and status_code = 'FIN'))
    ) v1`,
   projectRefUrl: `select * from ref_url where post_id = ? and post_category='RCB'`,
 
@@ -135,7 +135,7 @@ module.exports = {
   ,fn_get_username(t.applicant_id) user_nickname
   ,fn_get_applyDeptCode(apply_dept_id ) apply_dept_code
       from apply_admin t , user t2
-    where t.apply_status = 'ACC' and t.project_id = ? 
+    where t.apply_status = 'ACC' and t.project_id = ?
       and t.applicant_id = t2.user_id`,
 
   getProjectCount: `SELECT count(project_id) as cnt
@@ -168,25 +168,25 @@ module.exports = {
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
   /* 내가 리뷰를 안쓴 +  (내가 리더인+내가ACC받은 프로젝트 ) 의 projectId 와 LIST를 가져옴. */
-  ReviewAvailProjectList: `  
+  ReviewAvailProjectList: `
   WITH
-  ct1 AS ( select v3.project_id from review  v3 where v3.writer_id = ?  and v3.del_yn ='N'  )       
-     SELECT *  from project  
-     
+  ct1 AS ( select v3.project_id from review  v3 where v3.writer_id = ?  and v3.del_yn ='N'  )
+     SELECT *  from project
+
      where project_id in (
-        select vv.project_Id from 
+        select vv.project_Id from
         (select v1.project_id from project v1 where v1.leader_user = ?
         union all
         select v2.project_Id from apply_admin v2 where v2.apply_status ='ACC' and  v2.applicant_id = ?)  vv
         )
      and project_id not in (select project_id from ct1 )
-     and  status_code ='FIN'  
+     and  status_code ='FIN'
      `,
   reviewList: `select t2.user_nickname, t3.stack_code, t.*
   from review t, user t2, project t3
-  where t.writer_id = t2.user_id 
+  where t.writer_id = t2.user_id
   and t.project_id = t3.project_id
-  and t3.stack_code like ? 
+  and t3.stack_code like ?
   and (t.title like ? or t2.user_nickname like ? or t.desc like ?)
   order by t.created_datetime desc
   limit 8 offset ?;`,
@@ -198,11 +198,11 @@ module.exports = {
   reviewDetail: `SELECT * FROM review where review_id = ?`,
   reviewOutcomeUrl: `SELECT * FROM review_outcome_url where review_id = ?`,
   getReviewCount: `SELECT count(review_id) as cnt
-  FROM (SELECT t2.user_nickname, t3.stack_code, t.* 
+  FROM (SELECT t2.user_nickname, t3.stack_code, t.*
     FROM review t, user t2, project t3
-    WHERE t.writer_id = t2.user_id 
+    WHERE t.writer_id = t2.user_id
     AND t.project_id = t3.project_id
-    AND t3.stack_code like ? 
+    AND t3.stack_code like ?
     AND (t.title like ? or t2.user_nickname like ? or t.desc like ?)
     )ta`,
   // getUserHistory: `SELECT t.project_id, t.leader_user, t.status_code, t.title, t2.applicant_id, t2.apply_status
@@ -229,7 +229,7 @@ module.exports = {
   manage_topSelect: `select    t.status_code, '진행중 프로젝트'  AS "statusName",'N' AS "mentor_yn" , t.title as "project_name", t.project_id  from project t where t.project_id  in  (
                     select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN'
                     union all
-                    select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code <> 'FIN' 
+                    select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code <> 'FIN'
                     )
                     union all
                     select      t.status_code  ,'완료된 프로젝트' AS  "statusName",'N' AS "mentor_yn"  , t.title  as "project_name", t.project_id from project t where t.project_id  in   (
