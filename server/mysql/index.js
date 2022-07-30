@@ -98,7 +98,7 @@ const justjoin = (webCodeArray) => {
    TABLE의 자료를 SELECT할때 사용한다  */
 const splitDbCodesWithConvertCode = (dbCodeString) => {
   let arr = [];
-  console.log(dbCodeString);
+  //console.log(dbCodeString);
   if (dbCodeString != "" && !_.isNull(dbCodeString)) {
     let temp = dbCodeString.split(",");
 
@@ -114,16 +114,16 @@ const splitDbCodesWithConvertCode = (dbCodeString) => {
 /* 선택적으로 사용됨!!!! query 의 결과물 중 like_dept_code . like_stack_code 있는 경우 
   FOR LOOP 돌면서 각 요소요소를 splitDbCodesWithConvertCode 처리 해주는 공통 영역 메서드!!   */
 const splitDbCodesWithLoop = (query_result) => {
-  console.log("splitDbCodesWithLoop");
-  console.log("splitDbCodesWithLoop");
-  console.log(_.isArray(query_result));
-  console.log("TRUE 여부");
-  console.log(query_result);
+  // console.log("splitDbCodesWithLoop");
+  // console.log("splitDbCodesWithLoop");
+  // console.log(_.isArray(query_result));
+  // console.log("TRUE 여부");
+  // console.log(query_result);
   if (_.isArray(query_result)) {
-    console.log("배열이다.");
-    console.log(query_result.length);
+    //console.log("배열이다.");
+    //console.log(query_result.length);
   } else {
-    console.log("배열아님다.");
+    //console.log("배열아님다.");
   }
   return query_result;
 };
@@ -133,12 +133,12 @@ const convertCodeToNaturalArray = (queryResult) => {
   // console.log(queryResult);
   // console.log("조건에 맞는가? ");
 
-  console.log(queryResult.length > 0);
+  //console.log(queryResult.length > 0);
   if (queryResult.length > 0) {
     for (let index = 0; index < queryResult.length; index++) {
       let element = queryResult[index];
-      console.log("1차 LOOP ELEMENT ");
-      console.log(element);
+      //console.log("1차 LOOP ELEMENT ");
+      //console.log(element);
       if (!_.isNull(element.stack_code) && !_.isUndefined(element.stack_code)) {
         console.log("element.stack_code");
         queryResult[index].stack_code_origin = queryResult[index].stack_code;
@@ -187,12 +187,11 @@ const convertCodeToNaturalArray = (queryResult) => {
     console.log(
       "============================================================일단 ELSE 탐. "
     );
-    console.log("왜 ELSE인지.. 모양확인 ");
-    console.log(queryResult.length);
-    console.log("왜 ELSE인지.. 모양확인 ");
-    console.log(queryResult);
-    console.log("왜 ELSE인지.. 모양확인 끄으으으으으읕 ");
-    console.log("check1111");
+    // console.log("왜 ELSE인지.. 모양확인 ");
+    // console.log(queryResult.length);
+    // console.log("왜 ELSE인지.. 모양확인 ");
+    // console.log(queryResult);
+    // console.log("check1111");
     console.log(
       !_.isNull(queryResult.stack_code) &&
         !_.isUndefined(queryResult.stack_code)
@@ -201,7 +200,7 @@ const convertCodeToNaturalArray = (queryResult) => {
       !_.isNull(queryResult.stack_code) &&
       !_.isUndefined(queryResult.stack_code)
     ) {
-      console.log("element.stack_code");
+      console.log("result.stack_code");
       queryResult.stack_code_origin = queryResult.stack_code;
       queryResult.stack_code = convertCommaCodeStringToNaturalArray(
         queryResult.stack_code
@@ -255,7 +254,7 @@ const convertCommaCodeStringToNaturalArray = (commaCodeString) => {
   let arr = commaCodeString.split(",");
   let resArr = [];
   let resultString = "";
-  console.log(arr);
+  //console.log(arr);
   if (arr.length > 0) {
     arr.forEach((element) => {
       //console.log("==================자연어  처리 진행");
@@ -282,13 +281,13 @@ const convertCodeToNaturalString = (queryResult) => {
   console.log(queryResult.length > 0);
   if (queryResult.length > 0) {
     for (let index = 0; index < queryResult.length; index++) {
-      console.log("1차 LOOP ELEMENT ");
-      console.log(queryResult[index]);
+      //console.log("1차 LOOP ELEMENT ");
+      //console.log(queryResult[index]);
       if (
         !_.isNull(queryResult[index].stack_code) &&
         !_.isUndefined(queryResult[index].stack_code)
       ) {
-        console.log("element.stack_code");
+        // console.log("element.stack_code");
         queryResult[index].stack_code_origin = queryResult[index].stack_code;
         queryResult[index].stack_code = convertCommaCodeStringToNatural(
           queryResult[index].stack_code
@@ -316,8 +315,8 @@ const convertCodeToNaturalString = (queryResult) => {
           queryResult[index].like_dept_code
         );
       }
-      console.log("queryResult[index].like_dept_code");
-      console.log(queryResult[index].like_dept_code);
+      // console.log("queryResult[index].like_dept_code");
+      // console.log(queryResult[index].like_dept_code);
       //mentoring_dept_code
       if (
         !_.isNull(queryResult[index].mentoring_dept_code) &&
@@ -335,27 +334,27 @@ const convertCodeToNaturalString = (queryResult) => {
     console.log(
       "============================================================일단 ELSE 탐. "
     );
-    console.log("왜 ELSE인지.. 모양확인 ");
-    console.log(queryResult.length);
-    console.log("왜 ELSE인지.. 모양확인 ");
-    console.log(queryResult);
-    console.log("왜 ELSE인지.. 모양확인 끄으으으으으읕 ");
-    console.log("check1111");
-    console.log(
-      !_.isNull(queryResult.stack_code) &&
-        !_.isUndefined(queryResult.stack_code)
-    );
+    // console.log("왜 ELSE인지.. 모양확인 ");
+    // console.log(queryResult.length);
+    // console.log("왜 ELSE인지.. 모양확인 ");
+    // console.log(queryResult);
+    // console.log("왜 ELSE인지.. 모양확인 끄으으으으으읕 ");
+    // console.log("check1111");
+    // console.log(
+    //   !_.isNull(queryResult.stack_code) &&
+    //     !_.isUndefined(queryResult.stack_code)
+    // );
     if (
       !_.isNull(queryResult.stack_code) &&
       !_.isUndefined(queryResult.stack_code)
     ) {
-      console.log("element.stack_code");
+      //console.log("element.stack_code");
       queryResult.stack_code_origin = queryResult.stack_code;
       queryResult.stack_code = convertCommaCodeStringToNatural(
         queryResult.stack_code
       );
     }
-    console.log("check22222");
+    // console.log("check22222");
     if (
       !_.isNull(queryResult.like_stack_code) &&
       !_.isUndefined(queryResult.like_stack_code)
@@ -365,12 +364,12 @@ const convertCodeToNaturalString = (queryResult) => {
         queryResult.like_stack_code
       );
     }
-    console.log(queryResult.like_stack_code);
-    console.log("check3333");
-    console.log(
-      !_.isNull(queryResult.like_dept_code) &&
-        !_.isUndefined(queryResult.like_dept_code)
-    );
+    // console.log(queryResult.like_stack_code);
+    // console.log("check3333");
+    // console.log(
+    //   !_.isNull(queryResult.like_dept_code) &&
+    //     !_.isUndefined(queryResult.like_dept_code)
+    // );
 
     if (
       !_.isNull(queryResult.like_dept_code) &&
@@ -397,12 +396,12 @@ const convertCodeToNaturalString = (queryResult) => {
   return queryResult;
 };
 const convertCommaCodeStringToNatural = (commaCodeString) => {
-  console.log("convertCommaCodeStringToNatural 에 뭐가들어왔길래.");
-  console.log(commaCodeString);
+  // console.log("convertCommaCodeStringToNatural 에 뭐가들어왔길래.");
+  //console.log(commaCodeString);
   let arr = commaCodeString.split(",");
   let resArr = [];
   let resultString = "";
-  console.log(arr);
+  // console.log(arr);
   if (arr.length > 0) {
     arr.forEach((element) => {
       //console.log("==================자연어  처리 진행");
@@ -507,8 +506,13 @@ const query = async (alias, values) => {
         //console.log("/sql/" + alias);
         //console.log("query alias========================");
         // console.log(results);
-        // console.log("query ========================");
-        // console.log("query ========================");
+        console.log("query 수행 정상적!========================");
+        console.log("호출한 sql ALIAS ========================");
+        console.log(alias);
+        console.log("결과 로우  수========================");
+        console.log(results.length);
+        console.log("============== ==============");
+
         resolve(results);
       } // 쿼리 결과를 전달
     })
@@ -649,7 +653,7 @@ const queryDynamic = async (alias, values) => {
 /* 02-3 getMentorInfoList  동적 쿼리로  멘토 리스트를 가져온다  */
 const getMentorInfoList = async (values) => {
   console.log("values:=====================");
-  console.log(values);
+  //console.log(values);
   let sql = ` 
   select
   t1.mentor_info_id  
@@ -720,7 +724,7 @@ const getMentorInfoList = async (values) => {
 
 const getMentorInfoTotalCount = async (values) => {
   console.log("values:=====================");
-  console.log(values);
+  // console.log(values);
   let sql = ` 
   select
   count(t1.mentor_info_id ) count

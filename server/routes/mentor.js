@@ -37,8 +37,9 @@ router.post("/mentorList", async (req, res) => {
     mentorList[index].RATE = await mysql.query("getRate", [
       mentorList[index].user_id
     ]);
-    //console.log (index +"의 RATE ")
-    //console.log (mentorList[index].RATE)
+    console.log(mentorList[index].user_id + " :: INFO_iD");
+    console.log(index + "의 RATE ");
+    console.log(mentorList[index].RATE);
     console.log("=-=========");
     console.log(mentorList[index].mentoring_dept_code);
     mentorList[index].mentoring_dept_code_origin =

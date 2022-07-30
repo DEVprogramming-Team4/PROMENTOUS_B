@@ -136,7 +136,8 @@ module.exports = {
   ,fn_get_applyDeptCode(apply_dept_id ) apply_dept_code
       from apply_admin t , user t2
     where t.apply_status = 'ACC' and t.project_id = ?
-      and t.applicant_id = t2.user_id`,
+      and t.applicant_id = t2.user_id
+      order by apply_dept_code `,
 
   getProjectCount: `SELECT count(project_id) as cnt
   FROM (select t2.user_nickname, t.project_id
@@ -428,7 +429,7 @@ and t.project_id = ?
   where rate_type = 'MENTOR'
   and rated_target_id = ?
   group by rated_target_id;`,
-  getRate: `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
+  getRate: `select  IFNULL(rate,0) rate   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
   getDeptOfMentorInfo: `select mentoring_dept_code from mentor_info
      where mentor_info_id = ?  `,
   checkMentorInfoExist: `select mentor_info_id from mentor_info t where t.user_id =  ?  `,
