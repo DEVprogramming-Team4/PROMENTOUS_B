@@ -92,7 +92,7 @@ router.post("/getProjectInfo", async (req, res) => {
   console.log("============================");
   console.log(applicants);
   console.log(_.isArray(applicants));
-  applicants = mysql.convertCodeToNaturalString(applicants);
+  applicants = mysql.convertCodeToNaturalArray(applicants);
   if (applicants.length == 1) {
     teamTotalResult.applicants = [mysql.changeSnake2Camel(applicants)];
   } else {
@@ -113,7 +113,7 @@ router.post("/getProjectInfo", async (req, res) => {
     project_id,
     project_id
   ]);
-  members = mysql.convertCodeToNaturalString(members);
+  members = mysql.convertCodeToNaturalArray(members);
   if (members.length == 1) {
     // 1개있으면 배열로 안오는 현상때문에 배열화 처리함..
     teamTotalResult.members = [mysql.changeSnake2Camel(members)];
