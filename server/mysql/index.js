@@ -500,7 +500,98 @@ const query = async (alias, values) => {
     })
   );
 };
-/* 02-2. queryDynamic  동적 쿼리 구현 SAMPLE */
+/* 02-2. REF URL  전부 delte 치고 .새로 입력하기!  */
+const replaceRefUrls = async (category, id, urlArray) => {
+  //alias, values
+  return new Promise((resolve, reject) => {
+    // delete 수행 .
+    let res;
+    pool.query(sql[`common_urlDelete`], [category, id], (error, results) => {
+      if (error) {
+        // 에러가 발생
+        console.log(error);
+      } else {
+        // console.log("query ========================");
+        console.log("방금 호출된 query ============");
+        console.log(sql[`common_urlDelete`]);
+
+        urlArray.forEach(
+          (element) => {
+            // FOR 문 돌면서 INSERT 수행
+            let temp = {
+              url_title: element.title,
+              url_address: element.address,
+              post_category: category,
+              post_id: id
+            };
+            pool.query(sql[`common_urlInsert`], temp, (error, results) => {
+              if (error) {
+                // 에러가 발생
+                console.log(error);
+                reject({ error });
+              } else {
+                // console.log("query ========================");
+                console.log("방금 호출된 query ==========");
+                console.log(sql[`common_urlInsert`]);
+              } // 쿼리 결과를 전달
+            });
+          } // 쿼리 결과를 전달
+        );
+      }
+      res = results;
+    });
+
+    resolve(res);
+  });
+};
+
+// pool.query();
+// 들어오는 데이터 예시!!
+// [
+// {
+//   post_category: 'USB',
+//   post_id: '22',
+//   url_title: 'rrrrr',
+// } ,
+// {
+//   post_category: 'USB',
+//   post_id: '22',
+//   url_title: 'qwe',
+//   url_address: '123'
+// }
+// ]
+// let result1 = await mysql.query("common_urlDelete", ["USB", userId]);
+// //SQL 진행. INSERT 당연히 빈 배열이면 스킵되는 로직.
+// body.URL_LIST.forEach((element) => {
+//   let eachUrlData = {
+//     post_category: "USB",
+//     post_id: userId,
+//     url_title: element.title,
+//     url_address: element.address
+//   };
+//   console.log("eachUrlData EACH 입력건");
+//   console.log(eachUrlData);
+//   let result2 = mysql.query("common_urlInsert", eachUrlData);
+// });})
+//////////////
+// pool.query(sql[alias], values, (error, results) => {
+//   if (error) {
+//     // 에러가 발생
+//     console.log(error);
+//     reject({ error });
+//   } else {
+//     // console.log("query ========================");
+//     console.log("방금 호출된 query alias========================");
+//     console.log("/sql/" + alias);
+//     //console.log("query alias========================");
+//     // console.log(results);
+//     // console.log("query ========================");
+//     // console.log("query ========================");
+//     resolve(results);
+//   } // 쿼리 결과를 전달
+// })
+
+/* 02-3. queryDynamic  동적 쿼리 구현 SAMPLE */
 const queryDynamic = async (alias, values) => {
   //console.log("values:=====================");
   //console.log(values);
@@ -727,6 +818,7 @@ module.exports = {
   convertCodeToNaturalString,
   convertCommaCodeStringToNaturalArray,
   convertCommaCodeStringToNatural,
+  replaceRefUrls,
   getNewPostId,
   query,
   queryDynamic,
