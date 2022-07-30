@@ -179,9 +179,12 @@ module.exports = {
      and project_id not in (select project_id from ct1 )`,
   reviewList: `select t2.user_nickname, t3.stack_code, t.*
   from review t, user t2, project t3
-  where t.writer_id = t2.user_id and t.project_id = t3.project_id
+  where t.writer_id = t2.user_id 
+  and t.project_id = t3.project_id
+  and t3.stack_code like ? 
+  and (t.title like ? or t2.user_nickname like ? or t.desc like ?)
   order by t.created_datetime desc
-  limit 8`,
+  limit 8 offset ?;`,
   getReviewViewCount: `SELECT post_id, count(post_id) as viewCnt
   FROM view_count
   where post_category="RVB"
@@ -189,6 +192,21 @@ module.exports = {
   group by post_id;`,
   reviewDetail: `SELECT * FROM review where review_id = ?`,
   reviewOutcomeUrl: `SELECT * FROM review_outcome_url where review_id = ?`,
+  getReviewCount: `SELECT count(review_id) as cnt
+  FROM (SELECT t2.user_nickname, t3.stack_code, t.* 
+    FROM review t, user t2, project t3
+    WHERE t.writer_id = t2.user_id 
+    AND t.project_id = t3.project_id
+    AND t3.stack_code like ? 
+    AND (t.title like ? or t2.user_nickname like ? or t.desc like ?)
+    )ta`,
+  // getUserHistory: `SELECT t.project_id, t.leader_user, t.status_code, t.title, t2.applicant_id, t2.apply_status
+  getUserHistory: `SELECT t.project_id, t.title
+  FROM project t, apply_admin t2
+  WHERE t.status_code = 'FIN' and (t.leader_user = ? or t2.applicant_id = ?) and t2.apply_status = 'ACC'
+  GROUP BY t.project_id;`,
+  reviewInsert: `insert into review set ?`,
+  outcomeUrlInsert: `insert into review_outcome_url set ?`,
   /*--------------------------------------------------------------*/
   /*-프로젝트 지원 및 승인반려[apply_admin 테이블] (VALIDATION / INSERT )*/
   /*------------------------------------------------------------- -*/
