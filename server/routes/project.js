@@ -218,7 +218,7 @@ router.get("/:projectId/recruit_data", async (req, res) => {
   const recruitData = await mysql.query("projectRecruitData", [projectId]);
   // 각 배열을 순회하면서 apply_dept_id  기준으로 몇명 ACC 되었는지 값을 가져옴. (팀장 포함? 미포함? )
   //console.log(" recruitData 확인해보세요");
-  console.log(recruitData);
+  //console.log(recruitData);
   res.send(recruitData);
 });
 
