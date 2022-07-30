@@ -23,7 +23,7 @@ const codes = {
   풀스택: "FS",
   DE: "디자인",
   디자인: "DE",
-  UU: "UIUX" /*KEY에 UI/UX가 안들어간다.... */,
+  UU: "UI/UX" /*KEY에 UI/UX가 안들어간다.... */,
   UIUX: "UU" /**UIUX !! */,
   PL: "기획",
   기획: "PL",
@@ -81,6 +81,14 @@ const joinWebCodes = (webCodeArray) => {
   for (let j = 0; j < webCodeArray.length; j++) {
     let element = webCodeArray[j];
     arr.push(convertCode(element));
+  }
+  return arr.join();
+};
+const justjoin = (webCodeArray) => {
+  let arr = [];
+  for (let j = 0; j < webCodeArray.length; j++) {
+    let element = webCodeArray[j];
+    arr.push(element);
   }
   return arr.join();
 };
@@ -235,14 +243,15 @@ const convertCodeToNaturalArray = (queryResult) => {
       );
     }
   }
-  console.log("convertCodeToNaturalString ㄲㄲㄲㄲㄲ");
-  console.log(queryResult);
+  //console.log("convertCodeToNaturalString ㄲㄲㄲㄲㄲ");
+  //console.log(queryResult);
   return queryResult;
 };
 
 const convertCommaCodeStringToNaturalArray = (commaCodeString) => {
-  console.log("convertCommaCodeStringToNatural 에 뭐가들어왔길래.");
-  console.log(commaCodeString);
+  console.log("convertCommaCodeStringToNaturalArray");
+  //console.log("convertCommaCodeStringToNatural 에 뭐가들어왔길래?????");
+  //console.log(commaCodeString);
   let arr = commaCodeString.split(",");
   let resArr = [];
   let resultString = "";
@@ -383,8 +392,8 @@ const convertCodeToNaturalString = (queryResult) => {
       );
     }
   }
-  console.log("convertCodeToNaturalString ㄲㄲㄲㄲㄲ");
-  console.log(queryResult);
+  //console.log("convertCodeToNaturalString ㄲㄲㄲㄲㄲ");
+  //console.log(queryResult);
   return queryResult;
 };
 const convertCommaCodeStringToNatural = (commaCodeString) => {
@@ -829,6 +838,7 @@ module.exports = {
   changeCamel2Snake,
   convertCode,
   joinWebCodes,
+  justjoin,
   splitDbCodesWithConvertCode,
   splitDbCodesWithLoop,
   convertCodeToNaturalArray,

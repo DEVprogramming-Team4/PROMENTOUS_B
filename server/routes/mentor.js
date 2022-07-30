@@ -86,6 +86,7 @@ router.post("/getMentorDetail", async (req, res) => {
   //console.log("/getMentorDetail");
   mentorData.likePart = [];
   console.log("mentorData.basicInfo.mentoring_dept_code");
+  console.log(mentorData.basicInfo);
   mentorData.basicInfo[0].mentoring_dept_code_origin =
     mentorData.basicInfo[0].mentoring_dept_code;
   console.log(mentorData.basicInfo[0].mentoring_dept_code);

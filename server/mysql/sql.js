@@ -33,12 +33,12 @@ module.exports = {
   common_urlDelete: `delete from ref_url where post_category =? and post_id =? `,
   common_urlInsert: `insert into ref_url set ?`,
   common_urlUpdate: `update ref_url where post_category =? and post_id =? `,
-
+  isCode: `  select count(*) "count" from sb_code_data where code_data_name = ? `,
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
-  applicantsPerDept: ``,
+
   manage_HeaderSelect: `select 'babo' from dual`,
   projectList: `select t2.user_nickname, t2.user_image, t.*
   from project t , user t2

@@ -54,56 +54,40 @@ router.post("/saveData/:userId", async (req, res) => {
   // PARAM 가공하여 d에 넣어주기 - user
   console.log("param 받아올 때의 형태 ");
   console.log(req.body);
+  console.log("==============================================");
+  if (body.parts.length > 0) {
+    let ress = await mysql.query("isCode", [body.parts[0]]);
+    if (ress[0].count == 1) {
+      body.parts = mysql.justjoin(body.parts);
+    } else {
+      body.parts = mysql.joinWebCodes(body.parts);
+    }
+  }
+  if (body.stacks.length > 0) {
+    ress = await mysql.query("isCode", [body.stacks[0]]);
+    if (ress[0].count == 1) {
+      body.stacks = mysql.justjoin(body.stacks);
+    } else {
+      body.stacks = mysql.joinWebCodes(body.stacks);
+    }
+  }
+
   d1 = {
     user_nickname: body.nickname,
     user_intro: body.info,
     user_account: body.login,
     //user_image: req.body.param.imageUrl,  // 보강예정!
     //user_mento_authority: "", 이 값은 다른 곳에서 컨트롤 함.멘토 신청 시점에 update 쳐줌!
-    like_dept_code: mysql.joinWebCodes(body.parts),
-    like_stack_code: mysql.joinWebCodes(body.stacks)
+    like_dept_code: body.parts,
+    like_stack_code: body.stacks
     //user_register_date: "" 이 값도 여기서 다룰 값은 아님.
   };
   console.log("user테이블 저장 어떻게 ??  d1");
   console.log(d1);
-  /********
-   * user TABLE 모양새 
-   * user_id 
-user_nickname 
-user_intro 
-user_account 
-user_image 
-user_mento_authority 
-like_dept_code 
-like_stack_code 
-user_register_date 
-
-   */
 
   // 여기 한줄만 살리면  user 테이블  UPDATE 진행 됨!! 주의!!
-  //let result1 = await mysql.query("updateUserInfo", [d1, userId]);
-  // PARAM 가공하여 d2에 넣어주기 - ref_url
+  let result1 = await mysql.query("updateUserInfo", [d1, userId]);
 
-  //d2 = {};
-  /* FLAG 변환없이 .. 기존 내역 일괄 delete 하고 / 새 내용 insert 진행  */
-  /* front 에서 동일한가 체크하는 부분은 두지 않고 무조건 delete insert 진행 되는거로 ㄱ  */
-  // common_urlDelete: `delete ref_url where post_category =? and post_id =? `,
-  // common_urlInsert: `insert into ref_url set ?`,
-  // common_urlUpdate: `update ref_url where post_category =? and post_id =? `,
-  /* DELETE  */
-  //let result1 = await mysql.query("common_urlDelete", ['USB', userId]);
-  /* INSERT - FOR문 돌면서 돌아야함.. 
-  body.URL_LIST :: DATA구조는 
-[
-  {
-      post_category: "USB",
-      post_id: userId,
-      url_title: element.title,
-      url_address: element.address
-  }
-]  
-형태의 배열 이어야 한다.  
-  */
   if (!_.isNull(body.URL_LIST) && !_.isArray(body.URL_LIST))
     console.log("===================================================");
   console.log("===========replaceRefUrls=========================");
