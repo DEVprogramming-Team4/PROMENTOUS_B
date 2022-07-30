@@ -130,12 +130,16 @@ router.post("/registerMentorInfo", async (req, res) => {
   console.log("/registerMentorInfo");
   let lastMentorInfoId = await mysql.query("getMentorInfoMax", []);
   //무식하지만 max + 1 사용..
+  console.log("lastMentorInfoId==================");
+  console.log(lastMentorInfoId);
   let newPostId = lastMentorInfoId[0].max;
   let body = req.body;
+  console.log("body==================");
   console.log(body);
   body.mentor_info.mentoring_dept_code = mysql.joinWebCodes(
     body.mentor_info.mentoring_dept_code
   );
+  console.log("mentoring_dept_code");
   console.log(body.mentor_info.mentoring_dept_code);
   let result = await mysql.query("insertMentorInfo", [body.mentor_info]);
   //멘토등록시 참고링크 써둔 경우에만 작동하게 조건 걸어둠. not 필수값
@@ -147,6 +151,13 @@ router.post("/registerMentorInfo", async (req, res) => {
       result = await mysql.query("insertRefUrlForMentor", [element]);
     }
   }
+  /* user 에 update  */
+  await mysql.query("updateUserSet", [
+    {
+      user_mento_authority: "Y"
+    },
+    body.mentor_info.user_id
+  ]);
   res.send(result);
 });
 
