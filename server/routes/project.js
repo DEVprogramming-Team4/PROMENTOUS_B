@@ -222,14 +222,18 @@ router.get("/:projectId/currentMembers", async (req, res) => {
   const len = currentMembers.length;
   for (let i = 0; i < len; i++) {
     let memberId = currentMembers[i].applicant_id;
-    // 프로젝트 진행이력, 후기 작성 내역 넣어주는 부분
+    //   후기 작성 내역 넣어주는 부분
     let reviewHistory = await mysql.query("getUserReviewHistory", [memberId]);
     currentMembers[i].review = reviewHistory;
+    // 프로젝트 진행이력, 후기 작성 내역 넣어주는 부분
     let projectHistory = await mysql.query("leaderHistory", [
       memberId,
       memberId
     ]);
     currentMembers[i].project = projectHistory;
+    // 해당 유저  소셜링크 넣어주는 부분
+    let url_list = await mysql.query("common_getRefUrlInfo", [`USB`, memberId]);
+    currentMembers[i].url_list = url_list;
   }
 
   for (let index = 0; index < len; index++) {

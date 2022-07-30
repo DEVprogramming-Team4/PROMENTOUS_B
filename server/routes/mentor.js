@@ -99,10 +99,7 @@ router.post("/getMentorDetail", async (req, res) => {
 
   /* 멘토링 이력. - 해당 멘토가 멘토링 완료까지달성해낸  프로젝트 모집글링크 안내용 */
   mentorData.mentoringHistory = [];
-  temp = await mysql.query("mentorHistory", [
-    /*TODO  임시제거하고 2로하드코딩 !! req.body.mentorId*/
-    req.body.mentorId
-  ]); //mentorReputations  score/comment 만 땡겨온다. 별점 상위순으로 .
+  temp = await mysql.query("mentorHistory", [req.body.mentorId]); //mentorReputations  score/comment 만 땡겨온다. 별점 상위순으로 .
 
   for (let index = 0; index < temp.length; index++) {
     /* 멘토링이력에 뜨는 프로젝트들의 모집글로 이동할 수 있게   backtick 으로 url 직접제공   */
@@ -112,10 +109,12 @@ router.post("/getMentorDetail", async (req, res) => {
   }
   //console.log(mentorData.mentoringHistory);
   //console.log(mentorData.basicInfo[0].mentor_info_id);
-  mentorData.url_list = await mysql.query("common_refUrlInfo", [
+  mentorData.url_list = await mysql.query("common_getRefUrlInfo", [
     "MTB",
     mentorData.basicInfo[0].mentor_info_id
   ]);
+  console.log("결과 ========================= ");
+  console.log(mentorData);
   res.send(mentorData);
 });
 

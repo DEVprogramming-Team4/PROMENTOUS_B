@@ -109,6 +109,7 @@ router.post("/getProjectInfo", async (req, res) => {
 
   console.log("============APPPLICANTS!!++++");
   console.log(teamTotalResult.applicants);
+  console.log("프로젝트 지원자정보 끝.");
   /*프로젝트 지원자정보 끝.  */
 
   /*프로젝트 멤버정보들   시작 . */
@@ -134,8 +135,8 @@ router.post("/getProjectInfo", async (req, res) => {
     //console.log("각각 멤버에 심어주기.");
     /* 멤버 소셜 집어넣기 */
     teamTotalResult.members[index].userSocialUrl = await mysql.query(
-      "getUserSocialUrls",
-      [teamTotalResult.members[index].userId]
+      "common_getRefUrlInfo",
+      [`USB`, teamTotalResult.members[index].userId]
     );
     //console.log("teamTotalResult.members[index].userSocialUrl");
     //console.log(teamTotalResult.members[index].userSocialUrl);
@@ -184,7 +185,7 @@ router.post("/getProjectInfo", async (req, res) => {
     //       teamTotalResult.members[index].likeStackCodeOrigin
     //     );
     // }
-    console.log("멤버 +" + index);
+    console.log("멤버 +" + (index + 1));
     console.log(teamTotalResult.members[index]);
     /* 멤버 각 역할 집어넣기  */
     //console.log(teamTotalResult.members[index].leaderYn);
@@ -208,7 +209,9 @@ router.post("/getProjectInfo", async (req, res) => {
     }
   }
 
-  // console.log("------------------------------------------");
+  console.log("멤버 끝------------------------------------------");
+  console.log("멤버 끝------------------------------------------");
+  console.log("멤버 끝------------------------------------------");
   // console.log(teamTotalResult.members);
 
   /*프로젝트 멘토링정보*/
@@ -246,7 +249,7 @@ router.post("/getProjectInfo", async (req, res) => {
   }
   //ALL IN ONE SEND
   console.log("최종 SEND 직전! teamTotalResult-----------------------");
-  console.log(teamTotalResult);
+  //console.log(teamTotalResult);
   res.send(teamTotalResult);
 });
 
