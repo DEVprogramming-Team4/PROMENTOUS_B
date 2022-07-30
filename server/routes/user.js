@@ -37,7 +37,7 @@ router.get("/:userId", async (req, res) => {
   //console.log("check... ");
   //console.log(userDetail[0]);
   if (url_list.length == 1) {
-    userDetail[0].url_list = [url_list];
+    userDetail[0].url_list = url_list;
   } else if (url_list.length > 2) {
     userDetail[0].url_list = url_list;
   } else {
