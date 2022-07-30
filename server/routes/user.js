@@ -62,6 +62,8 @@ router.post("/saveData/:userId", async (req, res) => {
     } else {
       body.parts = mysql.joinWebCodes(body.parts);
     }
+  } else {
+    body.parts = "";
   }
   if (body.stacks.length > 0) {
     ress = await mysql.query("isCode", [body.stacks[0]]);
@@ -70,6 +72,8 @@ router.post("/saveData/:userId", async (req, res) => {
     } else {
       body.stacks = mysql.joinWebCodes(body.stacks);
     }
+  } else {
+    body.stacks = "";
   }
 
   d1 = {
