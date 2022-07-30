@@ -119,6 +119,149 @@ const splitDbCodesWithLoop = (query_result) => {
   }
   return query_result;
 };
+
+const convertCodeToNaturalArray = (queryResult) => {
+  // console.log("convertCodeToNaturalString");
+  // console.log(queryResult);
+  // console.log("조건에 맞는가? ");
+
+  console.log(queryResult.length > 0);
+  if (queryResult.length > 0) {
+    for (let index = 0; index < queryResult.length; index++) {
+      let element = queryResult[index];
+      console.log("1차 LOOP ELEMENT ");
+      console.log(element);
+      if (!_.isNull(element.stack_code) && !_.isUndefined(element.stack_code)) {
+        console.log("element.stack_code");
+        queryResult[index].stack_code_origin = queryResult[index].stack_code;
+        queryResult[index].stack_code = convertCommaCodeStringToNaturalArray(
+          element.stack_code
+        );
+      }
+
+      if (
+        !_.isNull(element.like_stack_code) &&
+        !_.isUndefined(element.like_stack_code)
+      ) {
+        queryResult[index].like_stack_code_origin =
+          queryResult[index].like_stack_code;
+        queryResult[index].like_stack_code =
+          convertCommaCodeStringToNaturalArray(
+            queryResult[index].like_stack_code
+          );
+      }
+
+      if (
+        !_.isNull(element.like_dept_code) &&
+        !_.isUndefined(element.like_dept_code)
+      ) {
+        queryResult[index].like_dept_code_origin =
+          queryResult[index].like_dept_code;
+        queryResult[index].like_dept_code =
+          convertCommaCodeStringToNaturalArray(
+            queryResult[index].like_dept_code
+          );
+      }
+      //mentoring_dept_code
+      if (
+        !_.isNull(element.mentoring_dept_code) &&
+        !_.isUndefined(element.mentoring_dept_code)
+      ) {
+        queryResult[index].mentoring_dept_code_origin =
+          queryResult[index].mentoring_dept_code;
+        queryResult[index].mentoring_dept_code =
+          convertCommaCodeStringToNaturalArray(
+            queryResult[index].mentoring_dept_code
+          );
+      }
+    }
+  } else {
+    console.log(
+      "============================================================일단 ELSE 탐. "
+    );
+    console.log("왜 ELSE인지.. 모양확인 ");
+    console.log(queryResult.length);
+    console.log("왜 ELSE인지.. 모양확인 ");
+    console.log(queryResult);
+    console.log("왜 ELSE인지.. 모양확인 끄으으으으으읕 ");
+    console.log("check1111");
+    console.log(
+      !_.isNull(queryResult.stack_code) &&
+        !_.isUndefined(queryResult.stack_code)
+    );
+    if (
+      !_.isNull(queryResult.stack_code) &&
+      !_.isUndefined(queryResult.stack_code)
+    ) {
+      console.log("element.stack_code");
+      queryResult.stack_code_origin = queryResult.stack_code;
+      queryResult.stack_code = convertCommaCodeStringToNaturalArray(
+        queryResult.stack_code
+      );
+    }
+    console.log("check22222");
+    if (
+      !_.isNull(queryResult.like_stack_code) &&
+      !_.isUndefined(queryResult.like_stack_code)
+    ) {
+      queryResult.like_stack_code_origin = queryResult.like_stack_code;
+      queryResult.like_stack_code = convertCommaCodeStringToNaturalArray(
+        queryResult.like_stack_code
+      );
+    }
+    console.log("check3333");
+    console.log(
+      !_.isNull(queryResult.like_dept_code) &&
+        !_.isUndefined(queryResult.like_dept_code)
+    );
+
+    if (
+      !_.isNull(queryResult.like_dept_code) &&
+      !_.isUndefined(queryResult.like_dept_code)
+    ) {
+      queryResult.like_dept_code_origin = queryResult.like_dept_code;
+      queryResult.like_dept_code = convertCommaCodeStringToNaturalArray(
+        queryResult.like_dept_code
+      );
+    }
+    //mentoring_dept_code
+    if (
+      !_.isNull(element.mentoring_dept_code) &&
+      !_.isUndefined(element.mentoring_dept_code)
+    ) {
+      queryResult[index].mentoring_dept_code_origin =
+        queryResult[index].mentoring_dept_code;
+      queryResult[index].mentoring_dept_code =
+        convertCommaCodeStringToNaturalArray(
+          queryResult[index].mentoring_dept_code
+        );
+    }
+  }
+  console.log("convertCodeToNaturalString ㄲㄲㄲㄲㄲ");
+  console.log(queryResult);
+  return queryResult;
+};
+
+const convertCommaCodeStringToNaturalArray = (commaCodeString) => {
+  console.log("convertCommaCodeStringToNatural 에 뭐가들어왔길래.");
+  console.log(commaCodeString);
+  let arr = commaCodeString.split(",");
+  let resArr = [];
+  let resultString = "";
+  console.log(arr);
+  if (arr.length > 0) {
+    arr.forEach((element) => {
+      //console.log("==================자연어  처리 진행");
+      resArr.push(convertCode(element));
+      // console.log("2");
+    });
+  } else {
+    //console.log("==================자연어  처리 미진행");
+  }
+
+  return resArr;
+};
+
 /**
  *
  * @param {*} queryResult  query 함수의 결과값을 parameter로 삼는다. (보통은 배열)
@@ -163,6 +306,18 @@ const convertCodeToNaturalString = (queryResult) => {
         queryResult[index].like_dept_code = convertCommaCodeStringToNatural(
           queryResult[index].like_dept_code
         );
+      }
+      //mentoring_dept_code
+      if (
+        !_.isNull(element.mentoring_dept_code) &&
+        !_.isUndefined(element.mentoring_dept_code)
+      ) {
+        queryResult[index].mentoring_dept_code_origin =
+          queryResult[index].mentoring_dept_code;
+        queryResult[index].mentoring_dept_code =
+          convertCommaCodeStringToNatural(
+            queryResult[index].mentoring_dept_code
+          );
       }
     }
   } else {
@@ -212,6 +367,17 @@ const convertCodeToNaturalString = (queryResult) => {
       queryResult.like_dept_code_origin = queryResult.like_dept_code;
       queryResult.like_dept_code = convertCommaCodeStringToNatural(
         queryResult.like_dept_code
+      );
+    }
+    //mentoring_dept_code
+    if (
+      !_.isNull(element.mentoring_dept_code) &&
+      !_.isUndefined(element.mentoring_dept_code)
+    ) {
+      queryResult[index].mentoring_dept_code_origin =
+        queryResult[index].mentoring_dept_code;
+      queryResult[index].mentoring_dept_code = convertCommaCodeStringToNatural(
+        queryResult[index].mentoring_dept_code
       );
     }
   }
@@ -560,7 +726,9 @@ module.exports = {
   joinWebCodes,
   splitDbCodesWithConvertCode,
   splitDbCodesWithLoop,
+  convertCodeToNaturalArray,
   convertCodeToNaturalString,
+  convertCommaCodeStringToNaturalArray,
   convertCommaCodeStringToNatural,
   getNewPostId,
   query,

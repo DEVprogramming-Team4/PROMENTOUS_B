@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const _ = require("lodash");
 const mysql = require("../mysql");
+const { projectList } = require("../mysql/sql");
 
 // localhost:3000/project/recruit
 async function getRestData(projectList) {
@@ -29,8 +30,9 @@ async function getRestData(projectList) {
 
 // 메인화면에 보내줄 정렬이 필요없는 결과값 보내주기
 router.get("/", async (req, res) => {
-  const projectListDefault = await mysql.query("projectListDefault");
+  let projectListDefault = await mysql.query("projectListDefault");
   await getRestData(projectListDefault);
+  projectListDefault = mysql.convertCodeToNaturalArray(projectListDefault);
   res.send(projectListDefault);
 });
 
