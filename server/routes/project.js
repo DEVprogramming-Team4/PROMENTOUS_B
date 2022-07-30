@@ -168,15 +168,27 @@ router.get("/:projectId", async (req, res) => {
 // 리더 기본정보
 router.get("/:projectId/leader", async (req, res) => {
   let projectId = req.params.projectId;
-  const leaderData = await mysql.query("projectLeaderData", [projectId]);
+  let leaderData = await mysql.query("projectLeaderData", [projectId]);
+  console.log("=-=====================");
+  console.log(leaderData);
+  console.log("=-=====================");
+  console.log(leaderData);
+  leaderData = mysql.convertCodeToNaturalString(leaderData);
   const leaderHistory = await mysql.query("leaderHistory", [
     projectId,
     projectId
   ]);
+  leaderData[0].leaderHistory = leaderHistory;
+  const leaderUrl = await mysql.query("common_getRefUrlInfo", [
+    "USB",
+    leaderData[0].user_id
+  ]);
+  leaderData[0].url_info = leaderUrl;
   /* 값이 단일값이고/ object 로 query 가 꺼내오는 우를 범하는 경우.  일단 내가 send 칠 녀석에  컨버트메서드돌린 놈을 가져온다. */
-  leaderData[0].leaderHistory = mysql.convertCodeToNaturalString(leaderHistory);
-  console.log(mysql.convertCodeToNaturalString(leaderData[0])); // leaderData 확인해보세요
+  //  common_getRefUrlInfo: `select * from ref_url where post_category = ? and post_id = ?`,
+
   console.log("leaderData 확인해보세요");
+  console.log(leaderData[0]);
   res.send(leaderData[0]);
 });
 
@@ -212,13 +224,13 @@ router.get("/:projectId/recruit_data", async (req, res) => {
 router.get("/:projectId/currentMembers", async (req, res) => {
   let projectId = req.params.projectId;
   // apply_dept_id 별로 값을 가짐.
-  const currentMembers = await mysql.query("getCurrentMembers", [projectId]);
+  let currentMembers = await mysql.query("getCurrentMembers", [projectId]);
   // 각 배열을 순회하면서 apply_dept_id  기준으로 몇명 ACC 되었는지 값을 가져옴. (팀장 포함? 미포함? )
   //console.log(" currentMembers 확인해보세요");
   //console.log(currentMembers);
   sendData = {};
   deptIdArray = [];
-
+  currentMembers = mysql.convertCodeToNaturalArray(currentMembers);
   const len = currentMembers.length;
   for (let i = 0; i < len; i++) {
     let memberId = currentMembers[i].applicant_id;
@@ -251,7 +263,7 @@ router.get("/:projectId/currentMembers", async (req, res) => {
     //console.log("loop : deptIdArray");
     //console.log(deptIdArray);
   }
-  //console.log(" sendData 확인해보세요");
+  // console.log(" sendData 확인해보세요");
   // console.log(sendData);
   res.send(sendData);
 });

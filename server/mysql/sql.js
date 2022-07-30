@@ -131,11 +131,12 @@ module.exports = {
       from apply_dept t where t.project_id = ?  `,
 
   getCurrentMembers: `
-    select  t.*
-            ,fn_get_username(t.applicant_id) user_nickname
-            ,fn_get_applyDeptCode(apply_dept_id ) apply_dept_code
-      from apply_admin t
-        where t.apply_status = 'ACC' and t.project_id = ?`,
+  select  t.* , t2.*
+  ,fn_get_username(t.applicant_id) user_nickname
+  ,fn_get_applyDeptCode(apply_dept_id ) apply_dept_code
+      from apply_admin t , user t2
+    where t.apply_status = 'ACC' and t.project_id = ? 
+      and t.applicant_id = t2.user_id`,
 
   getProjectCount: `SELECT count(project_id) as cnt
   FROM (select t2.user_nickname, t.project_id
