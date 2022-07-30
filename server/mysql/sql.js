@@ -31,6 +31,7 @@ module.exports = {
   common_urlDelete: `delete ref_url where post_category =? and post_id =? `,
   common_urlInsert: `insert into ref_url set ?`,
   common_urlUpdate: `update ref_url where post_category =? and post_id =? `,
+
   /*--------------------------------------------------------------*/
   /*-------------------  프로젝트 모집 영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
@@ -201,6 +202,7 @@ module.exports = {
   /*-------------------  팀 개요    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
+  insertRate: `insert into rate set ? on duplicate key update ?`, // unique key가 있어야
   manage_topSelect: `select    t.status_code, '진행중 프로젝트'  AS "statusName",'N' AS "mentor_yn" , t.title as "project_name", t.project_id  from project t where t.project_id  in  (
                     select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN'
                     union all

@@ -268,7 +268,40 @@ router.patch("/saveTeamManageInfo/:project_id", async (req, res) => {
 /*************       INSERT   / UPDATE 레이팅 관련..                  *** */
 /********************************************************************** */
 /********************************************************************** */
-router.post("/saveMentorRating", async (req, res) => {
+
+router.post("/postRating/:rated_target_id", async (req, res) => {
+  let rated_target_id = req.params.rated_target_id;
+  let rate_user_id = req.body.sessionUserId;
+  let ratingInfo = req.body.postRatingInfo;
+  let ratingType = req.body.ratingType;
+  let rate = ratingInfo.score;
+  let rate_comment = ratingInfo.comment;
+  let project_id = ratingInfo.projectId;
+  console.log("=========================== 평판 작성 API GOGO");
+  console.log(body.postRatingInfo);
+  console.log(body.postRatingInfo);
+  // 일단은 건바이건으로 object 로 올 것으로 기대. 일괄 전송인지? 건바이건 전송인지?
+
+  if (ratingType == "MENTOR") {
+  } else if (ratingType == "USER") {
+  } else {
+    console.log("예외 발생!!!!!!!!!!!!!!!!!");
+  }
+  /**QUERY  insertRate 수행 시  배열 안에 2개의 object 뭉치가 필요함. */
+  await mysql.query("insertRate", [
+    {
+      rate_user_id: rate_user_id,
+      rated_target_id: rated_target_id,
+      rate_type: ratingType,
+      project_id: project_id,
+      rate: rate,
+      rate_comment: rate_comment
+    },
+    {
+      rate: rate,
+      rate_comment: rate_comment
+    }
+  ]);
   console.log(
     "/*************       INSERT   / UPDATE                ***************** */"
   );
@@ -277,7 +310,7 @@ router.post("/saveMentorRating", async (req, res) => {
     "/*************       INSERT   / UPDATE                ***************** */"
   );
 
-  res.send(null);
+  res.send(result);
 });
 
 /*questions */
