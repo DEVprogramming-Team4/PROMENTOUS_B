@@ -162,6 +162,18 @@ const convertCodeToNaturalArray = (queryResult) => {
             queryResult[index].like_dept_code
           );
       }
+      //mentoring_dept_code
+      if (
+        !_.isNull(element.mentoring_dept_code) &&
+        !_.isUndefined(element.mentoring_dept_code)
+      ) {
+        queryResult[index].mentoring_dept_code_origin =
+          queryResult[index].mentoring_dept_code;
+        queryResult[index].mentoring_dept_code =
+          convertCommaCodeStringToNaturalArray(
+            queryResult[index].mentoring_dept_code
+          );
+      }
     }
   } else {
     console.log(
@@ -211,6 +223,18 @@ const convertCodeToNaturalArray = (queryResult) => {
       queryResult.like_dept_code = convertCommaCodeStringToNaturalArray(
         queryResult.like_dept_code
       );
+    }
+    //mentoring_dept_code
+    if (
+      !_.isNull(element.mentoring_dept_code) &&
+      !_.isUndefined(element.mentoring_dept_code)
+    ) {
+      queryResult[index].mentoring_dept_code_origin =
+        queryResult[index].mentoring_dept_code;
+      queryResult[index].mentoring_dept_code =
+        convertCommaCodeStringToNaturalArray(
+          queryResult[index].mentoring_dept_code
+        );
     }
   }
   console.log("convertCodeToNaturalString ㄲㄲㄲㄲㄲ");
@@ -283,6 +307,18 @@ const convertCodeToNaturalString = (queryResult) => {
           queryResult[index].like_dept_code
         );
       }
+      //mentoring_dept_code
+      if (
+        !_.isNull(element.mentoring_dept_code) &&
+        !_.isUndefined(element.mentoring_dept_code)
+      ) {
+        queryResult[index].mentoring_dept_code_origin =
+          queryResult[index].mentoring_dept_code;
+        queryResult[index].mentoring_dept_code =
+          convertCommaCodeStringToNatural(
+            queryResult[index].mentoring_dept_code
+          );
+      }
     }
   } else {
     console.log(
@@ -331,6 +367,17 @@ const convertCodeToNaturalString = (queryResult) => {
       queryResult.like_dept_code_origin = queryResult.like_dept_code;
       queryResult.like_dept_code = convertCommaCodeStringToNatural(
         queryResult.like_dept_code
+      );
+    }
+    //mentoring_dept_code
+    if (
+      !_.isNull(element.mentoring_dept_code) &&
+      !_.isUndefined(element.mentoring_dept_code)
+    ) {
+      queryResult[index].mentoring_dept_code_origin =
+        queryResult[index].mentoring_dept_code;
+      queryResult[index].mentoring_dept_code = convertCommaCodeStringToNatural(
+        queryResult[index].mentoring_dept_code
       );
     }
   }
