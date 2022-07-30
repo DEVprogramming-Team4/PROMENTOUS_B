@@ -45,6 +45,7 @@ router.get("/getReviewAvailProjectList", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
+    // console.log(req.body.param);
     const page = (req.body.param.page - 1) * 8;
     const keyword = `%${req.body.param.keyword}%`;
     const stacks = req.body.param.stacks;
@@ -63,6 +64,7 @@ router.post("/", async (req, res) => {
       keyword
     ]);
     await getViewCount(reviewList);
+    mysql.convertCodeToNaturalString(reviewList);
     res.send({ count, reviewList });
   } catch (error) {
     res.send(error);
