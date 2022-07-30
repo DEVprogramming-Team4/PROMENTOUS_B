@@ -169,14 +169,15 @@ router.get("/:projectId", async (req, res) => {
 router.get("/:projectId/leader", async (req, res) => {
   let projectId = req.params.projectId;
   let leaderData = await mysql.query("projectLeaderData", [projectId]);
-  console.log("=-=====================");
-  console.log(leaderData);
-  console.log("=-=====================");
-  console.log(leaderData);
+  // console.log("=-=====================");
+  // console.log(leaderData);
+  // console.log("=-=====================");
+  // console.log(leaderData);
+  const leaderId = leaderData[0].user_id;
   leaderData = mysql.convertCodeToNaturalString(leaderData);
   const leaderHistory = await mysql.query("leaderHistory", [
-    projectId,
-    projectId
+    leaderId,
+    leaderId
   ]);
   leaderData[0].leaderHistory = leaderHistory;
   const leaderUrl = await mysql.query("common_getRefUrlInfo", [
