@@ -164,8 +164,8 @@ const convertCodeToNaturalArray = (queryResult) => {
       }
       //mentoring_dept_code
       if (
-        !_.isNull(element.mentoring_dept_code) &&
-        !_.isUndefined(element.mentoring_dept_code)
+        !_.isNull(queryResult[index].mentoring_dept_code) &&
+        !_.isUndefined(queryResult[index].mentoring_dept_code)
       ) {
         queryResult[index].mentoring_dept_code_origin =
           queryResult[index].mentoring_dept_code;
@@ -226,15 +226,13 @@ const convertCodeToNaturalArray = (queryResult) => {
     }
     //mentoring_dept_code
     if (
-      !_.isNull(element.mentoring_dept_code) &&
-      !_.isUndefined(element.mentoring_dept_code)
+      !_.isNull(queryResult.mentoring_dept_code) &&
+      !_.isUndefined(queryResult.mentoring_dept_code)
     ) {
-      queryResult[index].mentoring_dept_code_origin =
-        queryResult[index].mentoring_dept_code;
-      queryResult[index].mentoring_dept_code =
-        convertCommaCodeStringToNaturalArray(
-          queryResult[index].mentoring_dept_code
-        );
+      queryResult.mentoring_dept_code_origin = queryResult.mentoring_dept_code;
+      queryResult.mentoring_dept_code = convertCommaCodeStringToNaturalArray(
+        queryResult.mentoring_dept_code
+      );
     }
   }
   console.log("convertCodeToNaturalString ㄲㄲㄲㄲㄲ");
@@ -309,8 +307,8 @@ const convertCodeToNaturalString = (queryResult) => {
       }
       //mentoring_dept_code
       if (
-        !_.isNull(element.mentoring_dept_code) &&
-        !_.isUndefined(element.mentoring_dept_code)
+        !_.isNull(queryResult[index].mentoring_dept_code) &&
+        !_.isUndefined(queryResult[index].mentoring_dept_code)
       ) {
         queryResult[index].mentoring_dept_code_origin =
           queryResult[index].mentoring_dept_code;
@@ -371,13 +369,12 @@ const convertCodeToNaturalString = (queryResult) => {
     }
     //mentoring_dept_code
     if (
-      !_.isNull(element.mentoring_dept_code) &&
-      !_.isUndefined(element.mentoring_dept_code)
+      !_.isNull(queryResult.mentoring_dept_code) &&
+      !_.isUndefined(queryResult.mentoring_dept_code)
     ) {
-      queryResult[index].mentoring_dept_code_origin =
-        queryResult[index].mentoring_dept_code;
-      queryResult[index].mentoring_dept_code = convertCommaCodeStringToNatural(
-        queryResult[index].mentoring_dept_code
+      queryResult.mentoring_dept_code_origin = queryResult.mentoring_dept_code;
+      queryResult.mentoring_dept_code = convertCommaCodeStringToNatural(
+        queryResult.mentoring_dept_code
       );
     }
   }
