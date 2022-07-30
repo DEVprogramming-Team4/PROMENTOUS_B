@@ -178,7 +178,9 @@ module.exports = {
         union all
         select v2.project_Id from apply_admin v2 where v2.apply_status ='ACC' and  v2.applicant_id = ?)  vv
         )
-     and project_id not in (select project_id from ct1 )`,
+     and project_id not in (select project_id from ct1 )
+     and  status_code ='FIN'  
+     `,
   reviewList: `select t2.user_nickname, t3.stack_code, t.*
   from review t, user t2, project t3
   where t.writer_id = t2.user_id 
