@@ -273,20 +273,22 @@ const convertCodeToNaturalString = (queryResult) => {
   console.log(queryResult.length > 0);
   if (queryResult.length > 0) {
     for (let index = 0; index < queryResult.length; index++) {
-      let element = queryResult[index];
       console.log("1차 LOOP ELEMENT ");
-      console.log(element);
-      if (!_.isNull(element.stack_code) && !_.isUndefined(element.stack_code)) {
+      console.log(queryResult[index]);
+      if (
+        !_.isNull(queryResult[index].stack_code) &&
+        !_.isUndefined(queryResult[index].stack_code)
+      ) {
         console.log("element.stack_code");
         queryResult[index].stack_code_origin = queryResult[index].stack_code;
         queryResult[index].stack_code = convertCommaCodeStringToNatural(
-          element.stack_code
+          queryResult[index].stack_code
         );
       }
 
       if (
-        !_.isNull(element.like_stack_code) &&
-        !_.isUndefined(element.like_stack_code)
+        !_.isNull(queryResult[index].like_stack_code) &&
+        !_.isUndefined(queryResult[index].like_stack_code)
       ) {
         queryResult[index].like_stack_code_origin =
           queryResult[index].like_stack_code;
@@ -296,8 +298,8 @@ const convertCodeToNaturalString = (queryResult) => {
       }
 
       if (
-        !_.isNull(element.like_dept_code) &&
-        !_.isUndefined(element.like_dept_code)
+        !_.isNull(queryResult[index].like_dept_code) &&
+        !_.isUndefined(queryResult[index].like_dept_code)
       ) {
         queryResult[index].like_dept_code_origin =
           queryResult[index].like_dept_code;
@@ -305,6 +307,8 @@ const convertCodeToNaturalString = (queryResult) => {
           queryResult[index].like_dept_code
         );
       }
+      console.log("queryResult[index].like_dept_code");
+      console.log(queryResult[index].like_dept_code);
       //mentoring_dept_code
       if (
         !_.isNull(queryResult[index].mentoring_dept_code) &&
@@ -352,6 +356,7 @@ const convertCodeToNaturalString = (queryResult) => {
         queryResult.like_stack_code
       );
     }
+    console.log(queryResult.like_stack_code);
     console.log("check3333");
     console.log(
       !_.isNull(queryResult.like_dept_code) &&
