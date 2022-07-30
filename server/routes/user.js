@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mysql = require("../mysql");
+const _ = require("lodash");
 /****
  * FOR LOGIN  + USER INFO
  *
@@ -31,29 +32,41 @@ router.get("/:userId", async (req, res) => {
   userDetail[0].like_dept_code = mysql.splitDbCodesWithConvertCode(
     userDetail[0].like_dept_code_origin
   );
+
+  let url_list = await mysql.query("common_getRefUrlInfo", ["USB", userId]);
   //console.log("check... ");
   //console.log(userDetail[0]);
+  if (url_list.length == 1) {
+    userDetail[0].url_list = [url_list];
+  } else if (url_list.length > 2) {
+    userDetail[0].url_list = url_list;
+  } else {
+    userDetail[0].url_list = [];
+  }
   res.send(userDetail[0]);
 });
 
-// 유저 정보 UPDATE 하기  ( POST : /user/:userId  )
-router.post("/:userId", async (req, res) => {
+// 유저 정보 저장 UPDATE 하기  ( $post(`/user/saveData/${this.userId}  )
+router.post("/saveData/:userId", async (req, res) => {
   let userId = req.params.userId;
+  let body = req.body;
   console.log("post(userId :: " + userId);
   // PARAM 가공하여 d에 넣어주기 - user
   console.log("param 받아올 때의 형태 ");
-  console.log(req.body.param);
+  console.log(req.body);
   d1 = {
-    user_nickname: req.body.param.nickname,
-    user_intro: req.body.param.info,
-    user_account: req.body.param.login,
+    user_nickname: body.nickname,
+    user_intro: body.info,
+    user_account: body.login,
     //user_image: req.body.param.imageUrl,  // 보강예정!
     //user_mento_authority: "", 이 값은 다른 곳에서 컨트롤 함.멘토 신청 시점에 update 쳐줌!
-    like_dept_code: mysql.joinWebCodes(req.body.param.parts),
-    like_stack_code: mysql.joinWebCodes(req.body.param.stacks)
+    like_dept_code: mysql.joinWebCodes(body.parts),
+    like_stack_code: mysql.joinWebCodes(body.stacks)
     //user_register_date: "" 이 값도 여기서 다룰 값은 아님.
   };
-  console.log("user테이블 저장형태 d1---- ");
+  console.log("user테이블 저장 어떻게 ??  d1");
+  console.log("user테이블 저장 어떻게 ??  d1");
+  console.log("user테이블 저장 어떻게 ??  d1");
   console.log(d1);
   /********
    * user TABLE 모양새 
@@ -79,26 +92,27 @@ user_register_date
   /* DELETE  */
   //let result1 = await mysql.query("common_urlDelete", ['USB', userId]);
   /* INSERT - FOR문 돌면서 돌아야함.. 
-  DATA구조 예상 [{title : 1, address: "1.com"}
-                      , {title : 2, address: "222.com"} 
-                 ]   */
-
-  //let result1 = await mysql.query("common_urlInsert", ['USB', userId]);
-
-  //SQL 진행. INSERT 당연히 빈 배열이면 스킵되는 로직.
-  req.body.param.URL_LIST.forEach((element) => {
-    let eachUrlData = {
+  body.URL_LIST :: DATA구조는 
+[
+  {
       post_category: "USB",
       post_id: userId,
       url_title: element.title,
       url_address: element.address
-    };
-    console.log("eachUrlData EACH 입력건");
-    console.log(eachUrlData);
-    //let result2 = await mysql.query("common_urlInsert",eachUrlData );
-  });
+  }
+]  
+형태의 배열 이어야 한다.
+  
+  
+  */
+  if (!_.isNull(body.URL_LIST) && !_.isArray(body.URL_LIST))
+    console.log("===================================================");
+  console.log("===================================================");
+  console.log("===========replaceRefUrls=================");
+  console.log("===========replaceRefUrls=========================");
+  console.log("===================================================");
+  r = await mysql.replaceRefUrls("USB", userId, body.URL_LIST);
 
-  r = {};
   // let param = {
   //   nickname: this.user.nickname,
   //   info: this.user.selfInfo,

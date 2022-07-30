@@ -26,9 +26,9 @@ module.exports = {
   common_boardTypes: `SELECT * FROM sb_code_data where code_class_id =8`, //지원상태분류가져오기
   common_TeamRatingInfo: ``,
   common_MentorRatingInfo: ``,
-  common_refUrlInfo: `select * from ref_url where post_category = ? and post_id = ?`,
+  common_getRefUrlInfo: `select * from ref_url where post_category = ? and post_id = ?`,
   common_selectMaxId: `select max(?)+1  from  ? `,
-  common_urlDelete: `delete ref_url where post_category =? and post_id =? `,
+  common_urlDelete: `delete from ref_url where post_category =? and post_id =? `,
   common_urlInsert: `insert into ref_url set ?`,
   common_urlUpdate: `update ref_url where post_category =? and post_id =? `,
 
@@ -224,7 +224,7 @@ module.exports = {
   manage_topSelect: `select    t.status_code, '진행중 프로젝트'  AS "statusName",'N' AS "mentor_yn" , t.title as "project_name", t.project_id  from project t where t.project_id  in  (
                     select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN'
                     union all
-                    select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code <> 'FIN' and v3.status_code <> 'REC'
+                    select v2.project_id  from apply_admin v2, project v3 where v2.project_id = v3.project_id  and  v2.applicant_id = ? and v2.apply_status ='ACC' and v3.status_code <> 'FIN' 
                     )
                     union all
                     select      t.status_code  ,'완료된 프로젝트' AS  "statusName",'N' AS "mentor_yn"  , t.title  as "project_name", t.project_id from project t where t.project_id  in   (
