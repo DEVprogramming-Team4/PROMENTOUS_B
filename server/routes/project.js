@@ -183,12 +183,12 @@ router.get("/:projectId/leader", async (req, res) => {
     "USB",
     leaderData[0].user_id
   ]);
-  leaderData[0].url_info = leaderUrl;
+  leaderData[0].url_list = leaderUrl;
   /* 값이 단일값이고/ object 로 query 가 꺼내오는 우를 범하는 경우.  일단 내가 send 칠 녀석에  컨버트메서드돌린 놈을 가져온다. */
   //  common_getRefUrlInfo: `select * from ref_url where post_category = ? and post_id = ?`,
 
-  console.log("leaderData 확인해보세요");
-  console.log(leaderData[0]);
+  //console.log("leaderData 확인해보세요");
+  // console.log(leaderData[0]);
   res.send(leaderData[0]);
 });
 
