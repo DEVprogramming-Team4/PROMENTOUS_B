@@ -40,6 +40,14 @@ app.use(cors(corsOptions));
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const AWS = require("aws-sdk");
+const multerS3 = require("multer-s3");
+
+AWS.config.update({
+  accessKeyId: process.env.S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+  region: "ap-northeast-2"
+});
 
 try {
   fs.readdirSync("uploads");
@@ -48,13 +56,18 @@ try {
   fs.mkdirSync("uploads");
 }
 const upload = multer({
-  storage: multer.diskStorage({
-    destination(req, file, done) {
-      done(null, "uploads/");
-    },
-    filename(req, file, done) {
-      const ext = path.extname(file.originalname);
-      done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+  // storage: multer.diskStorage({
+  // destination(req, file, done) {
+  //   done(null, "uploads/");
+  // },
+  // filename(req, file, done) {
+  //   const ext = path.extname(file.originalname);
+  //   done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+  storage: multerS3({
+    s3: new AWS.S3(),
+    bucket: "promentous2",
+    key(req, file, cb) {
+      cb(null, `original/${Date.now()}${path.basename(file.originalname)}`);
     }
   }),
   limits: { fileSize: 5 * 1024 * 1024 }
@@ -62,8 +75,11 @@ const upload = multer({
 
 app.post("/img", upload.single("image"), (req, res) => {
   console.log(req.file);
-  // res.send("ok");
-  res.json({ url: `/img/${req.file.filename}` });
+  // res.json({ url: `/img/${req.file.filename}` });
+  if (req.file === undefined) {
+    return;
+  }
+  res.json({ url: req.file.location });
 });
 // 이미지 업로드 세팅
 
