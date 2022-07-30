@@ -65,8 +65,6 @@ router.post("/saveData/:userId", async (req, res) => {
     //user_register_date: "" 이 값도 여기서 다룰 값은 아님.
   };
   console.log("user테이블 저장 어떻게 ??  d1");
-  console.log("user테이블 저장 어떻게 ??  d1");
-  console.log("user테이블 저장 어떻게 ??  d1");
   console.log(d1);
   /********
    * user TABLE 모양새 
@@ -80,10 +78,13 @@ like_dept_code
 like_stack_code 
 user_register_date 
 
-   * 
+   */
+
+  // 여기 한줄만 살리면  user 테이블  UPDATE 진행 됨!! 주의!!
   //let result1 = await mysql.query("updateUserInfo", [d1, userId]);
   // PARAM 가공하여 d2에 넣어주기 - ref_url
-  d2 = {};
+
+  //d2 = {};
   /* FLAG 변환없이 .. 기존 내역 일괄 delete 하고 / 새 내용 insert 진행  */
   /* front 에서 동일한가 체크하는 부분은 두지 않고 무조건 delete insert 진행 되는거로 ㄱ  */
   // common_urlDelete: `delete ref_url where post_category =? and post_id =? `,
@@ -101,16 +102,13 @@ user_register_date
       url_address: element.address
   }
 ]  
-형태의 배열 이어야 한다.
-  
-  
+형태의 배열 이어야 한다.  
   */
   if (!_.isNull(body.URL_LIST) && !_.isArray(body.URL_LIST))
     console.log("===================================================");
-  console.log("===================================================");
-  console.log("===========replaceRefUrls=================");
   console.log("===========replaceRefUrls=========================");
   console.log("===================================================");
+
   r = await mysql.replaceRefUrls("USB", userId, body.URL_LIST);
 
   // let param = {

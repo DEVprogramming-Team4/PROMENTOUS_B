@@ -438,6 +438,7 @@ and t.project_id = ?
   getMentorInfoMax: `select max(mentor_info_id)+1  "max"  from mentor_info `,
   insertMentorInfo: `insert into mentor_info set ?`,
   insertRefUrlForMentor: `insert into ref_url set ? `,
+  updateUserSet: `update user t set ?  where user_id  = ? `,
 
   /*--------------------------------------------------------------*/
   /*-------------------  멘토디테일    영역--------------------------*/
