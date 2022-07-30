@@ -102,14 +102,30 @@ router.post("/getProjectInfo", async (req, res) => {
   } else {
     teamTotalResult.applicants = mysql.changeSnake2Camel(applicants);
   }
-
   if (applicants.length == 0) {
     teamTotalResult.applicants = [];
   }
-
-  console.log("============APPPLICANTS!!++++");
-  console.log(teamTotalResult.applicants);
-  console.log("프로젝트 지원자정보 끝.");
+  /* APPLICANTS  각각의  review / project / url_list 삽입  */
+  for (let i = 0; i < teamTotalResult.applicants.length; i++) {
+    let userId = teamTotalResult.applicants[i].applicantId;
+    //   후기 작성 내역 넣어주는 부분
+    console.log("Applicants ==============LOOOOOOOOOOOOP :" + i + 1);
+    console.log("");
+    let reviewHistory = await mysql.query("getUserReviewHistory", [userId]);
+    teamTotalResult.applicants[i].review = reviewHistory;
+    console.log(teamTotalResult.applicants[i].review);
+    // 프로젝트 진행이력, 후기 작성 내역 넣어주는 부분
+    let projectHistory = await mysql.query("leaderHistory", [userId, userId]);
+    teamTotalResult.applicants[i].project = projectHistory;
+    console.log(teamTotalResult.applicants[i].project);
+    // 해당 유저  소셜링크 넣어주는 부분
+    let url_list = await mysql.query("common_getRefUrlInfo", [`USB`, userId]);
+    teamTotalResult.applicants[i].url_list = url_list;
+    console.log(teamTotalResult.applicants[i].url_list);
+  }
+  // console.log("============APPPLICANTS!!++++");
+  // console.log(teamTotalResult.applicants);
+  // console.log("프로젝트 지원자정보 끝.");
   /*프로젝트 지원자정보 끝.  */
 
   /*프로젝트 멤버정보들   시작 . */
@@ -134,12 +150,30 @@ router.post("/getProjectInfo", async (req, res) => {
   for (let index = 0; index < teamTotalResult.members.length; index++) {
     //console.log("각각 멤버에 심어주기.");
     /* 멤버 소셜 집어넣기 */
+    /* 어거지로 title address 맞춘 것인데........  */
     teamTotalResult.members[index].userSocialUrl = await mysql.query(
-      "common_getRefUrlInfo",
-      [`USB`, teamTotalResult.members[index].userId]
+      "getUserSocialUrls",
+      [teamTotalResult.members[index].userId]
     );
+
     //console.log("teamTotalResult.members[index].userSocialUrl");
     //console.log(teamTotalResult.members[index].userSocialUrl);
+    let reviewHistory = await mysql.query("getUserReviewHistory", [
+      teamTotalResult.members[index].userId
+    ]);
+    teamTotalResult.members[index].review = reviewHistory;
+    // 프로젝트 진행이력, 후기 작성 내역 넣어주는 부분
+    let projectHistory = await mysql.query("leaderHistory", [
+      teamTotalResult.members[index].userId,
+      teamTotalResult.members[index].userId
+    ]);
+    teamTotalResult.members[index].project = projectHistory;
+    // 해당 유저  소셜링크 넣어주는 부분
+    let url_list = await mysql.query("common_getRefUrlInfo", [
+      `USB`,
+      teamTotalResult.members[index].userId
+    ]);
+    teamTotalResult.members[index].url_list = url_list;
 
     /* 멤버 평가여부 집어넣기 멘토링ID 처럼 고유값이 아님. rate user id 및 project까지 다필요함.  */
     teamTotalResult.members[index].rating = await mysql.query(
@@ -163,30 +197,8 @@ router.post("/getProjectInfo", async (req, res) => {
       teamTotalResult.members[index].rating = tempArr;
     }
 
-    // if (
-    //   teamTotalResult.members[index].likeDeptCode != "" ||
-    //   teamTotalResult.members[index].likeDeptCode != null
-    // ) {
-    //   teamTotalResult.members[index].likeDeptCodeOrigin =
-    //     teamTotalResult.members[index].likeDeptCode;
-    //   teamTotalResult.members[index].likeDeptCode =
-    //     mysql.splitDbCodesWithConvertCode(
-    //       teamTotalResult.members[index].likeDeptCodeOrigin
-    //     );
-    // }
-    // if (
-    //   teamTotalResult.members[index].likeStackCode != "" ||
-    //   teamTotalResult.members[index].likeStackCode != null
-    // ) {
-    //   teamTotalResult.members[index].likeStackCodeOrigin =
-    //     teamTotalResult.members[index].likeStackCode;
-    //   teamTotalResult.members[index].likeStackCode =
-    //     mysql.splitDbCodesWithConvertCode(
-    //       teamTotalResult.members[index].likeStackCodeOrigin
-    //     );
-    // }
-    console.log("멤버 +" + (index + 1));
-    console.log(teamTotalResult.members[index]);
+    //console.log("멤버 +" + (index + 1));
+    //console.log(teamTotalResult.members[index]);
     /* 멤버 각 역할 집어넣기  */
     //console.log(teamTotalResult.members[index].leaderYn);
     if (_.isEqual("Y", teamTotalResult.members[index].leaderYn)) {
@@ -248,7 +260,7 @@ router.post("/getProjectInfo", async (req, res) => {
     }
   }
   //ALL IN ONE SEND
-  console.log("최종 SEND 직전! teamTotalResult-----------------------");
+  //console.log("최종 SEND 직전! teamTotalResult-----------------------");
   //console.log(teamTotalResult);
   res.send(teamTotalResult);
 });
