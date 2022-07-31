@@ -136,7 +136,8 @@ module.exports = {
   ,fn_get_applyDeptCode(apply_dept_id ) apply_dept_code
       from apply_admin t , user t2
     where t.apply_status = 'ACC' and t.project_id = ?
-      and t.applicant_id = t2.user_id`,
+      and t.applicant_id = t2.user_id
+      order by apply_dept_code `,
 
   getProjectCount: `SELECT count(project_id) as cnt
   FROM (select t2.user_nickname, t.project_id
@@ -146,6 +147,24 @@ module.exports = {
     and t.stack_code like ?
     and (t.title like ? or t2.user_nickname like ? or t.project_desc like ?)
     )ta`,
+  getProjectOnlineCount: `SELECT count(project_id) as cnt
+    FROM (select t2.user_nickname, t.project_id
+      from project t , user t2
+      where t.leader_user = t2.user_id
+      and t.status_code = ?
+      and t.stack_code like ?
+      and t.progress_method = ?
+      and (t.title like ? or t2.user_nickname like ? or t.project_desc like ?)
+      )ta`,
+  getProjectLargeCityCount: `SELECT count(project_id) as cnt
+      FROM (select t2.user_nickname, t.project_id
+        from project t , user t2
+        where t.leader_user = t2.user_id
+        and t.status_code = ?
+        and t.stack_code like ?
+        and t.main_area_code like ?
+        and (t.title like ? or t2.user_nickname like ? or t.project_desc like ?)
+        )ta`,
   getProjectViewCount: `SELECT post_id, count(post_id) as viewCnt
   FROM view_count
   where post_category="RCB"
@@ -182,7 +201,7 @@ module.exports = {
      and project_id not in (select project_id from ct1 )
      and  status_code ='FIN'
      `,
-  reviewList: `select t2.user_nickname, t3.stack_code, t.*
+  reviewList: `select t2.user_nickname, t2.user_image, t3.stack_code, t.*
   from review t, user t2, project t3
   where t.writer_id = t2.user_id
   and t.project_id = t3.project_id
@@ -428,7 +447,7 @@ and t.project_id = ?
   where rate_type = 'MENTOR'
   and rated_target_id = ?
   group by rated_target_id;`,
-  getRate: `select  IFNULL(rate,0)   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
+  getRate: `select  IFNULL(rate,0) rate   from rate where rate_type ='MENTOR' and rated_target_Id = ? `,
   getDeptOfMentorInfo: `select mentoring_dept_code from mentor_info
      where mentor_info_id = ?  `,
   checkMentorInfoExist: `select mentor_info_id from mentor_info t where t.user_id =  ?  `,
