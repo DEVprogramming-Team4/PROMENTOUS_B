@@ -549,8 +549,8 @@ const replaceRefUrls = async (category, id, urlArray) => {
           (element) => {
             // FOR 문 돌면서 INSERT 수행
             let temp = {
-              url_title: element.title,
-              url_address: element.address,
+              url_title: element.url_title,
+              url_address: element.url_adress,
               post_category: category,
               post_id: id
             };
