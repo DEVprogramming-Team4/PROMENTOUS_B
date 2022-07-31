@@ -63,9 +63,10 @@ router.post("/", async (req, res) => {
         keyword,
         page
       ]);
-      count = await mysql.query("getProjectCount", [
+      count = await mysql.query("getProjectOnlineCount", [
         recruitStatus,
         stack1,
+        "ON",
         keyword,
         keyword,
         keyword
@@ -96,9 +97,10 @@ router.post("/", async (req, res) => {
         keyword,
         page
       ]);
-      count = await mysql.query("getProjectCount", [
+      count = await mysql.query("getProjectLargeCityCount", [
         recruitStatus,
         stack1,
+        mainArea,
         keyword,
         keyword,
         keyword
