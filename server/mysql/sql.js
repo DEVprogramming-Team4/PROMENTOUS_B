@@ -410,7 +410,7 @@ and t.project_id = ?
   insertUser: `insert into user set ? on duplicate key update ?`, // unique key가 있어야 중복 인서트가 안되더라~
   getLoginUser: `select * from user where user_account = ?`,
   userDetail: `select * from user t where user_id = ? `,
-  userRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
+  userRate: `SELECT rated_target_id, count(rate_id) as cnt, FORMAT( avg(rate),1 )  as rateAVG
   FROM rate
   where rate_type = 'USER'
   and rated_target_id = ?
@@ -442,7 +442,7 @@ and t.project_id = ?
   and (rated_target_id in (select user_id from mentor_info order by mentor_register_date desc))
   group by rated_target_id;`,
   */
-  mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, avg(rate)  as rateAVG
+  mentorRate: `SELECT rated_target_id, count(rate_id) as cnt, FORMAT( avg(rate),1 )   as rateAVG
   FROM rate
   where rate_type = 'MENTOR'
   and rated_target_id = ?
