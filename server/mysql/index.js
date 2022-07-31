@@ -249,22 +249,27 @@ const convertCodeToNaturalArray = (queryResult) => {
 
 const convertCommaCodeStringToNaturalArray = (commaCodeString) => {
   console.log("convertCommaCodeStringToNaturalArray");
-  //console.log("convertCommaCodeStringToNatural 에 뭐가들어왔길래?????");
-  //console.log(commaCodeString);
-  let arr = commaCodeString.split(",");
+  console.log("convertCommaCodeStringToNaturalArray 에 뭐가들어왔길래?????");
+  console.log(commaCodeString);
   let resArr = [];
-  let resultString = "";
-  //console.log(arr);
-  if (arr.length > 0) {
-    arr.forEach((element) => {
-      //console.log("==================자연어  처리 진행");
-      resArr.push(convertCode(element));
-      // console.log("2");
-    });
-  } else {
-    //console.log("==================자연어  처리 미진행");
-  }
 
+  if (_.isEqual(commaCodeString, "")) {
+    console.log("빈값임!!!!");
+  } else {
+    console.log("빈값아님!!!!!!!");
+    let arr = commaCodeString.split(",");
+    let resultString = "";
+    //console.log(arr);
+    if (arr.length > 0) {
+      arr.forEach((element) => {
+        //console.log("==================자연어  처리 진행");
+        resArr.push(convertCode(element));
+        // console.log("2");
+      });
+    } else {
+      //console.log("==================자연어  처리 미진행");
+    }
+  }
   return resArr;
 };
 
