@@ -17,6 +17,7 @@ const MAIN_CODES = async () => {
 /****************************/
 // 팀개요화면의 상단에서 , userId 기준으로 하여서 선택가능한 팀들을 가져옴.
 /* PARAM : user_id ( ex) 3    ) */
+
 router.get("/getTeamListForManage/:user_id", async (req, res) => {
   const { user_id } = req.params;
   let teamListParam = [
@@ -297,17 +298,18 @@ router.post("/postRating/:rated_target_id", async (req, res) => {
   let rate_comment = ratingInfo.comment;
   let project_id = ratingInfo.projectId;
   console.log("=========================== 평판 작성 API GOGO");
-  console.log(body.postRatingInfo);
-  console.log(body.postRatingInfo);
+  console.log(req.body.postRatingInfo);
+  console.log(req.body.postRatingInfo);
   // 일단은 건바이건으로 object 로 올 것으로 기대. 일괄 전송인지? 건바이건 전송인지?
-
+  /*
   if (ratingType == "MENTOR") {
   } else if (ratingType == "USER") {
   } else {
     console.log("예외 발생!!!!!!!!!!!!!!!!!");
   }
+  */
   /**QUERY  insertRate 수행 시  배열 안에 2개의 object 뭉치가 필요함. */
-  await mysql.query("insertRate", [
+  const result = await mysql.query("insertRate", [
     {
       rate_user_id: rate_user_id,
       rated_target_id: rated_target_id,
