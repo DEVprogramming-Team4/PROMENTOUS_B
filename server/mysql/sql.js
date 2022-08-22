@@ -244,6 +244,7 @@ module.exports = {
   /*-------------------  팀 개요    영역--------------------------*/
   /* 셀렉트박스  ,  viewcount validation 등등..                      */
   /*------------------------------------------------------------- -*/
+  getUserRate: `SELECT * FROM rate WHERE rated_target_id = ?`,
   insertRate: `insert into rate set ? on duplicate key update ?`, // unique key가 있어야
   manage_topSelect: `select    t.status_code, '진행중 프로젝트'  AS "statusName",'N' AS "mentor_yn" , t.title as "project_name", t.project_id  from project t where t.project_id  in  (
                     select  v1.project_id  from project v1  where v1.leader_user = ?  and v1.status_code <> 'FIN'
