@@ -118,4 +118,12 @@ router.post("/saveData/:userId", async (req, res) => {
   res.send(r);
 });
 
+router.get("/rate/:userId", async (req, res) => {
+  let userId = req.params.userId;
+  let userRate = await mysql.query("getUserRate", userId);
+  userRate =
+    userRate.length === 0 ? "아직 유저에 대한 평가가 없습니다!" : userRate;
+  res.send(userRate);
+});
+
 module.exports = router; // NECCESARY END STATE
