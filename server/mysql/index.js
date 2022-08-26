@@ -73,7 +73,7 @@ const convertCode = (codeValue) => {
   if (keyword == "C#") keyword = "Csharp";
   return codes[keyword];
 };
-/*joinWebCodes - 웹에서 받아온 코드뭉치 배열ARRAY를 재료로 받고, 
+/*joinWebCodes - 웹에서 받아온 코드뭉치 배열ARRAY를 재료로 받고,
    여기 요소들을 코드화하여 join 해서 단일 문자열화 한다.
    TABLE 에 insert / update 할때 사용한다.  */
 const joinWebCodes = (webCodeArray) => {
@@ -111,7 +111,7 @@ const splitDbCodesWithConvertCode = (dbCodeString) => {
   return arr;
 };
 
-/* 선택적으로 사용됨!!!! query 의 결과물 중 like_dept_code . like_stack_code 있는 경우 
+/* 선택적으로 사용됨!!!! query 의 결과물 중 like_dept_code . like_stack_code 있는 경우
   FOR LOOP 돌면서 각 요소요소를 splitDbCodesWithConvertCode 처리 해주는 공통 영역 메서드!!   */
 const splitDbCodesWithLoop = (query_result) => {
   // console.log("splitDbCodesWithLoop");
@@ -246,7 +246,6 @@ const convertCodeToNaturalArray = (queryResult) => {
   //console.log(queryResult);
   return queryResult;
 };
-
 const convertCommaCodeStringToNaturalArray = (commaCodeString) => {
   console.log("convertCommaCodeStringToNaturalArray");
   console.log("convertCommaCodeStringToNaturalArray 에 뭐가들어왔길래?????");
@@ -420,7 +419,7 @@ const convertCommaCodeStringToNatural = (commaCodeString) => {
   return resArr.join();
 };
 
-/* getNewPostId  테이블이름 + 테이블 키값 을 재료로 주면 , 새로이 등록될 
+/* getNewPostId  테이블이름 + 테이블 키값 을 재료로 주면 , 새로이 등록될
  글의  post id 값을 가져올수 있다.  "신규 등록 글" 이 참고링크가 달려 있는 경우에
   새로이 생성될 놈의 post_id 값을 넣어 주어야 하므로, 이때 사용한다.   */
 const getNewPostId = async (tableName, autoIncrementColumn) => {};
@@ -437,8 +436,8 @@ const getConnection = async () => {
     })
   );
 };
-/* changeSnake2Camel :   DB에서 날것인 SNAKE를  FRONT에 보내기전에 CAMEL 화 한다 
-   OBJECT 속 OBJECT /배열 이라면.. 
+/* changeSnake2Camel :   DB에서 날것인 SNAKE를  FRONT에 보내기전에 CAMEL 화 한다
+   OBJECT 속 OBJECT /배열 이라면..
    changeCamel2Snake  를  하위 OBJECT 에도 수행 해줘야 함!! */
 function changeSnake2Camel(object) {
   if (Object.keys(object).length < 2) {
@@ -463,8 +462,8 @@ function changeSnake2Camel(object) {
     return temp;
   }
 }
-/* changeCamel2Snake :  FRONT에서  CAMEL 로 데이터 던져주는경우에 CAMEL 화 한다 
-   OBJECT 속 OBJECT /배열 이라면.. 
+/* changeCamel2Snake :  FRONT에서  CAMEL 로 데이터 던져주는경우에 CAMEL 화 한다
+   OBJECT 속 OBJECT /배열 이라면..
    changeCamel2Snake  를  하위 OBJECT 에도 수행 해줘야 함!!   */
 function changeCamel2Snake(object) {
   if (Object.keys(object).length < 2) {
@@ -525,16 +524,16 @@ const query = async (alias, values) => {
 };
 /* 02-2. REF URL -DB에저장 때마다 전부 delte 치고 .새로 입력하는 로직임  */
 /**
- * 
- * @param {*} category -  첫번째 매개변수 --  type ::   USB유저소셜참조링크  / RCB 모집용 참조링크 /  MTB멘토info 용 참조링크 / RVB 후기용 참조링크 
+ *
+ * @param {*} category -  첫번째 매개변수 --  type ::   USB유저소셜참조링크  / RCB 모집용 참조링크 /  MTB멘토info 용 참조링크 / RVB 후기용 참조링크
  * @param {*} id - 두번째 매개변수 -- target_id ::  USB -  userID (user테이블 )  /  RCB - project_id (project테이블 )
-                 / MTB mentor_info_id ( mentor_info테이블)  /  RVB  review_id ( review 테이블) 
- * @param {*} urlArray  -  세번째 매개변수 --  배열 속에  title , address  있는 object들 들어있으면 됨. 
+                 / MTB mentor_info_id ( mentor_info테이블)  /  RVB  review_id ( review 테이블)
+ * @param {*} urlArray  -  세번째 매개변수 --  배열 속에  title , address  있는 object들 들어있으면 됨.
                           [
                             { title: '데모 프로젝트1 ', address: 'www.naver.com' },
                             { title: '참조 링크 2 ', address: 'www.tesla.com' }
                           ]
- * @returns 
+ * @returns
  */
 const replaceRefUrls = async (category, id, urlArray) => {
   //alias, values
@@ -659,12 +658,12 @@ const queryDynamic = async (alias, values) => {
 const getMentorInfoList = async (values) => {
   console.log("values:=====================");
   //console.log(values);
-  let sql = ` 
+  let sql = `
   select
-  t1.mentor_info_id  
-  , t1.mentoring_title 
+  t1.mentor_info_id
+  , t1.mentoring_title
   ,t1.mentoring_intro
-  ,t1.user_id  
+  ,t1.user_id
   ,fn_getMentorRate(t1.user_id  ) totalRate
   ,fn_getMentorRateCount( t1.user_id )  rateCount
   ,t2.user_nickname
@@ -673,18 +672,18 @@ const getMentorInfoList = async (values) => {
   ,t1.mentor_register_date
   ,t1.mentoring_dept_code
   ,fn_board_viewcnt ('MTB', t1.mentor_info_id ) view_count
-  from mentor_info t1 , user t2 
- where    t2.user_id = t1.user_id   
+  from mentor_info t1 , user t2
+ where    t2.user_id = t1.user_id
   `;
   // values 는 프론트단에서 건너온 배열인데 이것을 체크
   if (values.searchKeyWord != null && values.searchKeyWord != "") {
-    sql += ` 
+    sql += `
               /*조건1 검색어 */
-              and 
+              and
               (t1.mentoring_title like '%${values.searchKeyWord}%'
-              OR 
+              OR
               t1.mentoring_intro like '%${values.searchKeyWord}%'
-              ) 
+              )
              `;
   }
   /*dept_code 는  코드문자열로 들어온다고 전제함. */
@@ -730,21 +729,21 @@ const getMentorInfoList = async (values) => {
 const getMentorInfoTotalCount = async (values) => {
   console.log("values:=====================");
   // console.log(values);
-  let sql = ` 
+  let sql = `
   select
   count(t1.mentor_info_id ) count
-  from mentor_info t1 , user t2 
- where    t2.user_id = t1.user_id   
+  from mentor_info t1 , user t2
+ where    t2.user_id = t1.user_id
   `;
   // values 는 프론트단에서 건너온 배열인데 이것을 체크
   if (values.searchKeyWord != null && values.searchKeyWord != "") {
-    sql += ` 
+    sql += `
               /*조건1 검색어 */
-              and 
+              and
               (t1.mentoring_title like '%${values.searchKeyWord}%'
-              OR 
+              OR
               t1.mentoring_intro like '%${values.searchKeyWord}%'
-              ) 
+              )
              `;
   }
   /*dept_code 는  코드문자열로 들어온다고 전제함. */
